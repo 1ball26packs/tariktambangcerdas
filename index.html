@@ -170,7 +170,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
   </div>
-  <div class="hint">bayu_adinegaraps • UI Touch</div>
+  <div class="hint">V2 • 2 pemain + penonton • maks 100 soal • realtime Firebase</div>
 </section>
 
 <section id="join" class="screen">
@@ -867,60 +867,74 @@ async function loadLeaderboard(){
   const sortBy = sortSel ? sortSel.value : "wins";
   box.innerHTML='<div class="spinner"></div>';
   try{
-    // ambil 50 teratas biar filter kategori tetap akurat
-    const q=query(ref(db,"leaderboard"),orderByChild("wins"),limitToLast(50));
-    const snap=await get(q);
+    // v2.5.2 FIX: ambil SEMUA, bukan cuma orderBy wins, biar yang 0W tetap nongol
+    const snap=await get(ref(db,"leaderboard"));
     if(!snap.exists()){box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>';return}
     let rows=[];
     snap.forEach(ch=>rows.push({uid:ch.key, ...ch.val()}));
+    
+    console.log("Leaderboard raw:", rows.length, rows);
 
-    // sorting berdasarkan kategori & sort mode
+    // filter: kalau kategori bukan semua, tampilkan yang pernah main di kategori itu (total>0)
+    let filtered = rows;
+    if(category!=="semua"){
+      filtered = rows.filter(r=>{
+        const cat = r.perCategory?.[category];
+        return cat && (cat.total||0)>0;
+      });
+      // kalau gak ada yang pernah main kategori itu, fallback ke semua biar gak kosong
+      if(filtered.length===0){
+        box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}. Coba filter Semua.<br>Data mentah: ${rows.length} pemain</div>`;
+        // tetap tampilkan semua
+        filtered = rows;
+      }
+    }
+
     const getCatWins = (r)=> {
       if(category==="semua") return r.wins||0;
       return r.perCategory?.[category]?.wins||0;
     };
     const getWinrate = (r)=>{
-      const total = r.totalGames||0;
+      const total = category==="semua" ? (r.totalGames||0) : (r.perCategory?.[category]?.total||0);
+      const wins = getCatWins(r);
       if(total===0) return 0;
-      return (r.wins||0)/total;
+      return wins/total;
     };
 
-    rows.sort((a,b)=>{
+    filtered.sort((a,b)=>{
       if(sortBy==="wins"){
         return getCatWins(b) - getCatWins(a);
       } else if(sortBy==="winrate"){
         return getWinrate(b) - getWinrate(a);
       } else if(sortBy==="total"){
-        return (b.totalGames||0) - (a.totalGames||0);
+        const at = category==="semua" ? (a.totalGames||0) : (a.perCategory?.[category]?.total||0);
+        const bt = category==="semua" ? (b.totalGames||0) : (b.perCategory?.[category]?.total||0);
+        return bt - at;
       }
       return 0;
     });
 
-    const top = rows.slice(0,20);
-    if(top.length===0){
-      box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}. Main dulu! 🎮</div>`;
-      return;
-    }
-
+    const top = filtered.slice(0,50);
     box.innerHTML=top.map((r,i)=>{
       const catStat = category==="semua" ? r : (r.perCategory?.[category]||{wins:0,losses:0,draws:0,total:0});
       const w = category==="semua" ? (r.wins||0) : (catStat.wins||0);
       const l = category==="semua" ? (r.losses||0) : (catStat.losses||0);
       const d = category==="semua" ? (r.draws||0) : (catStat.draws||0);
-      const total = r.totalGames||0;
-      const winrate = total>0 ? Math.round(((r.wins||0)/total)*100) : 0;
+      const total = category==="semua" ? (r.totalGames||0) : (catStat.total||0);
+      const winrate = total>0 ? Math.round((w/total)*100) : 0;
       const best = r.bestScore||0;
-      return `<div class="lb-row">
+      const isZero = w===0 && total>0;
+      return `<div class="lb-row" style="${isZero ? 'opacity:0.85' : ''}">
         <span class="lb-rank">#${i+1}</span>
-        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${winrate}% • Best ${best}</span></span>
+        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${winrate}% • Best ${best} • ${total} game</span></span>
         <span class="lb-wins">${w} 🏆</span>
-        <span class="lb-stats" style="text-align:center">${total} game<br>${r.bestStreak||0}🔥</span>
+        <span class="lb-stats" style="text-align:center">${r.totalGames||0} total<br>${r.bestStreak||0}🔥</span>
       </div>`;
-    }).join("");
+    }).join("") + `<div class="status" style="margin-top:10px">Debug: ${rows.length} pemain di DB, ${filtered.length} di kategori ${esc(category)}</div>`;
 
   }catch(e){
     console.error(e);
-    box.innerHTML='<div class="status error">Gagal memuat papan peringkat. Cek Rules .indexOn ["wins"]<br>'+esc(e.message||"")+ '</div>';
+    box.innerHTML='<div class="status error">Gagal memuat papan peringkat.<br>'+esc(e.message||"")+'</div>';
   }
 }
 
