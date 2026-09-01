@@ -14,7 +14,7 @@ button{cursor:pointer}
 .app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;max-width:520px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
 .screen{display:none;background:rgba(255,250,240,.94);min-height:100vh;padding:22px 18px 28px}
 .screen.active{display:flex;flex-direction:column}
-.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:-2px;margin:28px 0 12px;transform:rotate(-2deg)}
+.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:2px;margin:28px 0 12px;transform:rotate(-2deg)}
 .logo span{display:block;color:var(--red)}
 .tag{font-family:'Comic Neue',cursive;text-align:center;font-weight:900;margin:10px 0 28px}
 .card{background:#fff;position:relative;border:4px solid var(--ink);border-radius:22px;padding:18px;box-shadow:7px 7px 0 var(--ink);margin-bottom:18px}
@@ -105,7 +105,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
   </div>
-  <div class="hint">bayu_adinegaraps • with AI touch</div>
+  <div class="hint">bayu_adinegarps • with AI touch</div>
 </section>
 
 <section id="join" class="screen">
@@ -182,8 +182,32 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 
 <section id="leaderboard" class="screen">
   <h2 style="text-align:center">🏆 Papan Peringkat</h2>
-  <div class="card" id="leaderboardList"><div class="spinner"></div></div>
+  <div class="card" style="padding:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <select id="lbCategory">
+        <option value="semua">🎲 Semua Kategori</option>
+        <option value="umum">🧠 Umum</option>
+        <option value="mtk">🔢 MTK</option>
+        <option value="logika">🧩 Logika</option>
+      </select>
+      <select id="lbSort">
+        <option value="wins">🏆 Wins</option>
+        <option value="winrate">📊 Winrate</option>
+        <option value="total">🎮 Total Game</option>
+      </select>
+    </div>
+    <div id="leaderboardList"><div class="spinner"></div></div>
+    <div class="mini" style="margin-top:10px">Menampilkan Top 20 • W-L-D = Menang-Kalah-Seri</div>
+  </div>
   <button class="btn secondary" id="leaderboardBackBtn">← KEMBALI</button>
+  <style>
+    .lb-row{display:grid;grid-template-columns:32px 1fr auto auto;gap:6px;align-items:center;padding:10px 8px;border-bottom:2px dashed #241b17; font-weight:900}
+    .lb-row:last-child{border-bottom:none}
+    .lb-rank{background:var(--yellow);border:2px solid var(--ink);border-radius:8px;text-align:center;padding:2px 0}
+    .lb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lb-stats{font-size:11px;opacity:.8;text-align:right;line-height:1.1}
+    .lb-wins{font-size:18px}
+  </style>
 </section>
 
 </div>
@@ -688,36 +712,149 @@ async function timeOut(round){
 }
 
 async function recordLeaderboard(d){
-  if(!d.winner)return;
   try{
     const flagRef=ref(db,`games/${roomId}/leaderboardRecorded`);
     const res=await runTransaction(flagRef,v=>v?undefined:true);
-    if(!res || !res.committed)return;
-    const winnerData=d[d.winner];
-    if(!winnerData || !winnerData.id)return;
-    const lbRef=ref(db,`leaderboard/${winnerData.id}`);
-    await runTransaction(lbRef,cur=>{
-      cur=cur||{name:winnerData.name,wins:0};
-      cur.name=winnerData.name;
-      cur.wins=(cur.wins||0)+1;
-      return cur;
-    });
-  }catch(e){}
+    if(!res || !res.committed)return; // sudah dicatat
+    const category = d.category || "semua";
+    const p1 = d.player1, p2 = d.player2;
+    if(!p1 || !p2) return;
+
+    const tasks = [];
+
+    const makeUpdate = (uid, name, result, score, bestStreak)=>{
+      if(!uid) return null;
+      const lbRef = ref(db, `leaderboard/${uid}`);
+      return runTransaction(lbRef, cur=>{
+        cur = cur || {name:name, wins:0, losses:0, draws:0, totalGames:0, totalScore:0, bestScore:0, bestStreak:0, perCategory:{}};
+        cur.name = name;
+        cur.totalGames = (cur.totalGames||0)+1;
+        cur.totalScore = (cur.totalScore||0) + (score||0);
+        if((score||0) > (cur.bestScore||0)) cur.bestScore = score||0;
+        if((bestStreak||0) > (cur.bestStreak||0)) cur.bestStreak = bestStreak||0;
+        cur.lastPlayedAt = Date.now();
+
+        if(result==="win") cur.wins = (cur.wins||0)+1;
+        else if(result==="loss") cur.losses = (cur.losses||0)+1;
+        else if(result==="draw") cur.draws = (cur.draws||0)+1;
+
+        cur.perCategory = cur.perCategory || {};
+        cur.perCategory[category] = cur.perCategory[category] || {wins:0, losses:0, draws:0, total:0};
+        cur.perCategory[category].total = (cur.perCategory[category].total||0)+1;
+        if(result==="win") cur.perCategory[category].wins = (cur.perCategory[category].wins||0)+1;
+        else if(result==="loss") cur.perCategory[category].losses = (cur.perCategory[category].losses||0)+1;
+        else cur.perCategory[category].draws = (cur.perCategory[category].draws||0)+1;
+
+        // juga update kategori 'semua' untuk filter mudah
+        if(category!=="semua"){
+          cur.perCategory["semua"] = cur.perCategory["semua"] || {wins:0, losses:0, draws:0, total:0};
+          cur.perCategory["semua"].total = (cur.perCategory["semua"].total||0)+1;
+          if(result==="win") cur.perCategory["semua"].wins = (cur.perCategory["semua"].wins||0)+1;
+          else if(result==="loss") cur.perCategory["semua"].losses = (cur.perCategory["semua"].losses||0)+1;
+          else cur.perCategory["semua"].draws = (cur.perCategory["semua"].draws||0)+1;
+        }
+
+        return cur;
+      });
+    };
+
+    if(d.winner){
+      const winnerSlot = d.winner;
+      const loserSlot = winnerSlot==="player1" ? "player2" : "player1";
+      const winnerData = d[winnerSlot];
+      const loserData = d[loserSlot];
+      const winnerScore = winnerData?.score||0;
+      const loserScore = loserData?.score||0;
+      const winnerStreak = winnerSlot==="player1" ? (d.streakP1||0) : (d.streakP2||0);
+      const loserStreak = loserSlot==="player1" ? (d.streakP1||0) : (d.streakP2||0);
+
+      if(winnerData?.id) tasks.push(makeUpdate(winnerData.id, winnerData.name, "win", winnerScore, winnerStreak));
+      if(loserData?.id) tasks.push(makeUpdate(loserData.id, loserData.name, "loss", loserScore, loserStreak));
+    } else {
+      // seri
+      const s1 = p1?.score||0, s2 = p2?.score||0;
+      const st1 = d.streakP1||0, st2 = d.streakP2||0;
+      if(p1?.id) tasks.push(makeUpdate(p1.id, p1.name, "draw", s1, st1));
+      if(p2?.id) tasks.push(makeUpdate(p2.id, p2.name, "draw", s2, st2));
+    }
+
+    await Promise.all(tasks);
+  }catch(e){ console.error("leaderboard error", e); }
 }
 
 async function loadLeaderboard(){
   const box=$("leaderboardList");
+  const catSel = $("lbCategory");
+  const sortSel = $("lbSort");
+  const category = catSel ? catSel.value : "semua";
+  const sortBy = sortSel ? sortSel.value : "wins";
   box.innerHTML='<div class="spinner"></div>';
   try{
-    const q=query(ref(db,"leaderboard"),orderByChild("wins"),limitToLast(10)); // v2.1: pastikan di Firebase Rules ada ".indexOn": ["wins"] untuk /leaderboard
+    // ambil 50 teratas biar filter kategori tetap akurat
+    const q=query(ref(db,"leaderboard"),orderByChild("wins"),limitToLast(50));
     const snap=await get(q);
     if(!snap.exists()){box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>';return}
-    const rows=[];
-    snap.forEach(ch=>rows.push(ch.val()));
-    rows.sort((a,b)=>(b.wins||0)-(a.wins||0));
-    box.innerHTML=rows.map((r,i)=>`<div class="lb-row"><span class="lb-rank">#${i+1}</span><span class="lb-name">${esc(r.name||"Pemain")}</span><span>${r.wins||0} 🏆</span></div>`).join("");
-  }catch(e){box.innerHTML='<div class="status error">Gagal memuat papan peringkat.</div>'}
+    let rows=[];
+    snap.forEach(ch=>rows.push({uid:ch.key, ...ch.val()}));
+
+    // sorting berdasarkan kategori & sort mode
+    const getCatWins = (r)=> {
+      if(category==="semua") return r.wins||0;
+      return r.perCategory?.[category]?.wins||0;
+    };
+    const getWinrate = (r)=>{
+      const total = r.totalGames||0;
+      if(total===0) return 0;
+      return (r.wins||0)/total;
+    };
+
+    rows.sort((a,b)=>{
+      if(sortBy==="wins"){
+        return getCatWins(b) - getCatWins(a);
+      } else if(sortBy==="winrate"){
+        return getWinrate(b) - getWinrate(a);
+      } else if(sortBy==="total"){
+        return (b.totalGames||0) - (a.totalGames||0);
+      }
+      return 0;
+    });
+
+    const top = rows.slice(0,20);
+    if(top.length===0){
+      box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}. Main dulu! 🎮</div>`;
+      return;
+    }
+
+    box.innerHTML=top.map((r,i)=>{
+      const catStat = category==="semua" ? r : (r.perCategory?.[category]||{wins:0,losses:0,draws:0,total:0});
+      const w = category==="semua" ? (r.wins||0) : (catStat.wins||0);
+      const l = category==="semua" ? (r.losses||0) : (catStat.losses||0);
+      const d = category==="semua" ? (r.draws||0) : (catStat.draws||0);
+      const total = r.totalGames||0;
+      const winrate = total>0 ? Math.round(((r.wins||0)/total)*100) : 0;
+      const best = r.bestScore||0;
+      return `<div class="lb-row">
+        <span class="lb-rank">#${i+1}</span>
+        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${winrate}% • Best ${best}</span></span>
+        <span class="lb-wins">${w} 🏆</span>
+        <span class="lb-stats" style="text-align:center">${total} game<br>${r.bestStreak||0}🔥</span>
+      </div>`;
+    }).join("");
+
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<div class="status error">Gagal memuat papan peringkat. Cek Rules .indexOn ["wins"]<br>'+esc(e.message||"")+ '</div>';
+  }
 }
+
+// auto reload saat ganti filter
+document.addEventListener("DOMContentLoaded", ()=>{
+  const c = document.getElementById("lbCategory");
+  const s = document.getElementById("lbSort");
+  if(c) c.addEventListener("change", loadLeaderboard);
+  if(s) s.addEventListener("change", loadLeaderboard);
+});
+
 
 function renderResult(d){
   clearInterval(timerInterval);
