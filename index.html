@@ -4,7 +4,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN KITA!</h2>
+      <h2>ATURAN MAIN BOSS!</h2>
     </div>
     <div class="modal-body">
       <div class="rule-grid">
@@ -170,7 +170,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="historyBtn">📜 RIWAYAT MATCH</button>
   </div>
-  <div class="hint">V2 • 2 pemain + penonton • maks 100 soal • realtime Firebase</div>
+  <div class="hint">• bayu_adinegaraps • 1ball26packs •</div>
 </section>
 
 <section id="join" class="screen">
@@ -267,7 +267,15 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     .history-stat{background:var(--yellow);border:3px solid var(--ink);border-radius:10px;padding:8px;text-align:center}
     .history-stat b{display:block;font-size:22px;line-height:1}.history-stat span{font-size:10px;font-weight:900}
     .history-filter{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
-    .history-card{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px;margin:10px 0;box-shadow:3px 3px 0 var(--ink)}
+    .history-card{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px;margin:10px 0;box-shadow:3px 3px 0 var(--ink);overflow:hidden}
+    .history-card.is-open{box-shadow:4px 4px 0 var(--ink)}
+    .history-summary{cursor:pointer;position:relative}
+    .history-summary:active{transform:scale(.995)}
+    .history-toggle{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;padding:6px;border-top:2px dashed var(--ink);font-size:10px;font-weight:900;user-select:none}
+    .history-details{display:none}
+    .history-card.is-open .history-details{display:block}
+    .history-card.is-open .history-toggle .toggle-open{display:none}
+    .history-card:not(.is-open) .history-toggle .toggle-close{display:none}
     .match-head{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:900;opacity:.72;margin-bottom:8px}
     .match-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;text-align:center}
     .team{padding:8px 4px;border:2px solid var(--ink);border-radius:10px;font-weight:900}.team.win{background:#91e6ac}.team.lose{background:#ff9a9a}.team.draw{background:#ffe08a}
@@ -875,6 +883,7 @@ function renderHistoryCard(g){
   const result=winner?(winner==="player1"?`${esc(p1.name||"Player 1")} MENANG`:`${esc(p2.name||"Player 2")} MENANG`):"PERTANDINGAN SERI";
   const timeline=ev.slice(-12).map(e=>{const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?`-5 / -${e.penalty||0}s`:"Waktu habis";return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} <span style="font-weight:600">${esc(e.question||"")}</span></span><span class="event-note">${note}</span></div>`;}).join("");
   return `<article class="history-card">
+    <div class="history-summary" onclick="toggleHistoryCard(this.parentElement)">
     <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())} • ${esc(g.id||"")}</span><span>${esc(date)}</span></div>
     <div class="match-score">
       <div class="team ${cls1}"><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
@@ -886,9 +895,21 @@ function renderHistoryCard(g){
       <div class="detail-box"><h4>🔵 ${esc(p1.name||"PLAYER 1")}</h4><div class="detail-line"><span>Benar</span><b>${s1.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s1.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s1.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s1.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s1.maxStreak} 🔥</b></div></div>
       <div class="detail-box"><h4>🔴 ${esc(p2.name||"PLAYER 2")}</h4><div class="detail-line"><span>Benar</span><b>${s2.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s2.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s2.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s2.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s2.maxStreak} 🔥</b></div></div>
     </div>
+    <div class="history-toggle"><span class="toggle-open">▼ LIHAT DETAIL STATISTIK</span><span class="toggle-close">▲ SEMBUNYIKAN DETAIL</span></div>
+    </div>
+    <div class="history-details">
     ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b>${timeline}</div>`:""}
     <div class="match-footer">ID MATCH: ${esc(g.id||"")} • ${s1.attempts+s2.attempts} percobaan tercatat</div>
+    </div>
   </article>`;
+}
+
+
+function toggleHistoryCard(card){
+  if(!card)return;
+  const willOpen=!card.classList.contains("is-open");
+  document.querySelectorAll(".history-card.is-open").forEach(c=>c.classList.remove("is-open"));
+  if(willOpen)card.classList.add("is-open");
 }
 
 // auto reload saat ganti filter
