@@ -4,7 +4,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN!</h2>
+      <h2>ATURAN MAIN KITA!</h2>
     </div>
     <div class="modal-body">
       <div class="rule-grid">
@@ -170,7 +170,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="historyBtn">📜 RIWAYAT MATCH</button>
   </div>
-  <div class="hint">• 1ball26packs@2026 •</div>
+  <div class="hint">1ball26packs@2026</div>
 </section>
 
 <section id="join" class="screen">
@@ -248,7 +248,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <section id="history" class="screen">
   <h2 style="text-align:center">📜 Riwayat Pertandingan</h2>
   <div class="card" style="padding:12px">
-    <div id="gameStats" class="history-summary"></div>
+    <div id="gameStats" class="history-stats"></div>
     <div class="history-filter">
       <select id="historyFilter">
         <option value="semua">🎲 Semua Kategori</option>
@@ -263,7 +263,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   </div>
   <button class="btn secondary" id="historyHomeBtn" style="margin-top:8px">🏠 Home</button>
   <style>
-    .history-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+    .history-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
     .history-stat{background:var(--yellow);border:3px solid var(--ink);border-radius:10px;padding:8px;text-align:center}
     .history-stat b{display:block;font-size:22px;line-height:1}.history-stat span{font-size:10px;font-weight:900}
     .history-filter{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
@@ -272,8 +272,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     .history-summary{cursor:pointer;position:relative}
     .history-summary:active{transform:scale(.995)}
     .history-toggle{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;padding:6px;border-top:2px dashed var(--ink);font-size:10px;font-weight:900;user-select:none}
-    .history-details{display:none}
-    .history-card.is-open .history-details{display:block}
+    .history-details{display:block;max-height:0;opacity:0;overflow:hidden;margin-top:0;transition:max-height .35s ease,opacity .2s ease,margin-top .35s ease}
+    .history-card.is-open .history-details{max-height:5000px;opacity:1;margin-top:10px}
     .history-card.is-open .history-toggle .toggle-open{display:none}
     .history-card:not(.is-open) .history-toggle .toggle-close{display:none}
     .match-head{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:900;opacity:.72;margin-bottom:8px}
@@ -285,7 +285,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.detail-box{border:2px dashed var(--ink);border-radius:9px;padding:7px;font-size:10px}.detail-box h4{margin:0 0 5px;font-size:11px}.detail-line{display:flex;justify-content:space-between;gap:5px;margin:2px 0}.detail-line b{font-weight:900}
     .timeline{margin-top:9px;border-top:2px dashed var(--ink);padding-top:7px}.event{display:grid;grid-template-columns:34px 1fr auto;gap:5px;align-items:center;font-size:9px;padding:3px 0}.event-icon{font-size:14px;text-align:center}.event-name{font-weight:900}.event-note{opacity:.7;text-align:right}
     .match-footer{margin-top:8px;text-align:center;font-size:9px;font-weight:900;opacity:.65}
-    @media(min-width:600px){.history-summary{grid-template-columns:repeat(4,1fr)}}
+    @media(min-width:600px){.history-stats{grid-template-columns:repeat(4,1fr)}}
   </style>
 </section>
 
@@ -293,18 +293,6 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 
 </div>
 
-<style>
-.stat-card{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px;text-align:center}
-.stat-card b{font-size:22px;display:block}
-.stat-card span{font-size:11px;opacity:.8}
-.history-row{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px;margin:8px 0;display:grid;gap:6px}
-.history-top{display:flex;justify-content:space-between;font-weight:800;font-size:11px;opacity:.7}
-.history-players{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.history-p{flex:1;text-align:center;padding:8px;border:2px solid var(--ink);border-radius:10px;font-weight:900;font-size:12px}
-.history-p.winner{background:#91e6ac}
-.history-p.loser{background:#ff9a9a}
-.history-meta{font-size:10px;opacity:.7;text-align:center}
-</style>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
@@ -874,36 +862,77 @@ async function loadHistory(){
 }
 
 function renderHistoryCard(g){
-  const p1=g.player1||{},p2=g.player2||{}, winner=g.winner||null;
+  const p1=g.player1||{},p2=g.player2||{},winner=g.winner||null;
   const ev=Array.isArray(g.matchEvents)?g.matchEvents:[];
-  const statFor=slot=>{const es=ev.filter(e=>e.slot===slot), c=es.filter(e=>e.type==="correct").length,w=es.filter(e=>e.type==="wrong").length,t=c+w;return {correct:c,wrong:w,attempts:t,accuracy:t?Math.round(c/t*100):0,penalty:Number(g.playerPenalty?.[slot]||0),maxStreak:Number(g.maxStreak?.[slot]||0),timeouts:es.filter(e=>e.type==="timeout").length};};
+  const statFor=slot=>{
+    const es=ev.filter(e=>e.slot===slot);
+    const c=es.filter(e=>e.type==="correct").length;
+    const w=es.filter(e=>e.type==="wrong").length;
+    const t=c+w;
+    return {
+      correct:c, wrong:w, attempts:t,
+      accuracy:t?Math.round(c/t*100):0,
+      penalty:Number(g.playerPenalty?.[slot]||0),
+      maxStreak:Number(g.maxStreak?.[slot]||0),
+      timeouts:es.filter(e=>e.type==="timeout").length
+    };
+  };
   const s1=statFor("player1"),s2=statFor("player2");
-  const cls1=winner==="player1"?"win":winner==="player2"?"lose":"draw", cls2=winner==="player2"?"win":winner==="player1"?"lose":"draw";
+  const cls1=winner==="player1"?"win":winner==="player2"?"lose":"draw";
+  const cls2=winner==="player2"?"win":winner==="player1"?"lose":"draw";
   const date=g.startedAt?new Date(Number(g.startedAt)).toLocaleString("id-ID"):"-";
-  const result=winner?(winner==="player1"?`${esc(p1.name||"Player 1")} MENANG`:`${esc(p2.name||"Player 2")} MENANG`):"PERTANDINGAN SERI";
-  const timeline=ev.slice(-12).map(e=>{const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?`-5 / -${e.penalty||0}s`:"Waktu habis";return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} <span style="font-weight:600">${esc(e.question||"")}</span></span><span class="event-note">${note}</span></div>`;}).join("");
+  const result=winner
+    ? `${esc(winner==="player1"?(p1.name||"Player 1"):(p2.name||"Player 2"))} MENANG`
+    : "PERTANDINGAN SERI";
+  const timeline=ev.slice().sort((a,b)=>Number(a.at||0)-Number(b.at||0)).map(e=>{
+    const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));
+    const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";
+    const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?`-5 / -${e.penalty||0}s`:"Waktu habis";
+    const q=e.question?`<span class="event-question">${esc(e.question)}</span>`:"";
+    return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} ${q}</span><span class="event-note">${note}</span></div>`;
+  }).join("");
+
   return `<article class="history-card">
-    <div class="history-summary" onclick="toggleHistoryCard(this.parentElement)">
-    <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())} • ${esc(g.id||"")}</span><span>${esc(date)}</span></div>
-    <div class="match-score">
-      <div class="team ${cls1}"><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
-      <div class="vs">VS</div>
-      <div class="team ${cls2}"><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
+    <div class="history-summary" role="button" tabindex="0">
+      <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())}</span><span>${esc(date)}</span></div>
+      <div class="match-score">
+        <div class="team ${cls1}"><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
+        <div class="vs">VS</div>
+        <div class="team ${cls2}"><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
+      </div>
+      <div class="match-meta">
+        <span class="pill">🏆 ${result}</span>
+        <span class="pill">🔢 ${Number(g.round||0)} ronde</span>
+        <span class="pill">🪢 ${Number(g.ropePosition||0)}%</span>
+        <span class="pill">⏱️ ${Number(g.durationSeconds||0)} detik</span>
+      </div>
+      <div class="history-toggle"><span class="toggle-open">▼ LIHAT DETAIL STATISTIK</span><span class="toggle-close">▲ SEMBUNYIKAN DETAIL</span></div>
     </div>
-    <div class="match-meta"><span class="pill">🏆 ${result}</span><span class="pill">🔢 ${Number(g.round||0)} ronde</span><span class="pill">🪢 ${Number(g.ropePosition||0)}%</span><span class="pill">⏱️ ${Number(g.durationSeconds||0)} detik</span></div>
-    <div class="detail-grid">
-      <div class="detail-box"><h4>🔵 ${esc(p1.name||"PLAYER 1")}</h4><div class="detail-line"><span>Benar</span><b>${s1.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s1.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s1.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s1.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s1.maxStreak} 🔥</b></div></div>
-      <div class="detail-box"><h4>🔴 ${esc(p2.name||"PLAYER 2")}</h4><div class="detail-line"><span>Benar</span><b>${s2.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s2.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s2.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s2.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s2.maxStreak} 🔥</b></div></div>
-    </div>
-    <div class="history-toggle"><span class="toggle-open">▼ LIHAT DETAIL STATISTIK</span><span class="toggle-close">▲ SEMBUNYIKAN DETAIL</span></div>
-    </div>
+
     <div class="history-details">
-    ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b>${timeline}</div>`:""}
-    <div class="match-footer">ID MATCH: ${esc(g.id||"")} • ${s1.attempts+s2.attempts} percobaan tercatat</div>
+      <div class="detail-grid">
+        <div class="detail-box"><h4>🔵 ${esc(p1.name||"PLAYER 1")}</h4>
+          <div class="detail-line"><span>Benar</span><b>${s1.correct}</b></div>
+          <div class="detail-line"><span>Salah</span><b>${s1.wrong}</b></div>
+          <div class="detail-line"><span>Akurasi</span><b>${s1.accuracy}%</b></div>
+          <div class="detail-line"><span>Penalti</span><b>${s1.penalty}s</b></div>
+          <div class="detail-line"><span>Timeout</span><b>${s1.timeouts}</b></div>
+          <div class="detail-line"><span>Max streak</span><b>${s1.maxStreak} 🔥</b></div>
+        </div>
+        <div class="detail-box"><h4>🔴 ${esc(p2.name||"PLAYER 2")}</h4>
+          <div class="detail-line"><span>Benar</span><b>${s2.correct}</b></div>
+          <div class="detail-line"><span>Salah</span><b>${s2.wrong}</b></div>
+          <div class="detail-line"><span>Akurasi</span><b>${s2.accuracy}%</b></div>
+          <div class="detail-line"><span>Penalti</span><b>${s2.penalty}s</b></div>
+          <div class="detail-line"><span>Timeout</span><b>${s2.timeouts}</b></div>
+          <div class="detail-line"><span>Max streak</span><b>${s2.maxStreak} 🔥</b></div>
+        </div>
+      </div>
+      ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN (${ev.length})</b>${timeline}</div>`:`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b><div class="mini">Tidak ada event yang tercatat.</div></div>`}
+      <div class="match-footer">ID MATCH: ${esc(g.matchId||g.id||"-")} • ${s1.attempts+s2.attempts} percobaan • ${s1.timeouts+s2.timeouts} timeout</div>
     </div>
   </article>`;
 }
-
 
 function toggleHistoryCard(card){
   if(!card)return;
@@ -911,6 +940,21 @@ function toggleHistoryCard(card){
   document.querySelectorAll(".history-card.is-open").forEach(c=>c.classList.remove("is-open"));
   if(willOpen)card.classList.add("is-open");
 }
+
+// Expand/collapse riwayat — event delegation agar tetap bekerja
+// meskipun kartu dibuat ulang oleh loadHistory().
+document.addEventListener("click", function(e){
+  const summary=e.target.closest(".history-summary");
+  if(!summary)return;
+  toggleHistoryCard(summary.closest(".history-card"));
+});
+document.addEventListener("keydown", function(e){
+  if(e.key!=="Enter" && e.key!==" ")return;
+  const summary=e.target.closest(".history-summary");
+  if(!summary)return;
+  e.preventDefault();
+  toggleHistoryCard(summary.closest(".history-card"));
+});
 
 // auto reload saat ganti filter
 document.addEventListener("DOMContentLoaded", ()=>{
