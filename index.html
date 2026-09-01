@@ -4,7 +4,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN NIH!</h2>
+      <h2>ATURAN MAIN!</h2>
     </div>
     <div class="modal-body">
       <div class="rule-grid">
@@ -824,150 +824,131 @@ async function timeOut(round){
 
 async function recordLeaderboard(d){
   try{
-    const flagRef=ref(db,`games/${roomId}/leaderboardRecorded`);
-    const res=await runTransaction(flagRef,v=>v?undefined:true);
-    if(!res || !res.committed)return; // sudah dicatat
     const category = d.category || "semua";
     const p1 = d.player1, p2 = d.player2;
-    if(!p1 || !p2) return;
+    if(!p1?.id || !p2?.id) throw new Error("Data kedua pemain tidak lengkap.");
 
-    const tasks = [];
+    // Gunakan transaction sebagai lock, tetapi JANGAN mengunci sebelum seluruh
+    // statistik berhasil ditulis. Status pending/complete membantu retry aman.
+    const stateRef = ref(db, `games/${roomId}/leaderboardState`);
+    const claim = await runTransaction(stateRef, cur=>{
+      if(cur?.status === "complete") return;
+      if(cur?.status === "processing" && cur.uid !== uid) return;
+      return {status:"processing", uid, startedAt:Date.now()};
+    });
+    if(!claim?.committed) return;
 
-    const makeUpdate = (uid, name, result, score, bestStreak)=>{
-      if(!uid) return null;
-      const lbRef = ref(db, `leaderboard/${uid}`);
-      return runTransaction(lbRef, cur=>{
+    const makeUpdate = async (playerUid, name, result, score, bestStreak)=>{
+      // Idempotensi per pemain per pertandingan: retry tidak menggandakan statistik.
+      const appliedRef = ref(db, `games/${roomId}/leaderboardApplied/${playerUid}`);
+      const mark = await runTransaction(appliedRef, cur=>{
+        if(cur?.status === "complete" || cur?.status === "processing") return;
+        return {status:"processing", startedAt:Date.now(), by:uid};
+      });
+      if(!mark?.committed) return {skipped:true, committed:true};
+      const lbRef = ref(db, `leaderboard/${playerUid}`);
+      try {
+        const result = await runTransaction(lbRef, cur=>{
         cur = cur || {name:name, wins:0, losses:0, draws:0, totalGames:0, totalScore:0, bestScore:0, bestStreak:0, perCategory:{}};
-        cur.name = name;
-        cur.totalGames = (cur.totalGames||0)+1;
-        cur.totalScore = (cur.totalScore||0) + (score||0);
-        if((score||0) > (cur.bestScore||0)) cur.bestScore = score||0;
-        if((bestStreak||0) > (cur.bestStreak||0)) cur.bestStreak = bestStreak||0;
+        cur.name = name || cur.name || "Pemain";
+        cur.totalGames = Number(cur.totalGames||0)+1;
+        cur.totalScore = Number(cur.totalScore||0)+Number(score||0);
+        cur.bestScore = Math.max(Number(cur.bestScore||0), Number(score||0));
+        cur.bestStreak = Math.max(Number(cur.bestStreak||0), Number(bestStreak||0));
         cur.lastPlayedAt = Date.now();
-
-        if(result==="win") cur.wins = (cur.wins||0)+1;
-        else if(result==="loss") cur.losses = (cur.losses||0)+1;
-        else if(result==="draw") cur.draws = (cur.draws||0)+1;
+        if(result==="win") cur.wins=Number(cur.wins||0)+1;
+        else if(result==="loss") cur.losses=Number(cur.losses||0)+1;
+        else cur.draws=Number(cur.draws||0)+1;
 
         cur.perCategory = cur.perCategory || {};
-        cur.perCategory[category] = cur.perCategory[category] || {wins:0, losses:0, draws:0, total:0};
-        cur.perCategory[category].total = (cur.perCategory[category].total||0)+1;
-        if(result==="win") cur.perCategory[category].wins = (cur.perCategory[category].wins||0)+1;
-        else if(result==="loss") cur.perCategory[category].losses = (cur.perCategory[category].losses||0)+1;
-        else cur.perCategory[category].draws = (cur.perCategory[category].draws||0)+1;
-
-        // juga update kategori 'semua' untuk filter mudah
-        if(category!=="semua"){
-          cur.perCategory["semua"] = cur.perCategory["semua"] || {wins:0, losses:0, draws:0, total:0};
-          cur.perCategory["semua"].total = (cur.perCategory["semua"].total||0)+1;
-          if(result==="win") cur.perCategory["semua"].wins = (cur.perCategory["semua"].wins||0)+1;
-          else if(result==="loss") cur.perCategory["semua"].losses = (cur.perCategory["semua"].losses||0)+1;
-          else cur.perCategory["semua"].draws = (cur.perCategory["semua"].draws||0)+1;
-        }
-
-        return cur;
-      });
+        const cats = [category];
+        if(category !== "semua") cats.push("semua");
+        cats.forEach(cat=>{
+          const c = cur.perCategory[cat] || {wins:0,losses:0,draws:0,total:0};
+          c.total=Number(c.total||0)+1;
+          if(result==="win") c.wins=Number(c.wins||0)+1;
+          else if(result==="loss") c.losses=Number(c.losses||0)+1;
+          else c.draws=Number(c.draws||0)+1;
+          cur.perCategory[cat]=c;
+        });
+          return cur;
+        });
+        if(!result?.committed) throw new Error("Transaksi statistik pemain gagal.");
+        await set(appliedRef,{status:"complete",completedAt:Date.now()});
+        return result;
+      } catch(err) {
+        await set(appliedRef,{status:"failed",error:String(err?.message||err),failedAt:Date.now()}).catch(()=>{});
+        throw err;
+      }
     };
 
+    const tasks=[];
     if(d.winner){
-      const winnerSlot = d.winner;
-      const loserSlot = winnerSlot==="player1" ? "player2" : "player1";
-      const winnerData = d[winnerSlot];
-      const loserData = d[loserSlot];
-      const winnerScore = winnerData?.score||0;
-      const loserScore = loserData?.score||0;
-      const winnerStreak = winnerSlot==="player1" ? (d.streakP1||0) : (d.streakP2||0);
-      const loserStreak = loserSlot==="player1" ? (d.streakP1||0) : (d.streakP2||0);
-
-      if(winnerData?.id) tasks.push(makeUpdate(winnerData.id, winnerData.name, "win", winnerScore, winnerStreak));
-      if(loserData?.id) tasks.push(makeUpdate(loserData.id, loserData.name, "loss", loserScore, loserStreak));
-    } else {
-      // seri
-      const s1 = p1?.score||0, s2 = p2?.score||0;
-      const st1 = d.streakP1||0, st2 = d.streakP2||0;
-      if(p1?.id) tasks.push(makeUpdate(p1.id, p1.name, "draw", s1, st1));
-      if(p2?.id) tasks.push(makeUpdate(p2.id, p2.name, "draw", s2, st2));
+      const ws=d.winner, ls=ws==="player1"?"player2":"player1";
+      const wp=d[ws], lp=d[ls];
+      tasks.push(makeUpdate(wp.id,wp.name,"win",wp.score||0,ws==="player1"?d.streakP1||0:d.streakP2||0));
+      tasks.push(makeUpdate(lp.id,lp.name,"loss",lp.score||0,ls==="player1"?d.streakP1||0:d.streakP2||0));
+    }else{
+      tasks.push(makeUpdate(p1.id,p1.name,"draw",p1.score||0,d.streakP1||0));
+      tasks.push(makeUpdate(p2.id,p2.name,"draw",p2.score||0,d.streakP2||0));
     }
 
-    await Promise.all(tasks);
-  }catch(e){ console.error("leaderboard error", e); }
+    const results = await Promise.all(tasks);
+    if(results.some(r=>!r?.committed)) throw new Error("Transaksi leaderboard tidak berhasil.");
+
+    await set(stateRef,{status:"complete",uid,completedAt:Date.now()});
+    // kompatibilitas dengan data/versi lama
+    await set(ref(db,`games/${roomId}/leaderboardRecorded`),true);
+    console.log("Leaderboard berhasil dicatat", roomId);
+  }catch(e){
+    console.error("leaderboard error", e);
+    // Kembalikan lock agar pemain lain dapat retry.
+    try{ await set(ref(db,`games/${roomId}/leaderboardState`),{status:"failed",uid,error:String(e?.message||e),failedAt:Date.now()}); }catch(_){ }
+  }
 }
 
 async function loadLeaderboard(){
   const box=$("leaderboardList");
-  const catSel = $("lbCategory");
-  const sortSel = $("lbSort");
-  const category = catSel ? catSel.value : "semua";
-  const sortBy = sortSel ? sortSel.value : "wins";
+  if(!box) return;
+  const category=$("lbCategory")?.value || "semua";
+  const sortBy=$("lbSort")?.value || "wins";
   box.innerHTML='<div class="spinner"></div>';
   try{
-    // v2.5.2 FIX: ambil SEMUA, bukan cuma orderBy wins, biar yang 0W tetap nongol
     const snap=await get(ref(db,"leaderboard"));
-    if(!snap.exists()){box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>';return}
-    let rows=[];
-    snap.forEach(ch=>rows.push({uid:ch.key, ...ch.val()}));
-    
-    console.log("Leaderboard raw:", rows.length, rows);
-
-    // filter: kalau kategori bukan semua, tampilkan yang pernah main di kategori itu (total>0)
-    let filtered = rows;
-    if(category!=="semua"){
-      filtered = rows.filter(r=>{
-        const cat = r.perCategory?.[category];
-        return cat && (cat.total||0)>0;
-      });
-      // kalau gak ada yang pernah main kategori itu, fallback ke semua biar gak kosong
-      if(filtered.length===0){
-        box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}. Coba filter Semua.<br>Data mentah: ${rows.length} pemain</div>`;
-        // tetap tampilkan semua
-        filtered = rows;
-      }
+    if(!snap.exists()){
+      box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>'; return;
     }
+    const rows=[];
+    snap.forEach(ch=>rows.push({uid:ch.key,...ch.val()}));
+    let filtered=rows.filter(r=>category==="semua" || Number(r.perCategory?.[category]?.total||0)>0);
 
-    const getCatWins = (r)=> {
-      if(category==="semua") return r.wins||0;
-      return r.perCategory?.[category]?.wins||0;
-    };
-    const getWinrate = (r)=>{
-      const total = category==="semua" ? (r.totalGames||0) : (r.perCategory?.[category]?.total||0);
-      const wins = getCatWins(r);
-      if(total===0) return 0;
-      return wins/total;
-    };
+    const stat=r=>category==="semua" ? r : (r.perCategory?.[category]||{});
+    const wins=r=>Number(stat(r).wins||0);
+    const total=r=>Number(category==="semua" ? r.totalGames||0 : stat(r).total||0);
+    const rate=r=>total(r)>0 ? wins(r)/total(r) : 0;
 
     filtered.sort((a,b)=>{
-      if(sortBy==="wins"){
-        return getCatWins(b) - getCatWins(a);
-      } else if(sortBy==="winrate"){
-        return getWinrate(b) - getWinrate(a);
-      } else if(sortBy==="total"){
-        const at = category==="semua" ? (a.totalGames||0) : (a.perCategory?.[category]?.total||0);
-        const bt = category==="semua" ? (b.totalGames||0) : (b.perCategory?.[category]?.total||0);
-        return bt - at;
-      }
-      return 0;
+      if(sortBy==="winrate") return rate(b)-rate(a) || wins(b)-wins(a) || total(b)-total(a);
+      if(sortBy==="total") return total(b)-total(a) || wins(b)-wins(a);
+      return wins(b)-wins(a) || rate(b)-rate(a) || total(b)-total(a);
     });
 
-    const top = filtered.slice(0,50);
+    const top=filtered.slice(0,50);
+    if(!top.length){
+      box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}.</div>`; return;
+    }
     box.innerHTML=top.map((r,i)=>{
-      const catStat = category==="semua" ? r : (r.perCategory?.[category]||{wins:0,losses:0,draws:0,total:0});
-      const w = category==="semua" ? (r.wins||0) : (catStat.wins||0);
-      const l = category==="semua" ? (r.losses||0) : (catStat.losses||0);
-      const d = category==="semua" ? (r.draws||0) : (catStat.draws||0);
-      const total = category==="semua" ? (r.totalGames||0) : (catStat.total||0);
-      const winrate = total>0 ? Math.round((w/total)*100) : 0;
-      const best = r.bestScore||0;
-      const isZero = w===0 && total>0;
-      return `<div class="lb-row" style="${isZero ? 'opacity:0.85' : ''}">
+      const st=stat(r), w=Number(st.wins||0), l=Number(st.losses||0), d=Number(st.draws||0), t=total(r);
+      const wr=t?Math.round(w/t*100):0;
+      return `<div class="lb-row">
         <span class="lb-rank">#${i+1}</span>
-        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${winrate}% • Best ${best} • ${total} game</span></span>
+        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${wr}% • Best ${Number(r.bestScore||0)} • ${t} game</span></span>
         <span class="lb-wins">${w} 🏆</span>
-        <span class="lb-stats" style="text-align:center">${r.totalGames||0} total<br>${r.bestStreak||0}🔥</span>
+        <span class="lb-stats" style="text-align:center">${Number(r.totalGames||0)} total<br>${Number(r.bestStreak||0)}🔥</span>
       </div>`;
-    }).join("") + `<div class="status" style="margin-top:10px">Debug: ${rows.length} pemain di DB, ${filtered.length} di kategori ${esc(category)}</div>`;
-
+    }).join("");
   }catch(e){
-    console.error(e);
+    console.error("load leaderboard error",e);
     box.innerHTML='<div class="status error">Gagal memuat papan peringkat.<br>'+esc(e.message||"")+'</div>';
   }
 }
