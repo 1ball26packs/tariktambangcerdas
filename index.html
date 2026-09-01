@@ -14,7 +14,7 @@ button{cursor:pointer}
 .app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;max-width:520px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
 .screen{display:none;background:rgba(255,250,240,.94);min-height:100vh;padding:22px 18px 28px}
 .screen.active{display:flex;flex-direction:column}
-.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:2px;margin:28px 0 12px;transform:rotate(-2deg)}
+.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:5px;margin:28px 0 12px;transform:rotate(-2deg)}
 .logo span{display:block;color:var(--red)}
 .tag{font-family:'Comic Neue',cursive;text-align:center;font-weight:900;margin:10px 0 28px}
 .card{background:#fff;position:relative;border:4px solid var(--ink);border-radius:22px;padding:18px;box-shadow:7px 7px 0 var(--ink);margin-bottom:18px}
@@ -105,7 +105,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
   </div>
-  <div class="hint">bayu_adinegarps • with AI touch</div>
+  <div class="hint">bayu_adinegarps • with AI touch<br>BENAR = +10point +10%tarik +1Streak • SALAH = -5point -5detik -5%tarik Streakreset0 </div>
 </section>
 
 <section id="join" class="screen">
@@ -239,7 +239,9 @@ const COMBO_STREAK = 3;           // 3x benar berturut = combo
 const COMBO_MULTIPLIER = 2;       // tarikan combo 2x lipat
 const SUDDEN_DEATH_TIMEOUTS = 2;  // 2x timeout berturut = nudge
 const SUDDEN_DEATH_NUDGE = 5;     // besar nudge ke tengah
-const penaltySeconds = 3;
+const penaltySeconds = 5; // v2.4: -5s
+const POINT_CORRECT = 10;
+const POINT_WRONG = -5; // v2.4: +10 benar / -5 salah per percobaan
 
 // --- state lokal ---
 let uid = null, roomId = null, mySlot = null, roomUnsub = null;
@@ -619,13 +621,23 @@ async function answer(choice,q,btn){
   const correct=choice===q.c;
   btn.classList.add(correct?"correct":"wrong");
   const streakKey=mySlot==="player1"?"streakP1":"streakP2";
-  if(!correct){
-    $("gameMessage").textContent=`💥 SALAH! -${penaltySeconds} DETIK! COBA LAGI!`;
-    sfxWrong(); buzz([40,40,40]);
+    if(!correct){
+    $("gameMessage").textContent=`💥 SALAH! -5 POIN & -${penaltySeconds} DETIK!`;
+    sfxWrong(); buzz([80,40,80,40]);
+    // v2.4: sistem poin +10 benar / -5 salah (berlaku per percobaan)
+    runTransaction(ref(db,`games/${roomId}/${mySlot}/score`), cur=>{
+      return (Number(cur||0) - 5);
+    }).catch(()=>{});
     runTransaction(ref(db,`games/${roomId}/${streakKey}`),()=>0).catch(()=>{});
     runTransaction(ref(db,`games/${roomId}/playerPenalty/${mySlot}`),v=>Number(v||0)+penaltySeconds).catch(()=>{});
+    // tali ketarik lawan 5%
+    runTransaction(ref(db,`games/${roomId}/ropePosition`), pos=>{
+      const p = Number(pos||0);
+      const delta = mySlot==="player1" ? 5 : -5;
+      return Math.max(-100, Math.min(100, p + delta));
+    }).catch(()=>{});
     roundDeadline=Math.max(Date.now()+1000,roundDeadline-penaltySeconds*1000);
-    setTimeout(()=>{btn.classList.remove("wrong");$("gameMessage").textContent=""},700);
+    setTimeout(()=>{btn.classList.remove("wrong");$("gameMessage").textContent=""},900);
     return;
   }
   answered=true;setButtons(true);
@@ -636,7 +648,7 @@ async function answer(choice,q,btn){
       const order=d.questionOrder||[];
       const orderLen=order.length||questions.length;
       const my=d[mySlot]||{};
-      my.score=(my.score||0)+1;
+      my.score=(my.score||0)+10; // v2.4: +10 point
       d[mySlot]=my;
       const streak=(d[streakKey]||0)+1;
       d[streakKey]=streak;
