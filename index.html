@@ -145,20 +145,19 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .lb-rank{width:34px}
 .lb-name{flex:1}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
-/* Load the font. A <link> tag in your <head> is a touch faster than @import. */
-@import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&display=swap');
-
-/* Anton 76px - made with the BDLibraries CSS Text Styler */
-.hero-title {
-  font-family: 'Anton', sans-serif; /* loaded from Google Fonts */
-  font-size: 76px;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  line-height: 1;
-  color: #ff3b3b;
-  text-shadow: 1px 1px 0px #2b0a0a, 2px 2px 0px #2b0a0a, 3px 3px 0px #2b0a0a, 4px 4px 0px #2b0a0a, 5px 5px 0px #2b0a0a, 6px 6px 0px #2b0a0a, 7px 7px 0px #2b0a0a, 8px 8px 0px #2b0a0a, 9px 9px 0px #2b0a0a, 10px 10px 0px #2b0a0a, 12px 12px 8px #2b0a0a80; /* stacked layers, front to back */
-}
+.header {
+      padding: 12px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: #fff;
+    }
+  .logo {
+      width: 85%; /* responsive di HP */
+      max-width: 360px; /* jangan kegedean di tablet */
+      height: auto; /* jaga rasio */
+      display: block;
+    }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,9 +167,11 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <div class="app">
 
 <section id="home" class="screen active">
-<div><h1 class="hero-title">
-TARIK TAMBANG<br>CERDAS!
-</h1></div> 
+<div><header class="header">
+    <img src="logo.png" 
+         alt="Logo Tarik Tambang Cerdas" 
+         class="logo">
+  </header></div> 
   <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
   <div class="card">
     <label for="name">Nama pemain</label>
