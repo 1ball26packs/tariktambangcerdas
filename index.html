@@ -1,10 +1,75 @@
+
+<!-- POPUP ATURAN v2.5 -->
+<div id="rulesModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-emoji">📜</span>
+      <h2>ATURAN MAIN v2.4</h2>
+    </div>
+    <div class="modal-body">
+      <div class="rule-grid">
+        <div class="rule-item correct">
+          <span class="rule-icon">✅</span>
+          <div>
+            <b>BENAR +10 POIN</b>
+            <p>Tali ketarik 10% ke lawan.<br>3x benar beruntun = COMBO 20%!</p>
+          </div>
+        </div>
+        <div class="rule-item wrong">
+          <span class="rule-icon">❌</span>
+          <div>
+            <b>SALAH -5 POIN</b>
+            <p>Berlaku per percobaan!<br>Salah 2x = -10, salah 3x = -15</p>
+          </div>
+        </div>
+        <div class="rule-item penalty">
+          <span class="rule-icon">⏱️</span>
+          <div>
+            <b>PENALTI -5 DETIK & -5% TALI</b>
+            <p>Waktu kepotong 5 detik + tali keseret lawan 5%.<br>Streak combo reset!</p>
+          </div>
+        </div>
+        <div class="rule-item win">
+          <span class="rule-icon">🏆</span>
+          <div>
+            <b>CARA MENANG</b>
+            <p>1. Tarik tali sampai 100% (selisih 10 jawaban)<br>2. Skor tertinggi setelah 100 soal</p>
+          </div>
+        </div>
+      </div>
+      <label class="modal-check"><input type="checkbox" id="dontShowRules"> Jangan tampilkan lagi</label>
+    </div>
+    <button class="btn" id="closeRulesBtn">🔥 MENGERTI, MAIN!</button>
+  </div>
+</div>
+<style>
+.modal-overlay{position:fixed;inset:0;background:rgba(20,10,5,.85);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-card{background:var(--paper,#fff8e7);border:4px solid var(--ink,#241b17);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:420px;width:100%;padding:18px;animation:popIn .25s ease-out}
+@keyframes popIn{from{transform:scale(.9) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-header{text-align:center;margin-bottom:12px}
+.modal-header h2{margin:6px 0 0;font-size:22px}
+.modal-emoji{font-size:40px}
+.modal-body{margin:12px 0}
+.rule-grid{display:grid;gap:10px}
+.rule-item{display:flex;gap:10px;padding:10px;border:3px solid var(--ink);border-radius:14px;background:#fff}
+.rule-item.correct{background:#91e6ac}
+.rule-item.wrong{background:#ff9a9a}
+.rule-item.penalty{background:#ffe082}
+.rule-item.win{background:#b3d9ff}
+.rule-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.rule-item b{display:block;font-size:14px;margin-bottom:2px}
+.rule-item p{margin:0;font-size:12px;line-height:1.3;opacity:.9}
+.modal-check{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:700;cursor:pointer}
+.modal-check input{width:16px;height:16px}
+#closeRulesBtn{width:100%;margin-top:12px}
+</style>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tarik Tambang Cerdas</title>
+<title>Tug of War — V2</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
@@ -105,7 +170,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
   </div>
-  <div class="hint">bayu_adinegarps • with AI touch<br><green style="color: green;>• BENAR = +10point +10%tarik +1Streak</green><br><red style="color: red;>• SALAH = -5point -5detik -5%tarik Streakreset0</red></div>
+  <div class="hint">bayu_adinegarps • with AI touch</div>
 </section>
 
 <section id="join" class="screen">
@@ -917,6 +982,43 @@ function cleanup(){
   await ensureAuth();
   await tryResume();
 })();
+
+// --- v2.5 Rules Popup ---
+function initRulesModal(){
+  const modal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeRulesBtn");
+  const dontShow = document.getElementById("dontShowRules");
+  if(!modal) return;
+  
+  const hidden = localStorage.getItem("hideRulesPopup");
+  if(hidden === "1"){
+    modal.style.display = "none";
+  } else {
+    modal.style.display = "flex";
+  }
+  
+  closeBtn?.addEventListener("click", ()=>{
+    if(dontShow?.checked){
+      localStorage.setItem("hideRulesPopup","1");
+    }
+    modal.style.display = "none";
+  });
+  
+  modal.addEventListener("click", (e)=>{
+    if(e.target === modal){
+      modal.style.display = "none";
+    }
+  });
+  
+  // tombol info untuk buka lagi popup
+  window.openRulesPopup = ()=>{
+    modal.style.display = "flex";
+  };
+}
+document.addEventListener("DOMContentLoaded", initRulesModal);
+// fallback kalau DOMContentLoaded sudah lewat
+if(document.readyState !== "loading"){ initRulesModal(); }
+
 </script>
 </body>
 </html>
