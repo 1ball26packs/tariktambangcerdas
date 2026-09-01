@@ -4,7 +4,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN</h2>
+      <h2>ATURAN MAIN NIH!</h2>
     </div>
     <div class="modal-body">
       <div class="rule-grid">
@@ -264,7 +264,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <div id="leaderboardList"><div class="spinner"></div></div>
     <div class="mini" style="margin-top:10px">Menampilkan Top 20 • W-L-D = Menang-Kalah-Seri</div>
   </div>
-  <button class="btn" id="goHistoryBtn" style="margin-bottom:8px">📜 RIWAYAT MATCH</button>
+  <button class="btn" id="goHistoryBtn" style="margin-bottom:8px">📜 RIWAYAT MATCH + STATISTIK</button>
   <button class="btn secondary" id="leaderboardBackBtn">← KEMBALI</button>
   <style>
     .lb-row{display:grid;grid-template-columns:32px 1fr auto auto;gap:6px;align-items:center;padding:10px 8px;border-bottom:2px dashed #241b17; font-weight:900}
@@ -282,7 +282,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <div id="gameStats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
     <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px">
       <select id="historyFilter">
-        <option value="semua">🎲 Semua Kategori</option>
+        <option value="semua">🎲 Semua</option>
         <option value="umum">🧠 Umum</option>
         <option value="mtk">🔢 MTK</option>
         <option value="logika">🧩 Logika</option>
@@ -290,6 +290,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
       <button class="btn small" id="historyRefreshBtn">🔄 Refresh</button>
     </div>
     <div id="historyList"><div class="spinner"></div></div>
+    <div class="mini" id="historyDebug" style="margin-top:8px"></div>
   </div>
   <button class="btn secondary" id="historyBackBtn">← Kembali ke Leaderboard</button>
   <button class="btn secondary" id="historyHomeBtn" style="margin-top:8px">🏠 Home</button>
@@ -299,12 +300,12 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 
 <style>
 .stat-card{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px;text-align:center}
-.stat-card b{font-size:20px;display:block}
+.stat-card b{font-size:22px;display:block}
 .stat-card span{font-size:11px;opacity:.8}
 .history-row{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px;margin:8px 0;display:grid;gap:6px}
-.history-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:11px;opacity:.8}
-.history-players{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.history-p{flex:1;text-align:center;padding:8px;border:2px solid var(--ink);border-radius:10px;font-size:12px;font-weight:800}
+.history-top{display:flex;justify-content:space-between;font-weight:800;font-size:11px;opacity:.7}
+.history-players{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.history-p{flex:1;text-align:center;padding:8px;border:2px solid var(--ink);border-radius:10px;font-weight:900;font-size:12px}
 .history-p.winner{background:#91e6ac}
 .history-p.loser{background:#ff9a9a}
 .history-meta{font-size:10px;opacity:.7;text-align:center}
@@ -504,7 +505,7 @@ let questions = [
 ];
 
 
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active")}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active"); if(id==="leaderboard"){loadLeaderboard();} if(id==="history"){loadHistory();}}
 function cleanName(v){return (v||"").trim().slice(0,18)}
 function makeCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
@@ -589,14 +590,6 @@ $("showJoinBtn").onclick=()=>show("join");
 $("backBtn").onclick=()=>show("home");
 $("leaderboardBtn").onclick=()=>{show("leaderboard");loadLeaderboard()};
 $("leaderboardBackBtn").onclick=()=>show("home");
-
-$("historyFilter")?.addEventListener("change", loadHistory);
-$("historyRefreshBtn")?.addEventListener("click", loadHistory);
-$("historyBackBtn")?.addEventListener("click", ()=>showScreen('leaderboard'));
-$("historyHomeBtn")?.addEventListener("click", ()=>showScreen('home'));
-
-$("goHistoryBtn")?.addEventListener("click", ()=>{showScreen("history"); loadHistory();});
-
 
 $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
@@ -980,21 +973,24 @@ async function loadLeaderboard(){
 }
 
 async function loadHistory(){
-  const box=$("historyList");
-  const statsBox=$("gameStats");
-  const filterSel=$("historyFilter");
-  const cat = filterSel ? filterSel.value : "semua";
+  const box=document.getElementById("historyList");
+  const statsBox=document.getElementById("gameStats");
+  const debugBox=document.getElementById("historyDebug");
+  const cat=document.getElementById("historyFilter")?.value || "semua";
   if(!box) return;
   box.innerHTML='<div class="spinner"></div>';
   try{
     const snap = await get(ref(db,"games"));
     if(!snap.exists()){
-      box.innerHTML='<div class="status">Belum ada match.</div>';
+      box.innerHTML='<div class="status">Belum ada match finished.</div>';
       if(statsBox) statsBox.innerHTML='';
+      if(debugBox) debugBox.textContent='DB /games kosong';
       return;
     }
     let all=[];
+    let allCount=0;
     snap.forEach(ch=>{
+      allCount++;
       const g=ch.val();
       if(g.status!=="finished") return;
       if(cat!=="semua" && g.category!==cat) return;
@@ -1002,45 +998,45 @@ async function loadHistory(){
     });
     all.sort((a,b)=>(b.startedAt||0)-(a.startedAt||0));
     const total = all.length;
-    const totalPlayers = new Set();
-    let totalRounds=0; let totalPenalty=0; let catCount={};
+    const uniq = new Set();
+    let rounds=0, penalty=0;
     all.forEach(g=>{
-      if(g.player1?.id) totalPlayers.add(g.player1.id);
-      if(g.player2?.id) totalPlayers.add(g.player2.id);
-      totalRounds+= g.round||0;
-      totalPenalty+= (g.playerPenalty?.player1||0)+(g.playerPenalty?.player2||0);
-      const cc=g.category||"umum";
-      catCount[cc]=(catCount[cc]||0)+1;
+      if(g.player1?.id) uniq.add(g.player1.id);
+      if(g.player2?.id) uniq.add(g.player2.id);
+      rounds+= g.round||0;
+      penalty+= (g.playerPenalty?.player1||0)+(g.playerPenalty?.player2||0);
     });
     if(statsBox){
       statsBox.innerHTML=`
-        <div class="stat-card"><b>${total}</b><span>Total Match</span></div>
-        <div class="stat-card"><b>${totalPlayers.size}</b><span>Pemain Unik</span></div>
-        <div class="stat-card"><b>${total>0?Math.round(totalRounds/total):0}</b><span>Rata Ronde</span></div>
-        <div class="stat-card"><b>${totalPenalty}</b><span>Total Penalti</span></div>
+        <div class="stat-card"><b>${total}</b><span>Total Match Finished</span></div>
+        <div class="stat-card"><b>${uniq.size}</b><span>Pemain Unik</span></div>
+        <div class="stat-card"><b>${total?Math.round(rounds/total):0}</b><span>Rata Ronde</span></div>
+        <div class="stat-card"><b>${penalty}</b><span>Total Penalti detik</span></div>
       `;
     }
+    if(debugBox) debugBox.textContent=`Debug: ${allCount} room total di DB, ${total} finished, filter ${cat}`;
     if(all.length===0){
-      box.innerHTML=`<div class="status">Belum ada match untuk ${cat}</div>`;
+      box.innerHTML=`<div class="status">Belum ada match untuk kategori ${cat}. Coba Semua.</div>`;
       return;
     }
-    const top = all.slice(0,50);
+    const top=all.slice(0,50);
     box.innerHTML = top.map(g=>{
       const p1=g.player1||{}; const p2=g.player2||{};
       const win=g.winner;
       const date=g.startedAt?new Date(g.startedAt).toLocaleString("id-ID"):"-";
       const catName=g.category||"umum";
       const pp1=g.playerPenalty?.player1||0; const pp2=g.playerPenalty?.player2||0;
+      const safe = (s)=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       return `<div class="history-row">
-        <div class="history-top"><span>🆔 ${g.id} • ${catName.toUpperCase()}</span><span>${date}</span></div>
+        <div class="history-top"><span>🆔 ${safe(g.id)} • ${safe(catName.toUpperCase())}</span><span>${safe(date)}</span></div>
         <div class="history-players">
-          <div class="history-p ${win==="player1"?"winner":"loser"}"><b>${(p1.name||"P1").replace(/</g,"&lt;")}</b><br>${p1.score||0} poin<br>${pp1?`⚠️ ${pp1}s`:''}</div>
+          <div class="history-p ${win==="player1"?"winner":"loser"}"><b>${safe(p1.name||"P1")}</b><br>${p1.score||0} poin<br>${pp1?`⚠️ ${pp1}s`:''}</div>
           <div style="font-weight:900">VS</div>
-          <div class="history-p ${win==="player2"?"winner":"loser"}"><b>${(p2.name||"P2").replace(/</g,"&lt;")}</b><br>${p2.score||0} poin<br>${pp2?`⚠️ ${pp2}s`:''}</div>
+          <div class="history-p ${win==="player2"?"winner":"loser"}"><b>${safe(p2.name||"P2")}</b><br>${p2.score||0} poin<br>${pp2?`⚠️ ${pp2}s`:''}</div>
         </div>
-        <div class="history-meta">Ronde: ${g.round||0} • Tali: ${g.ropePosition||0}% • ${g.winner?`Menang: ${win==="player1"?(p1.name||"P1"):(p2.name||"P2")}`:"Seri"}</div>
+        <div class="history-meta">Ronde: ${g.round||0} • Tali: ${g.ropePosition||0}% • ${g.winner?`Menang: ${safe(win==="player1"?(p1.name||"P1"):(p2.name||"P2"))}`:"Seri"} • Soal ke-${g.questionIndex||0}</div>
       </div>`;
-    }).join("") + `<div class="mini" style="margin-top:10px">Menampilkan ${top.length} dari ${all.length} match</div>`;
+    }).join("");
   }catch(e){
     console.error(e);
     box.innerHTML='<div class="status error">Gagal load riwayat: '+e.message+'</div>';
