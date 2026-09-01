@@ -14,7 +14,7 @@ button{cursor:pointer}
 .app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;max-width:520px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
 .screen{display:none;background:rgba(255,250,240,.94);min-height:100vh;padding:22px 18px 28px}
 .screen.active{display:flex;flex-direction:column}
-.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:2px;margin:28px 0 12px;transform:rotate(-2deg)}
+.logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:-2px;margin:28px 0 12px;transform:rotate(-2deg)}
 .logo span{display:block;color:var(--red)}
 .tag{font-family:'Comic Neue',cursive;text-align:center;font-weight:900;margin:10px 0 28px}
 .card{background:#fff;position:relative;border:4px solid var(--ink);border-radius:22px;padding:18px;box-shadow:7px 7px 0 var(--ink);margin-bottom:18px}
@@ -75,7 +75,7 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
 <div class="app">
 
 <section id="home" class="screen active">
-  <div class="logo">Tug<span>of War!</span></div>
+  <div class="logo">Tarik Tambang<span>Cerdas!</span></div>
   <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
   <div class="card">
     <label for="name">Nama pemain</label>
@@ -172,6 +172,8 @@ const db = getDatabase(app);
 const $ = id => document.getElementById(id);
 let uid = null, roomId = null, mySlot = null, roomUnsub = null;
 let answered = false, timerInterval = null, localRound = 0;
+let roundDeadline = 0;
+const penaltySeconds = 3;
 let questions = [
   {q:"Planet terbesar di tata surya adalah...",a:["Bumi","Mars","Jupiter","Saturnus"],c:2},
   {q:"Ibukota Indonesia saat ini adalah...",a:["Bandung","Jakarta","Surabaya","Medan"],c:1},
@@ -218,7 +220,8 @@ function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",
 function myName(){return cleanName(mySlot==="player1"?$("name").value:$("joinName").value)}
 function playerId(slot){return slot==="player1" ? "player1" : "player2"}
 
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}\nasync function ensureAuth(){
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+async function ensureAuth(){
   if(uid)return uid;
   const cred=await signInAnonymously(auth);
   uid=cred.user.uid;
@@ -361,6 +364,7 @@ function startLocalTimer(d){
   const initial=Number(d.timeLeft)||20;
   if(!started){$("timer").textContent=initial;return}
   let serverStart=typeof started==="number"?started:Date.now();
+  roundDeadline=serverStart+initial*1000;
   const tick=()=>{
     const left=Math.max(0,Math.ceil((roundDeadline-Date.now())/1000));
     $("timer").textContent=left;
