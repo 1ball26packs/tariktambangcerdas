@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tug of War — V1</title>
+<title>Tug of War — V2</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
 body{margin:0;background:#17120f;color:var(--ink);font-family:'Comic Neue',Arial,sans-serif;min-height:100vh}
-button,input{font:inherit}
+button,input,select{font:inherit}
 button{cursor:pointer}
 .app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;max-width:520px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
 .screen{display:none;background:rgba(255,250,240,.94);min-height:100vh;padding:22px 18px 28px}
@@ -19,8 +19,8 @@ button{cursor:pointer}
 .tag{font-family:'Comic Neue',cursive;text-align:center;font-weight:900;margin:10px 0 28px}
 .card{background:#fff;position:relative;border:4px solid var(--ink);border-radius:22px;padding:18px;box-shadow:7px 7px 0 var(--ink);margin-bottom:18px}
 label{display:block;font-weight:900;margin-bottom:7px}
-input{width:100%;padding:14px 15px;border:3px solid var(--ink);border-radius:13px;outline:none;background:#fff;font-weight:800}
-input:focus{box-shadow:0 0 0 4px #ffe58a}
+input,select{width:100%;padding:14px 15px;border:3px solid var(--ink);border-radius:13px;outline:none;background:#fff;font-weight:800;appearance:none}
+input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .btn{font-family:'Comic Neue',cursive;width:100%;border:4px solid var(--ink);border-radius:15px;padding:14px 16px;font-weight:1000;background:var(--yellow);box-shadow:5px 5px 0 var(--ink);margin-top:10px;transition:.08s}
 .btn:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--ink)}
 .btn.secondary{background:#fff}
@@ -36,6 +36,7 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
 .player small{display:block;font-size:11px;opacity:.9}
 .score{font-size:22px}
 .timer{border:4px solid var(--ink);border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000;background:#fff}
+.spec-badge{text-align:center;font-size:12px;font-weight:800;opacity:.7;padding:2px 0 4px}
 .arena{margin:8px 12px 0;border:4px solid var(--ink);border-radius:24px;background:#bfe8ff;position:relative;overflow:hidden;height:245px;display:flex;align-items:center;justify-content:center}
 .cloud{position:absolute;width:90px;height:30px;background:#fff;border:3px solid var(--ink);border-radius:30px;top:28px;left:18px}
 .cloud:after{content:"";position:absolute;width:45px;height:45px;background:#fff;border:3px solid var(--ink);border-radius:50%;left:20px;top:-22px}
@@ -45,9 +46,19 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
 .rope{position:absolute;width:86%;height:12px;background:#b56b32;border:3px solid var(--ink);border-radius:20px;transition:transform .35s cubic-bezier(.2,.9,.3,1)}
 .rope:after{content:"";position:absolute;left:50%;top:-24px;transform:translateX(-50%);width:9px;height:60px;background:#e8d5a5;border:3px solid var(--ink)}
 .flag{position:absolute;left:50%;top:-33px;transform:translateX(-50%);font-size:26px;z-index:4}
-.character{position:absolute;bottom:25px;font-size:72px;z-index:3;filter:drop-shadow(3px 4px 0 #fff);transition:.35s}
+.character{position:absolute;bottom:25px;font-size:72px;z-index:3;filter:drop-shadow(3px 4px 0 #fff);animation:idleSway 1.8s ease-in-out infinite}
 .c1{left:8%}.c2{right:8%;transform:scaleX(-1)}
+.character.pulling{animation:pullPulse .4s ease}
+@keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.c2{animation:idleSway 1.8s ease-in-out infinite}
+@keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.5) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
 .arena-note{position:absolute;bottom:6px;z-index:5;font-size:11px;font-weight:900}
+.reactionFloat{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6}
+.reactionFloat span{position:absolute;bottom:40px;font-size:32px;animation:floatUp 1.4s ease-out forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(.6)}20%{transform:translateY(-20px) scale(1.2)}100%{opacity:0;transform:translateY(-150px) scale(1)}}
+.reactions{display:flex;justify-content:center;gap:8px;margin:10px 12px 0}
+.react-btn{border:3px solid var(--ink);border-radius:12px;background:#fff;font-size:20px;padding:6px 10px;box-shadow:2px 2px 0 var(--ink)}
+.react-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 .question-card{margin:12px;border:4px solid var(--ink);border-radius:24px;padding:16px;background:#fff;box-shadow:5px 5px 0 var(--ink)}
 .qnum{text-align:center;font-size:12px;font-weight:1000;opacity:.65}
 .question{font-family:'Comic Neue',cursive;text-align:center;font-size:23px;font-weight:900;margin:8px 0 14px;line-height:1.2}
@@ -65,6 +76,9 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
 .row{display:flex;gap:10px}.row>*{flex:1}
 .spinner{width:28px;height:28px;border:4px solid #ddd;border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+.lb-row{display:flex;align-items:center;gap:10px;border:3px solid var(--ink);border-radius:12px;padding:8px 12px;margin-bottom:8px;background:#fff9e8;font-weight:900}
+.lb-rank{width:34px}
+.lb-name{flex:1}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,10 +94,18 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="card">
     <label for="name">Nama pemain</label>
     <input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off">
+    <label for="category" style="margin-top:15px">Kategori soal</label>
+    <select id="category">
+      <option value="semua">🎲 Semua Kategori</option>
+      <option value="mtk">➗ Matematika</option>
+      <option value="umum">🌍 Pengetahuan Umum</option>
+      <option value="logika">🧠 Logika</option>
+    </select>
     <button class="btn" id="createBtn">🎮 BUAT PERMAINAN</button>
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
+    <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
   </div>
-  <div class="hint">V1 • 2 pemain • realtime Firebase</div>
+  <div class="hint">V2 • 2 pemain + penonton • maks 100 soal • realtime Firebase</div>
 </section>
 
 <section id="join" class="screen">
@@ -96,6 +118,7 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn" id="joinBtn">🚀 GABUNG</button>
     <button class="btn secondary" id="backBtn">← KEMBALI</button>
   </div>
+  <div class="hint">Kalau room sudah penuh, kamu otomatis jadi penonton 👀</div>
   <div id="joinError" class="status error hidden"></div>
 </section>
 
@@ -110,7 +133,7 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
     <div id="p1Status" class="status">👤 Menunggu pemain...</div>
     <div id="p2Status" class="status" style="margin-top:10px">👤 Menunggu pemain kedua...</div>
   </div>
-  <div id="lobbyMessage" class="hint">Bagikan kode kepada pemain lawan.</div>
+  <div id="lobbyMessage" class="hint">Bagikan kode kepada pemain lawan. Game mulai otomatis begitu berdua siap.</div>
   <button class="btn danger" id="leaveLobbyBtn">Keluar</button>
 </section>
 
@@ -120,11 +143,20 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
     <div class="timer" id="timer">20</div>
     <div class="player p2" id="p2Box"><span id="p2Name">PLAYER 2</span><small>SKOR</small><span class="score" id="p2Score">0</span></div>
   </div>
+  <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
     <div class="cloud"></div><div class="cloud cloud2"></div><div class="ground"></div>
     <div class="character c1">🤼</div><div class="character c2">🤼</div>
     <div class="rope-wrap"><div class="flag">🚩</div><div id="rope" class="rope"></div></div>
     <div class="arena-note">POSISI TALI</div>
+    <div class="reactionFloat" id="reactionFloat"></div>
+  </div>
+  <div class="reactions" id="reactions">
+    <button class="react-btn" data-emoji="😂">😂</button>
+    <button class="react-btn" data-emoji="🔥">🔥</button>
+    <button class="react-btn" data-emoji="😱">😱</button>
+    <button class="react-btn" data-emoji="👏">👏</button>
+    <button class="react-btn" data-emoji="💪">💪</button>
   </div>
   <div class="message" id="gameMessage"></div>
   <div class="question-card">
@@ -148,12 +180,18 @@ input:focus{box-shadow:0 0 0 4px #ffe58a}
   <button class="btn secondary" id="homeBtn">🏠 MENU UTAMA</button>
 </section>
 
+<section id="leaderboard" class="screen">
+  <h2 style="text-align:center">🏆 Papan Peringkat</h2>
+  <div class="card" id="leaderboardList"><div class="spinner"></div></div>
+  <button class="btn secondary" id="leaderboardBackBtn">← KEMBALI</button>
+</section>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getDatabase, ref, set, get, update, onValue, onDisconnect, remove, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { getDatabase, ref, set, get, update, onValue, onDisconnect, remove, runTransaction, serverTimestamp, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5rz32REtSttxYFXEamc57StcYYOlTYuY",
@@ -170,57 +208,74 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 const $ = id => document.getElementById(id);
+
+// --- konstanta aturan game ---
+const ROUND_LIMIT = 100;          // maksimal 100 soal per game
+const COMBO_STREAK = 3;           // 3x benar berturut = combo
+const COMBO_MULTIPLIER = 2;       // tarikan combo 2x lipat
+const SUDDEN_DEATH_TIMEOUTS = 2;  // 2x timeout berturut = nudge
+const SUDDEN_DEATH_NUDGE = 5;     // besar nudge ke tengah
+const penaltySeconds = 3;
+
+// --- state lokal ---
 let uid = null, roomId = null, mySlot = null, roomUnsub = null;
 let answered = false, timerInterval = null, localRound = 0;
 let roundDeadline = 0;
-const penaltySeconds = 3;
+let lastReactionTs = 0;
+let lastRopePos = 0;
+let audioCtx = null;
+let timeoutRound = 0;
+
 let questions = [
-  {q:"Planet terbesar di tata surya adalah...",a:["Bumi","Mars","Jupiter","Saturnus"],c:2},
-  {q:"Ibukota Indonesia saat ini adalah...",a:["Bandung","Jakarta","Surabaya","Medan"],c:1},
-  {q:"Hewan tercepat di darat adalah...",a:["Singa","Cheetah","Kuda","Serigala"],c:1},
-  {q:"12 + 8 = ?",a:["18","20","22","24"],c:1},
-  {q:"9 × 7 = ?",a:["54","56","63","72"],c:2},
-  {q:"Air membeku pada suhu...",a:["0°C","10°C","32°C","100°C"],c:0},
-  {q:"Benua terbesar di dunia adalah...",a:["Afrika","Eropa","Asia","Amerika"],c:2},
-  {q:"Bahasa resmi negara Jepang adalah...",a:["Korea","Mandarin","Jepang","Thai"],c:2},
-  {q:"Gunung tertinggi di dunia adalah...",a:["K2","Everest","Fuji","Kilimanjaro"],c:1},
-  {q:"25 − 13 = ?",a:["10","11","12","13"],c:2},
-  {q:"Organ tubuh yang memompa darah adalah...",a:["Paru-paru","Hati","Jantung","Ginjal"],c:2},
-  {q:"Warna yang dihasilkan dari campuran merah dan kuning adalah...",a:["Hijau","Ungu","Oranye","Cokelat"],c:2},
-  {q:"Planet yang dikenal sebagai Planet Merah adalah...",a:["Venus","Mars","Jupiter","Merkurius"],c:1},
-  {q:"36 ÷ 6 = ?",a:["5","6","7","8"],c:1},
-  {q:"Satuan untuk mengukur kuat arus listrik adalah...",a:["Volt","Watt","Ampere","Ohm"],c:2},
-  {q:"Hewan yang mengalami metamorfosis dari ulat menjadi dewasa adalah...",a:["Katak","Kupu-kupu","Ayam","Kucing"],c:1},
-  {q:"Samudra terbesar di dunia adalah...",a:["Atlantik","Hindia","Pasifik","Arktik"],c:2},
-  {q:"15 + 27 = ?",a:["40","41","42","43"],c:2},
-  {q:"Simbol kimia untuk emas adalah...",a:["Ag","Au","Fe","Cu"],c:1},
-  {q:"Negara yang terkenal dengan Menara Eiffel adalah...",a:["Italia","Prancis","Spanyol","Jerman"],c:1},
-  {q:"8 × 8 = ?",a:["56","64","72","81"],c:1},
-  {q:"Mamalia terbesar di dunia adalah...",a:["Gajah","Hiu paus","Paus biru","Jerapah"],c:2},
-  {q:"Alat untuk mengukur suhu disebut...",a:["Barometer","Termometer","Higrometer","Speedometer"],c:1},
-  {q:"100 − 45 = ?",a:["45","50","55","65"],c:2},
-  {q:"Pulau terbesar di Indonesia adalah...",a:["Jawa","Bali","Kalimantan","Lombok"],c:2},
-  {q:"Proses tumbuhan membuat makanan dengan bantuan cahaya disebut...",a:["Respirasi","Fotosintesis","Evaporasi","Fermentasi"],c:1},
-  {q:"7 × 6 = ?",a:["36","42","48","49"],c:1},
-  {q:"Lawan kata 'optimis' yang paling tepat adalah...",a:["Aktif","Pesimis","Berani","Tenang"],c:1},
-  {q:"Jika semua A adalah B, dan semua B adalah C, maka...",a:["Semua A adalah C","Tidak ada A yang C","Semua C adalah A","Bukan A yang C"],c:0},
-  {q:"50 ÷ 5 = ?",a:["5","10","15","20"],c:1},
-  {q:"Benda langit yang mengelilingi planet disebut...",a:["Bintang","Satelit","Komet","Asteroid"],c:1},
-  {q:"Hewan yang dikenal sebagai 'raja hutan' adalah...",a:["Harimau","Singa","Beruang","Serigala"],c:1},
-  {q:"18 + 24 = ?",a:["40","41","42","44"],c:2},
-  {q:"Ibukota Thailand adalah...",a:["Bangkok","Hanoi","Manila","Seoul"],c:0},
-  {q:"Zat yang kita hirup untuk bernapas adalah...",a:["Karbon dioksida","Oksigen","Nitrogen murni","Helium"],c:1},
-  {q:"Bentuk dengan tiga sisi disebut...",a:["Persegi","Lingkaran","Segitiga","Trapesium"],c:2}
+  {q:"Planet terbesar di tata surya adalah...",a:["Bumi","Mars","Jupiter","Saturnus"],c:2,cat:"umum"},
+  {q:"Ibukota Indonesia saat ini adalah...",a:["Bandung","Jakarta","Surabaya","Medan"],c:1,cat:"umum"},
+  {q:"Hewan tercepat di darat adalah...",a:["Singa","Cheetah","Kuda","Serigala"],c:1,cat:"umum"},
+  {q:"12 + 8 = ?",a:["18","20","22","24"],c:1,cat:"mtk"},
+  {q:"9 × 7 = ?",a:["54","56","63","72"],c:2,cat:"mtk"},
+  {q:"Air membeku pada suhu...",a:["0°C","10°C","32°C","100°C"],c:0,cat:"umum"},
+  {q:"Benua terbesar di dunia adalah...",a:["Afrika","Eropa","Asia","Amerika"],c:2,cat:"umum"},
+  {q:"Bahasa resmi negara Jepang adalah...",a:["Korea","Mandarin","Jepang","Thai"],c:2,cat:"umum"},
+  {q:"Gunung tertinggi di dunia adalah...",a:["K2","Everest","Fuji","Kilimanjaro"],c:1,cat:"umum"},
+  {q:"25 − 13 = ?",a:["10","11","12","13"],c:2,cat:"mtk"},
+  {q:"Organ tubuh yang memompa darah adalah...",a:["Paru-paru","Hati","Jantung","Ginjal"],c:2,cat:"umum"},
+  {q:"Warna yang dihasilkan dari campuran merah dan kuning adalah...",a:["Hijau","Ungu","Oranye","Cokelat"],c:2,cat:"umum"},
+  {q:"Planet yang dikenal sebagai Planet Merah adalah...",a:["Venus","Mars","Jupiter","Merkurius"],c:1,cat:"umum"},
+  {q:"36 ÷ 6 = ?",a:["5","6","7","8"],c:1,cat:"mtk"},
+  {q:"Satuan untuk mengukur kuat arus listrik adalah...",a:["Volt","Watt","Ampere","Ohm"],c:2,cat:"umum"},
+  {q:"Hewan yang mengalami metamorfosis dari ulat menjadi dewasa adalah...",a:["Katak","Kupu-kupu","Ayam","Kucing"],c:1,cat:"umum"},
+  {q:"Samudra terbesar di dunia adalah...",a:["Atlantik","Hindia","Pasifik","Arktik"],c:2,cat:"umum"},
+  {q:"15 + 27 = ?",a:["40","41","42","43"],c:2,cat:"mtk"},
+  {q:"Simbol kimia untuk emas adalah...",a:["Ag","Au","Fe","Cu"],c:1,cat:"umum"},
+  {q:"Negara yang terkenal dengan Menara Eiffel adalah...",a:["Italia","Prancis","Spanyol","Jerman"],c:1,cat:"umum"},
+  {q:"8 × 8 = ?",a:["56","64","72","81"],c:1,cat:"mtk"},
+  {q:"Mamalia terbesar di dunia adalah...",a:["Gajah","Hiu paus","Paus biru","Jerapah"],c:2,cat:"umum"},
+  {q:"Alat untuk mengukur suhu disebut...",a:["Barometer","Termometer","Higrometer","Speedometer"],c:1,cat:"umum"},
+  {q:"100 − 45 = ?",a:["45","50","55","65"],c:2,cat:"mtk"},
+  {q:"Pulau terbesar di Indonesia adalah...",a:["Jawa","Bali","Kalimantan","Lombok"],c:2,cat:"umum"},
+  {q:"Proses tumbuhan membuat makanan dengan bantuan cahaya disebut...",a:["Respirasi","Fotosintesis","Evaporasi","Fermentasi"],c:1,cat:"umum"},
+  {q:"7 × 6 = ?",a:["36","42","48","49"],c:1,cat:"mtk"},
+  {q:"Lawan kata 'optimis' yang paling tepat adalah...",a:["Aktif","Pesimis","Berani","Tenang"],c:1,cat:"logika"},
+  {q:"Jika semua A adalah B, dan semua B adalah C, maka...",a:["Semua A adalah C","Tidak ada A yang C","Semua C adalah A","Bukan A yang C"],c:0,cat:"logika"},
+  {q:"50 ÷ 5 = ?",a:["5","10","15","20"],c:1,cat:"mtk"},
+  {q:"Benda langit yang mengelilingi planet disebut...",a:["Bintang","Satelit","Komet","Asteroid"],c:1,cat:"umum"},
+  {q:"Hewan yang dikenal sebagai 'raja hutan' adalah...",a:["Harimau","Singa","Beruang","Serigala"],c:1,cat:"umum"},
+  {q:"18 + 24 = ?",a:["40","41","42","44"],c:2,cat:"mtk"},
+  {q:"Ibukota Thailand adalah...",a:["Bangkok","Hanoi","Manila","Seoul"],c:0,cat:"umum"},
+  {q:"Zat yang kita hirup untuk bernapas adalah...",a:["Karbon dioksida","Oksigen","Nitrogen murni","Helium"],c:1,cat:"umum"},
+  {q:"Bentuk dengan tiga sisi disebut...",a:["Persegi","Lingkaran","Segitiga","Trapesium"],c:2,cat:"umum"}
 ];
 
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active")}
 function cleanName(v){return (v||"").trim().slice(0,18)}
 function makeCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function myName(){return cleanName(mySlot==="player1"?$("name").value:$("joinName").value)}
-function playerId(slot){return slot==="player1" ? "player1" : "player2"}
-
+function clampRope(p){return Math.max(-100,Math.min(100,p||0))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function buildOrder(category){
+  const idxs=[...questions.keys()].filter(i=>category==="semua"||questions[i].cat===category);
+  return shuffle(idxs.length?idxs:[...questions.keys()]);
+}
+
 async function ensureAuth(){
   if(uid)return uid;
   const cred=await signInAnonymously(auth);
@@ -229,8 +284,50 @@ async function ensureAuth(){
 }
 onAuthStateChanged(auth,user=>{if(user)uid=user.uid});
 
+// --- sesi / reconnect ---
+function saveSession(){ if(roomId && mySlot && mySlot!=="spectator") localStorage.setItem("tow_session",JSON.stringify({roomId,mySlot})) }
+function clearSession(){ localStorage.removeItem("tow_session") }
+async function tryResume(){
+  const raw=localStorage.getItem("tow_session");
+  if(!raw)return false;
+  let saved; try{saved=JSON.parse(raw)}catch{clearSession();return false}
+  if(!saved || !saved.roomId || !saved.mySlot){clearSession();return false}
+  try{
+    const snap=await get(ref(db,"games/"+saved.roomId));
+    if(!snap.exists()){clearSession();return false}
+    const d=snap.val();
+    if(d.status==="finished" || !d[saved.mySlot] || d[saved.mySlot].id!==uid){clearSession();return false}
+    roomId=saved.roomId; mySlot=saved.mySlot;
+    await update(ref(db,`games/${roomId}/${mySlot}/connected`),true).catch(()=>{});
+    onDisconnect(ref(db,`games/${roomId}/${mySlot}/connected`)).set(false).catch(()=>{});
+    listenRoom(); renderLobby();
+    show(d.status==="playing"?"game":"lobby");
+    return true;
+  }catch(e){clearSession();return false}
+}
+
+// --- audio & haptik ---
+function beep(freq=440,dur=120,type="sine",vol=0.15){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+    osc.type=type;osc.frequency.value=freq;
+    gain.gain.setValueAtTime(vol,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur/1000);
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.start();osc.stop(audioCtx.currentTime+dur/1000);
+  }catch(e){}
+}
+function sfxCorrect(){beep(720,110,"square")}
+function sfxWrong(){beep(160,180,"sawtooth")}
+function sfxWin(){beep(523,120);setTimeout(()=>beep(659,120),120);setTimeout(()=>beep(784,220),240)}
+function sfxLose(){beep(140,320,"sawtooth")}
+function buzz(pattern){ if(navigator.vibrate)navigator.vibrate(pattern) }
+
 $("createBtn").onclick=async()=>{
   const name=cleanName($("name").value);
+  const category=$("category").value||"semua";
   if(!name){alert("Masukkan nama pemain.");$("name").focus();return}
   try{
     await ensureAuth();
@@ -239,17 +336,20 @@ $("createBtn").onclick=async()=>{
       status:"waiting", hostId:uid, createdAt:serverTimestamp(),
       player1:{id:uid,name,score:0,connected:true},
       player2:null, ropePosition:0, round:0, questionIndex:0,
-      questionOrder:shuffle([...Array(questions.length).keys()]),
+      questionOrder:buildOrder(category), category,
+      streakP1:0, streakP2:0, suddenDeathCounter:0, leaderboardRecorded:false,
       startedAt:null, roundStartedAt:null, timeLeft:20, winner:null
     };
     await set(ref(db,"games/"+roomId),room);
     await onDisconnect(ref(db,`games/${roomId}/player1/connected`)).set(false);
-    listenRoom(); renderLobby(); show("lobby");
+    saveSession(); listenRoom(); renderLobby(); show("lobby");
   }catch(e){alert("Gagal membuat game: "+e.message)}
 };
 
 $("showJoinBtn").onclick=()=>show("join");
 $("backBtn").onclick=()=>show("home");
+$("leaderboardBtn").onclick=()=>{show("leaderboard");loadLeaderboard()};
+$("leaderboardBackBtn").onclick=()=>show("home");
 
 $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
@@ -258,14 +358,26 @@ $("joinBtn").onclick=async()=>{
   try{
     await ensureAuth();
     const r=ref(db,"games/"+code), snap=await get(r);
-    if(!snap.exists()){throw new Error("Game tidak ditemukan.")}
+    if(!snap.exists())throw new Error("Game tidak ditemukan.");
     const data=snap.val();
-    if(data.status!=="waiting"){throw new Error("Game sudah dimulai atau selesai.")}
-    if(data.player2){throw new Error("Game sudah penuh.")}
+    if(data.status==="finished")throw new Error("Game sudah selesai.");
+    const alreadyP1=data.player1&&data.player1.id===uid;
+    const alreadyP2=data.player2&&data.player2.id===uid;
+    if(alreadyP1||alreadyP2){
+      roomId=code; mySlot=alreadyP1?"player1":"player2";
+      saveSession(); listenRoom(); renderLobby(); show(data.status==="playing"?"game":"lobby"); return;
+    }
+    if(data.player2){
+      // room penuh -> gabung sebagai penonton
+      roomId=code; mySlot="spectator";
+      await update(ref(db,`games/${code}/spectators/${uid}`),{name,joinedAt:serverTimestamp()});
+      onDisconnect(ref(db,`games/${code}/spectators/${uid}`)).remove().catch(()=>{});
+      listenRoom(); renderLobby(); show(data.status==="playing"?"game":"lobby"); return;
+    }
     roomId=code;mySlot="player2";
     await update(r,{player2:{id:uid,name,score:0,connected:true}});
     await onDisconnect(ref(db,`games/${roomId}/player2/connected`)).set(false);
-    listenRoom();renderLobby();show("lobby");
+    saveSession(); listenRoom();renderLobby();show("lobby");
   }catch(e){$("joinError").textContent=e.message;$("joinError").classList.remove("hidden")}
 };
 
@@ -275,11 +387,18 @@ function renderLobby(){
 function listenRoom(){
   if(roomUnsub)roomUnsub();
   roomUnsub=onValue(ref(db,"games/"+roomId),snap=>{
-    if(!snap.exists()){show("home");alert("Room sudah ditutup.");return}
+    if(!snap.exists()){clearSession();show("home");alert("Room sudah ditutup.");return}
     const d=snap.val();
     const p1=d.player1,p2=d.player2;
     $("p1Status").innerHTML=p1?`🔵 <b>${esc(p1.name)}</b> ${p1.connected?"🟢":"🔴"}`:"👤 Menunggu pemain...";
     $("p2Status").innerHTML=p2?`🔴 <b>${esc(p2.name)}</b> ${p2.connected?"🟢":"🔴"}`:"👤 Menunggu pemain kedua...";
+    const specCount=d.spectators?Object.keys(d.spectators).length:0;
+    const badge=$("specBadge");
+    if(badge)badge.textContent = mySlot==="spectator" ? `👀 Anda menonton${specCount>1?` • ${specCount} penonton`:""}` : (specCount?`👀 ${specCount} penonton`:"");
+    if(d.reaction && d.reaction.ts && d.reaction.ts!==lastReactionTs){
+      lastReactionTs=d.reaction.ts;
+      showReaction(d.reaction.emoji);
+    }
     if(d.status==="playing"){renderGame(d);show("game")}
     if(d.status==="finished"){renderResult(d);show("result")}
     if(d.status==="waiting" && p1 && p2 && mySlot==="player1"){
@@ -296,65 +415,111 @@ $("copyBtn").onclick=async()=>{
 };
 
 $("leaveLobbyBtn").onclick=async()=>{
-  if(roomId)await remove(ref(db,"games/"+roomId));
-  cleanup();show("home");
+  if(roomId && mySlot!=="spectator")await remove(ref(db,"games/"+roomId)).catch(()=>{});
+  if(roomId && mySlot==="spectator")await remove(ref(db,`games/${roomId}/spectators/${uid}`)).catch(()=>{});
+  clearSession(); cleanup();show("home");
 };
 
 function renderGame(d){
   const p1=d.player1||{},p2=d.player2||{};
   $("p1Name").textContent=p1.name||"PLAYER 1";$("p2Name").textContent=p2.name||"PLAYER 2";
   $("p1Score").textContent=p1.score||0;$("p2Score").textContent=p2.score||0;
-  const pos=Math.max(-100,Math.min(100,Number(d.ropePosition)||0));
+  const pos=clampRope(d.ropePosition);
+  if(pos!==lastRopePos){
+    pulseCharacter(pos<lastRopePos?"c1":"c2");
+  }
+  lastRopePos=pos;
   $("rope").style.transform=`translateX(${pos*1.7}px)`;
-  $("qNum").textContent=`SOAL ${d.round||1}`;
-  const qi=Number(d.questionIndex)||0; const order=d.questionOrder||[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
+  $("qNum").textContent=`SOAL ${Math.min(d.round||1,ROUND_LIMIT)} / ${ROUND_LIMIT}`;
+  const qi=Number(d.questionIndex)||0; const order=d.questionOrder&&d.questionOrder.length?d.questionOrder:[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
   $("question").textContent=q.q;
   if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;buildAnswers(q)}
   startLocalTimer(d);
-  if(d.winner)renderResult(d);
+  if(d.winner!==undefined && d.status==="finished")renderResult(d);
 }
+
+function pulseCharacter(cls){
+  const el=document.querySelector("."+cls);
+  if(!el)return;
+  el.classList.add("pulling");
+  setTimeout(()=>el.classList.remove("pulling"),400);
+}
+
+function showReaction(emoji){
+  const box=$("reactionFloat"); if(!box)return;
+  const span=document.createElement("span");
+  span.textContent=emoji;
+  span.style.left=(10+Math.random()*70)+"%";
+  box.appendChild(span);
+  span.addEventListener("animationend",()=>span.remove());
+}
+document.querySelectorAll(".react-btn").forEach(b=>{
+  b.onclick=()=>{
+    if(!roomId)return;
+    update(ref(db,`games/${roomId}/reaction`),{emoji:b.dataset.emoji,from:mySlot,ts:Date.now()}).catch(()=>{});
+  };
+});
 
 function buildAnswers(q){
   const box=$("answers");box.innerHTML="";
   q.a.forEach((ans,i)=>{
     const b=document.createElement("button");b.className="answer";b.textContent=ans;
-    b.onclick=()=>answer(i,q,b);
+    if(mySlot==="spectator"){b.disabled=true}
+    else{b.onclick=()=>answer(i,q,b)}
     box.appendChild(b);
   });
 }
 function setButtons(disabled){document.querySelectorAll(".answer").forEach(b=>b.disabled=disabled)}
 
 async function answer(choice,q,btn){
-  if(answered)return;
+  if(answered||mySlot==="spectator")return;
   const correct=choice===q.c;
   btn.classList.add(correct?"correct":"wrong");
+  const streakKey=mySlot==="player1"?"streakP1":"streakP2";
   if(!correct){
     $("gameMessage").textContent=`💥 SALAH! -${penaltySeconds} DETIK! COBA LAGI!`;
-    const penaltyRef=ref(db,`games/${roomId}/playerPenalty/${mySlot}`);
-    await runTransaction(penaltyRef,v=>Number(v||0)+penaltySeconds).catch(()=>{});
+    sfxWrong(); buzz([40,40,40]);
+    runTransaction(ref(db,`games/${roomId}/${streakKey}`),()=>0).catch(()=>{});
+    runTransaction(ref(db,`games/${roomId}/playerPenalty/${mySlot}`),v=>Number(v||0)+penaltySeconds).catch(()=>{});
     roundDeadline=Math.max(Date.now()+1000,roundDeadline-penaltySeconds*1000);
     setTimeout(()=>{btn.classList.remove("wrong");$("gameMessage").textContent=""},700);
     return;
   }
   answered=true;setButtons(true);
-  $("gameMessage").textContent="💪 BENAR! TARIK!";
-  const delta=mySlot==="player1"?-10:10;
   const gameRef=ref(db,"games/"+roomId);
   try{
-    await runTransaction(gameRef,d=>{
+    const result=await runTransaction(gameRef,d=>{
       if(!d||d.status!=="playing")return d;
+      const order=d.questionOrder||[];
+      const orderLen=order.length||questions.length;
       const my=d[mySlot]||{};
       my.score=(my.score||0)+1;
       d[mySlot]=my;
-      d.ropePosition=Math.max(-100,Math.min(100,(d.ropePosition||0)+delta));
-      if(Math.abs(d.ropePosition)>=100){d.status="finished";d.winner=mySlot}
-      else{
+      const streak=(d[streakKey]||0)+1;
+      d[streakKey]=streak;
+      const combo=streak>0 && streak%COMBO_STREAK===0;
+      d.lastComboSlot=combo?mySlot:null;
+      const baseDelta=mySlot==="player1"?-10:10;
+      const delta=combo?baseDelta*COMBO_MULTIPLIER:baseDelta;
+      d.ropePosition=clampRope((d.ropePosition||0)+delta);
+      d.suddenDeathCounter=0;
+      if(Math.abs(d.ropePosition)>=100){
+        d.status="finished";d.winner=mySlot;
+      }else if((d.round||1)>=ROUND_LIMIT){
+        d.status="finished";
+        const s1=(d.player1&&d.player1.score)||0, s2=(d.player2&&d.player2.score)||0;
+        d.winner = s1===s2?null:(s1>s2?"player1":"player2");
+      }else{
         d.round=(d.round||1)+1;
-        d.questionIndex=((d.questionIndex||0)+1)%questions.length;
+        d.questionIndex=((d.questionIndex||0)+1)%orderLen;
         d.roundStartedAt={".sv":"timestamp"}; d.timeLeft=20;
       }
       return d;
     });
+    const committed=result && result.snapshot ? result.snapshot.val() : null;
+    const wasCombo=committed && committed.lastComboSlot===mySlot;
+    $("gameMessage").textContent = wasCombo ? "🔥 COMBO x2! TARIKAN GANDA!" : "💪 BENAR! TARIK!";
+    sfxCorrect(); buzz(wasCombo?[30,20,30,20,60]:30);
   }catch(e){console.error(e)}
 }
 
@@ -372,49 +537,118 @@ function startLocalTimer(d){
   };
   tick();timerInterval=setInterval(tick,250);
 }
-let timeoutRound=0;
+
 async function timeOut(round){
   if(timeoutRound===round)return;timeoutRound=round;
   const r=ref(db,"games/"+roomId);
   await runTransaction(r,d=>{
     if(!d||d.status!=="playing"||d.round!==round)return d;
-    d.round=(d.round||1)+1;
-    d.questionIndex=((d.questionIndex||0)+1)%questions.length;
-    d.roundStartedAt={".sv":"timestamp"};d.timeLeft=20;
+    const order=d.questionOrder||[];
+    const orderLen=order.length||questions.length;
+    const sd=(d.suddenDeathCounter||0)+1;
+    if(sd>=SUDDEN_DEATH_TIMEOUTS){
+      d.suddenDeathCounter=0;
+      let pos=d.ropePosition||0;
+      if(pos>0)pos=Math.max(0,pos-SUDDEN_DEATH_NUDGE);
+      else if(pos<0)pos=Math.min(0,pos+SUDDEN_DEATH_NUDGE);
+      d.ropePosition=pos;
+    }else{
+      d.suddenDeathCounter=sd;
+    }
+    if((d.round||1)>=ROUND_LIMIT){
+      d.status="finished";
+      const s1=(d.player1&&d.player1.score)||0, s2=(d.player2&&d.player2.score)||0;
+      d.winner = s1===s2?null:(s1>s2?"player1":"player2");
+    }else{
+      d.round=(d.round||1)+1;
+      d.questionIndex=((d.questionIndex||0)+1)%orderLen;
+      d.roundStartedAt={".sv":"timestamp"};d.timeLeft=20;
+    }
     return d;
   }).catch(()=>{});
 }
+
+async function recordLeaderboard(d){
+  if(!d.winner)return;
+  try{
+    const flagRef=ref(db,`games/${roomId}/leaderboardRecorded`);
+    const res=await runTransaction(flagRef,v=>v?undefined:true);
+    if(!res || !res.committed)return;
+    const winnerData=d[d.winner];
+    if(!winnerData || !winnerData.id)return;
+    const lbRef=ref(db,`leaderboard/${winnerData.id}`);
+    await runTransaction(lbRef,cur=>{
+      cur=cur||{name:winnerData.name,wins:0};
+      cur.name=winnerData.name;
+      cur.wins=(cur.wins||0)+1;
+      return cur;
+    });
+  }catch(e){}
+}
+
+async function loadLeaderboard(){
+  const box=$("leaderboardList");
+  box.innerHTML='<div class="spinner"></div>';
+  try{
+    const q=query(ref(db,"leaderboard"),orderByChild("wins"),limitToLast(10));
+    const snap=await get(q);
+    if(!snap.exists()){box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>';return}
+    const rows=[];
+    snap.forEach(ch=>rows.push(ch.val()));
+    rows.sort((a,b)=>(b.wins||0)-(a.wins||0));
+    box.innerHTML=rows.map((r,i)=>`<div class="lb-row"><span class="lb-rank">#${i+1}</span><span class="lb-name">${esc(r.name||"Pemain")}</span><span>${r.wins||0} 🏆</span></div>`).join("");
+  }catch(e){box.innerHTML='<div class="status error">Gagal memuat papan peringkat.</div>'}
+}
+
 function renderResult(d){
   clearInterval(timerInterval);
   const winner=d.winner;
-  const me=winner===mySlot;
-  $("resultIcon").textContent=winner?"🏆":"🤝";
-  $("resultTitle").textContent=winner?(me?"MENANG!":"KALAH!"):"SELESAI";
-  $("resultSub").textContent=winner?`Pemenang: ${d[winner]?.name||"Pemain"}`:"Pertandingan selesai.";
+  const me=winner && winner===mySlot;
+  const isDraw=d.status==="finished" && !winner;
+  const fullPull=Math.abs(clampRope(d.ropePosition))>=100;
+  $("resultIcon").textContent = isDraw?"🤝":(winner?"🏆":"🏳️");
+  $("resultTitle").textContent = isDraw?"SERI!":(winner?(mySlot==="spectator"?`${esc(d[winner]?.name||"Pemain")} MENANG`:(me?"MENANG!":"KALAH!")):"SELESAI");
+  $("resultSub").textContent = isDraw?"Skor imbang setelah 100 soal.":(winner?`Pemenang: ${esc(d[winner]?.name||"Pemain")} ${fullPull?"(tarikan penuh)":"(skor akhir tertinggi)"}`:"Pertandingan selesai.");
   $("finalP1Name").textContent=d.player1?.name||"PLAYER 1";
   $("finalP2Name").textContent=d.player2?.name||"PLAYER 2";
   $("finalP1Score").textContent=d.player1?.score||0;
   $("finalP2Score").textContent=d.player2?.score||0;
+  if(mySlot!=="spectator"){
+    if(me){sfxWin();buzz([80,40,80,40,140])}
+    else if(winner && !me){sfxLose();buzz(200)}
+  }
+  if(mySlot==="player1")recordLeaderboard(d);
 }
+
 $("playAgainBtn").onclick=async()=>{
   if(!roomId)return;
   if(mySlot==="player1"){
+    let category="semua";
+    try{const cs=await get(ref(db,"games/"+roomId+"/category"));if(cs.exists())category=cs.val()}catch(e){}
     await update(ref(db,"games/"+roomId),{
       status:"waiting",ropePosition:0,round:0,questionIndex:0,winner:null,
-      "player1/score":0,"player2/score":0
+      "player1/score":0,"player2/score":0,
+      streakP1:0,streakP2:0,suddenDeathCounter:0,leaderboardRecorded:false,
+      questionOrder:buildOrder(category)
     });
   }
   $("gameMessage").textContent="Menunggu host memulai...";
   show("lobby");
 };
 $("homeBtn").onclick=async()=>{
-  if(roomId)await remove(ref(db,"games/"+roomId));
-  cleanup();show("home");
+  if(roomId && mySlot!=="spectator")await remove(ref(db,"games/"+roomId)).catch(()=>{});
+  if(roomId && mySlot==="spectator")await remove(ref(db,`games/${roomId}/spectators/${uid}`)).catch(()=>{});
+  clearSession(); cleanup();show("home");
 };
 function cleanup(){
   clearInterval(timerInterval);if(roomUnsub)roomUnsub();
-  roomUnsub=null;roomId=null;mySlot=null;localRound=0;answered=false;
+  roomUnsub=null;roomId=null;mySlot=null;localRound=0;answered=false;lastRopePos=0;
 }
+
+(async function init(){
+  await ensureAuth();
+  await tryResume();
+})();
 </script>
 </body>
 </html>
