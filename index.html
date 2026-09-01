@@ -4,7 +4,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN!</h2>
+      <h2>ATURAN MAIN KITA!</h2>
     </div>
     <div class="modal-body">
       <div class="rule-grid">
@@ -168,7 +168,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     </select>
     <button class="btn" id="createBtn">🎮 BUAT PERMAINAN</button>
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
-    <button class="btn secondary" id="leaderboardBtn">🏆 PAPAN PERINGKAT</button>
+    <button class="btn secondary" id="historyBtn">📜 RIWAYAT MATCH</button>
   </div>
   <div class="hint">V2 • 2 pemain + penonton • maks 100 soal • realtime Firebase</div>
 </section>
@@ -245,44 +245,13 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <button class="btn secondary" id="homeBtn">🏠 MENU UTAMA</button>
 </section>
 
-<section id="leaderboard" class="screen">
-  <h2 style="text-align:center">🏆 Papan Peringkat</h2>
-  <div class="card" style="padding:12px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-      <select id="lbCategory">
-        <option value="semua">🎲 Semua Kategori</option>
-        <option value="umum">🧠 Umum</option>
-        <option value="mtk">🔢 MTK</option>
-        <option value="logika">🧩 Logika</option>
-      </select>
-      <select id="lbSort">
-        <option value="wins">🏆 Wins</option>
-        <option value="winrate">📊 Winrate</option>
-        <option value="total">🎮 Total Game</option>
-      </select>
-    </div>
-    <div id="leaderboardList"><div class="spinner"></div></div>
-    <div class="mini" style="margin-top:10px">Menampilkan Top 20 • W-L-D = Menang-Kalah-Seri</div>
-  </div>
-  <button class="btn" id="goHistoryBtn" style="margin-bottom:8px">📜 RIWAYAT MATCH + STATISTIK</button>
-  <button class="btn secondary" id="leaderboardBackBtn">← KEMBALI</button>
-  <style>
-    .lb-row{display:grid;grid-template-columns:32px 1fr auto auto;gap:6px;align-items:center;padding:10px 8px;border-bottom:2px dashed #241b17; font-weight:900}
-    .lb-row:last-child{border-bottom:none}
-    .lb-rank{background:var(--yellow);border:2px solid var(--ink);border-radius:8px;text-align:center;padding:2px 0}
-    .lb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .lb-stats{font-size:11px;opacity:.8;text-align:right;line-height:1.1}
-    .lb-wins{font-size:18px}
-  </style>
-</section>
-
 <section id="history" class="screen">
   <h2 style="text-align:center">📜 Riwayat Pertandingan</h2>
   <div class="card" style="padding:12px">
-    <div id="gameStats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
-    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px">
+    <div id="gameStats" class="history-summary"></div>
+    <div class="history-filter">
       <select id="historyFilter">
-        <option value="semua">🎲 Semua</option>
+        <option value="semua">🎲 Semua Kategori</option>
         <option value="umum">🧠 Umum</option>
         <option value="mtk">🔢 MTK</option>
         <option value="logika">🧩 Logika</option>
@@ -292,9 +261,27 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <div id="historyList"><div class="spinner"></div></div>
     <div class="mini" id="historyDebug" style="margin-top:8px"></div>
   </div>
-  <button class="btn secondary" id="historyBackBtn">← Kembali ke Leaderboard</button>
   <button class="btn secondary" id="historyHomeBtn" style="margin-top:8px">🏠 Home</button>
+  <style>
+    .history-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+    .history-stat{background:var(--yellow);border:3px solid var(--ink);border-radius:10px;padding:8px;text-align:center}
+    .history-stat b{display:block;font-size:22px;line-height:1}.history-stat span{font-size:10px;font-weight:900}
+    .history-filter{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
+    .history-card{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px;margin:10px 0;box-shadow:3px 3px 0 var(--ink)}
+    .match-head{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:900;opacity:.72;margin-bottom:8px}
+    .match-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;text-align:center}
+    .team{padding:8px 4px;border:2px solid var(--ink);border-radius:10px;font-weight:900}.team.win{background:#91e6ac}.team.lose{background:#ff9a9a}.team.draw{background:#ffe08a}
+    .team-name{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.score-big{font-size:28px;line-height:1;margin:4px 0}
+    .match-result{font-size:10px;font-weight:900}.vs{font-weight:900;font-size:11px}
+    .match-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:8px}.pill{border:2px solid var(--ink);border-radius:99px;padding:3px 7px;font-size:9px;font-weight:900;background:#fff}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.detail-box{border:2px dashed var(--ink);border-radius:9px;padding:7px;font-size:10px}.detail-box h4{margin:0 0 5px;font-size:11px}.detail-line{display:flex;justify-content:space-between;gap:5px;margin:2px 0}.detail-line b{font-weight:900}
+    .timeline{margin-top:9px;border-top:2px dashed var(--ink);padding-top:7px}.event{display:grid;grid-template-columns:34px 1fr auto;gap:5px;align-items:center;font-size:9px;padding:3px 0}.event-icon{font-size:14px;text-align:center}.event-name{font-weight:900}.event-note{opacity:.7;text-align:right}
+    .match-footer{margin-top:8px;text-align:center;font-size:9px;font-weight:900;opacity:.65}
+    @media(min-width:600px){.history-summary{grid-template-columns:repeat(4,1fr)}}
+  </style>
 </section>
+
+
 
 </div>
 
@@ -505,7 +492,7 @@ let questions = [
 ];
 
 
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active"); if(id==="leaderboard"){loadLeaderboard();} if(id==="history"){loadHistory();}}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active"); if(id==="history"){loadHistory();}}
 function cleanName(v){return (v||"").trim().slice(0,18)}
 function makeCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
@@ -577,7 +564,7 @@ $("createBtn").onclick=async()=>{
       player1:{id:uid,name,score:0,connected:true},
       player2:null, ropePosition:0, round:0, questionIndex:0,
       questionOrder:buildOrder(category), category,
-      streakP1:0, streakP2:0, suddenDeathCounter:0, leaderboardRecorded:false,
+      streakP1:0, streakP2:0, suddenDeathCounter:0, matchEvents:[], maxStreak:{player1:0,player2:0}, historyRecorded:false,
       startedAt:null, roundStartedAt:null, timeLeft:20, winner:null
     };
     await set(ref(db,"games/"+roomId),room);
@@ -588,8 +575,7 @@ $("createBtn").onclick=async()=>{
 
 $("showJoinBtn").onclick=()=>show("join");
 $("backBtn").onclick=()=>show("home");
-$("leaderboardBtn").onclick=()=>{show("leaderboard");loadLeaderboard()};
-$("leaderboardBackBtn").onclick=()=>show("home");
+$("historyBtn").onclick=()=>show("history");
 
 $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
@@ -728,13 +714,17 @@ async function answer(choice,q,btn){
       return (Number(cur||0) - 5);
     }).catch(()=>{});
     runTransaction(ref(db,`games/${roomId}/${streakKey}`),()=>0).catch(()=>{});
-    runTransaction(ref(db,`games/${roomId}/playerPenalty/${mySlot}`),v=>Number(v||0)+penaltySeconds).catch(()=>{});
-    // tali ketarik lawan 5%
-    runTransaction(ref(db,`games/${roomId}/ropePosition`), pos=>{
-      const p = Number(pos||0);
-      const delta = mySlot==="player1" ? 5 : -5;
-      return Math.max(-100, Math.min(100, p + delta));
-    }).catch(()=>{});
+    const wrongRef=ref(db,"games/"+roomId);
+    runTransaction(wrongRef,d=>{
+      if(!d || d.status!=="playing") return d;
+      const my=d[mySlot]||{}; my.score=Number(my.score||0)-5; d[mySlot]=my;
+      d.playerPenalty=d.playerPenalty||{}; d.playerPenalty[mySlot]=Number(d.playerPenalty[mySlot]||0)+penaltySeconds;
+      d[streakKey]=0;
+      const p=Number(d.ropePosition||0), delta=mySlot==="player1"?5:-5; d.ropePosition=Math.max(-100,Math.min(100,p+delta));
+      d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+      d.matchEvents.push({type:"wrong",slot:mySlot,round:Number(d.round||1),questionIndex:Number(d.questionIndex||0),question:q.q||"",answer:q.a?.[choice]||"",correctAnswer:q.a?.[q.c]||"",points:-5,penalty:penaltySeconds,at:Date.now()});
+      return d;
+    }).catch(e=>console.error("wrong answer save",e));
     roundDeadline=Math.max(Date.now()+1000,roundDeadline-penaltySeconds*1000);
     setTimeout(()=>{btn.classList.remove("wrong");$("gameMessage").textContent=""},900);
     return;
@@ -752,6 +742,10 @@ async function answer(choice,q,btn){
       const streak=(d[streakKey]||0)+1;
       d[streakKey]=streak;
       const combo=streak>0 && streak%COMBO_STREAK===0;
+      d.maxStreak=d.maxStreak||{player1:0,player2:0};
+      d.maxStreak[mySlot]=Math.max(Number(d.maxStreak[mySlot]||0),streak);
+      d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+      d.matchEvents.push({type:"correct",slot:mySlot,round:Number(d.round||1),questionIndex:Number(d.questionIndex||0),question:q.q||"",answer:q.a?.[choice]||"",correctAnswer:q.a?.[q.c]||"",points:10,combo:!!combo,at:Date.now()});
       d.lastComboSlot=combo?mySlot:null;
       const baseDelta=mySlot==="player1"?-10:10;
       const delta=combo?baseDelta*COMBO_MULTIPLIER:baseDelta;
@@ -809,6 +803,8 @@ async function timeOut(round){
     }else{
       d.suddenDeathCounter=sd;
     }
+    d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+    d.matchEvents.push({type:"timeout",round:Number(d.round||round),questionIndex:Number(d.questionIndex||0),at:Date.now()});
     if((d.round||1)>=Math.min(ROUND_LIMIT, orderLen)){
       d.status="finished";
       const s1=(d.player1&&d.player1.score)||0, s2=(d.player2&&d.player2.score)||0;
@@ -822,216 +818,85 @@ async function timeOut(round){
   }).catch(()=>{});
 }
 
-async function recordLeaderboard(d){
+async function archiveMatchHistory(d){
   try{
-    const category = d.category || "semua";
-    const p1 = d.player1, p2 = d.player2;
-    if(!p1?.id || !p2?.id) throw new Error("Data kedua pemain tidak lengkap.");
-
-    // Gunakan transaction sebagai lock, tetapi JANGAN mengunci sebelum seluruh
-    // statistik berhasil ditulis. Status pending/complete membantu retry aman.
-    const stateRef = ref(db, `games/${roomId}/leaderboardState`);
-    const claim = await runTransaction(stateRef, cur=>{
-      if(cur?.status === "complete") return;
-      if(cur?.status === "processing" && cur.uid !== uid) return;
-      return {status:"processing", uid, startedAt:Date.now()};
+    if(!d || d.status!=="finished" || !d.player1?.id || !d.player2?.id) return;
+    const flagRef=ref(db,`games/${roomId}/historyRecorded`);
+    const claim=await runTransaction(flagRef,cur=>{
+      if(cur?.status==="complete") return;
+      if(cur?.status==="processing" && Date.now()-Number(cur.at||0)<15000) return;
+      return {status:"processing",uid,at:Date.now()};
     });
-    if(!claim?.committed) return;
-
-    const makeUpdate = async (playerUid, name, result, score, bestStreak)=>{
-      // Idempotensi per pemain per pertandingan: retry tidak menggandakan statistik.
-      const appliedRef = ref(db, `games/${roomId}/leaderboardApplied/${playerUid}`);
-      const mark = await runTransaction(appliedRef, cur=>{
-        if(cur?.status === "complete" || cur?.status === "processing") return;
-        return {status:"processing", startedAt:Date.now(), by:uid};
-      });
-      if(!mark?.committed) return {skipped:true, committed:true};
-      const lbRef = ref(db, `leaderboard/${playerUid}`);
-      try {
-        const result = await runTransaction(lbRef, cur=>{
-        cur = cur || {name:name, wins:0, losses:0, draws:0, totalGames:0, totalScore:0, bestScore:0, bestStreak:0, perCategory:{}};
-        cur.name = name || cur.name || "Pemain";
-        cur.totalGames = Number(cur.totalGames||0)+1;
-        cur.totalScore = Number(cur.totalScore||0)+Number(score||0);
-        cur.bestScore = Math.max(Number(cur.bestScore||0), Number(score||0));
-        cur.bestStreak = Math.max(Number(cur.bestStreak||0), Number(bestStreak||0));
-        cur.lastPlayedAt = Date.now();
-        if(result==="win") cur.wins=Number(cur.wins||0)+1;
-        else if(result==="loss") cur.losses=Number(cur.losses||0)+1;
-        else cur.draws=Number(cur.draws||0)+1;
-
-        cur.perCategory = cur.perCategory || {};
-        const cats = [category];
-        if(category !== "semua") cats.push("semua");
-        cats.forEach(cat=>{
-          const c = cur.perCategory[cat] || {wins:0,losses:0,draws:0,total:0};
-          c.total=Number(c.total||0)+1;
-          if(result==="win") c.wins=Number(c.wins||0)+1;
-          else if(result==="loss") c.losses=Number(c.losses||0)+1;
-          else c.draws=Number(c.draws||0)+1;
-          cur.perCategory[cat]=c;
-        });
-          return cur;
-        });
-        if(!result?.committed) throw new Error("Transaksi statistik pemain gagal.");
-        await set(appliedRef,{status:"complete",completedAt:Date.now()});
-        return result;
-      } catch(err) {
-        await set(appliedRef,{status:"failed",error:String(err?.message||err),failedAt:Date.now()}).catch(()=>{});
-        throw err;
-      }
-    };
-
-    const tasks=[];
-    if(d.winner){
-      const ws=d.winner, ls=ws==="player1"?"player2":"player1";
-      const wp=d[ws], lp=d[ls];
-      tasks.push(makeUpdate(wp.id,wp.name,"win",wp.score||0,ws==="player1"?d.streakP1||0:d.streakP2||0));
-      tasks.push(makeUpdate(lp.id,lp.name,"loss",lp.score||0,ls==="player1"?d.streakP1||0:d.streakP2||0));
-    }else{
-      tasks.push(makeUpdate(p1.id,p1.name,"draw",p1.score||0,d.streakP1||0));
-      tasks.push(makeUpdate(p2.id,p2.name,"draw",p2.score||0,d.streakP2||0));
-    }
-
-    const results = await Promise.all(tasks);
-    if(results.some(r=>!r?.committed)) throw new Error("Transaksi leaderboard tidak berhasil.");
-
-    await set(stateRef,{status:"complete",uid,completedAt:Date.now()});
-    // kompatibilitas dengan data/versi lama
-    await set(ref(db,`games/${roomId}/leaderboardRecorded`),true);
-    console.log("Leaderboard berhasil dicatat", roomId);
+    if(!claim?.committed)return;
+    const started=Number(d.startedAt||Date.now());
+    const matchId=`${roomId}_${started}`;
+    const durationSeconds=started?Math.max(0,Math.round((Date.now()-started)/1000)):0;
+    const history={...d,roomId,matchId,durationSeconds,archivedAt:Date.now()};
+    delete history.spectators; delete history.historyRecorded;
+    await set(ref(db,`matchHistory/${matchId}`),history);
+    await set(flagRef,{status:"complete",uid,at:Date.now(),matchId});
+    console.log("Riwayat match tersimpan",matchId);
   }catch(e){
-    console.error("leaderboard error", e);
-    // Kembalikan lock agar pemain lain dapat retry.
-    try{ await set(ref(db,`games/${roomId}/leaderboardState`),{status:"failed",uid,error:String(e?.message||e),failedAt:Date.now()}); }catch(_){ }
-  }
-}
-
-async function loadLeaderboard(){
-  const box=$("leaderboardList");
-  if(!box) return;
-  const category=$("lbCategory")?.value || "semua";
-  const sortBy=$("lbSort")?.value || "wins";
-  box.innerHTML='<div class="spinner"></div>';
-  try{
-    const snap=await get(ref(db,"leaderboard"));
-    if(!snap.exists()){
-      box.innerHTML='<div class="status">Belum ada data. Jadilah pemenang pertama! 🏆</div>'; return;
-    }
-    const rows=[];
-    snap.forEach(ch=>rows.push({uid:ch.key,...ch.val()}));
-    let filtered=rows.filter(r=>category==="semua" || Number(r.perCategory?.[category]?.total||0)>0);
-
-    const stat=r=>category==="semua" ? r : (r.perCategory?.[category]||{});
-    const wins=r=>Number(stat(r).wins||0);
-    const total=r=>Number(category==="semua" ? r.totalGames||0 : stat(r).total||0);
-    const rate=r=>total(r)>0 ? wins(r)/total(r) : 0;
-
-    filtered.sort((a,b)=>{
-      if(sortBy==="winrate") return rate(b)-rate(a) || wins(b)-wins(a) || total(b)-total(a);
-      if(sortBy==="total") return total(b)-total(a) || wins(b)-wins(a);
-      return wins(b)-wins(a) || rate(b)-rate(a) || total(b)-total(a);
-    });
-
-    const top=filtered.slice(0,50);
-    if(!top.length){
-      box.innerHTML=`<div class="status">Belum ada data untuk kategori ${esc(category)}.</div>`; return;
-    }
-    box.innerHTML=top.map((r,i)=>{
-      const st=stat(r), w=Number(st.wins||0), l=Number(st.losses||0), d=Number(st.draws||0), t=total(r);
-      const wr=t?Math.round(w/t*100):0;
-      return `<div class="lb-row">
-        <span class="lb-rank">#${i+1}</span>
-        <span class="lb-name">${esc(r.name||"Pemain")}<br><span class="lb-stats">${w}W-${l}L-${d}D • WR ${wr}% • Best ${Number(r.bestScore||0)} • ${t} game</span></span>
-        <span class="lb-wins">${w} 🏆</span>
-        <span class="lb-stats" style="text-align:center">${Number(r.totalGames||0)} total<br>${Number(r.bestStreak||0)}🔥</span>
-      </div>`;
-    }).join("");
-  }catch(e){
-    console.error("load leaderboard error",e);
-    box.innerHTML='<div class="status error">Gagal memuat papan peringkat.<br>'+esc(e.message||"")+'</div>';
+    console.error("archive history error",e);
+    try{await set(ref(db,`games/${roomId}/historyRecorded`),{status:"failed",uid,error:String(e?.message||e),at:Date.now()});}catch(_){}
   }
 }
 
 async function loadHistory(){
-  const box=document.getElementById("historyList");
-  const statsBox=document.getElementById("gameStats");
-  const debugBox=document.getElementById("historyDebug");
+  const box=document.getElementById("historyList"), statsBox=document.getElementById("gameStats"), debugBox=document.getElementById("historyDebug");
   const cat=document.getElementById("historyFilter")?.value || "semua";
-  if(!box) return;
+  if(!box)return;
   box.innerHTML='<div class="spinner"></div>';
   try{
-    const snap = await get(ref(db,"games"));
+    const snap=await get(ref(db,"matchHistory"));
     if(!snap.exists()){
-      box.innerHTML='<div class="status">Belum ada match finished.</div>';
-      if(statsBox) statsBox.innerHTML='';
-      if(debugBox) debugBox.textContent='DB /games kosong';
-      return;
+      box.innerHTML='<div class="status">Belum ada riwayat pertandingan.</div>';
+      if(statsBox)statsBox.innerHTML=''; if(debugBox)debugBox.textContent='matchHistory kosong'; return;
     }
-    let all=[];
-    let allCount=0;
-    snap.forEach(ch=>{
-      allCount++;
-      const g=ch.val();
-      if(g.status!=="finished") return;
-      if(cat!=="semua" && g.category!==cat) return;
-      all.push({id:ch.key, ...g});
-    });
-    all.sort((a,b)=>(b.startedAt||0)-(a.startedAt||0));
-    const total = all.length;
-    const uniq = new Set();
-    let rounds=0, penalty=0;
-    all.forEach(g=>{
-      if(g.player1?.id) uniq.add(g.player1.id);
-      if(g.player2?.id) uniq.add(g.player2.id);
-      rounds+= g.round||0;
-      penalty+= (g.playerPenalty?.player1||0)+(g.playerPenalty?.player2||0);
-    });
-    if(statsBox){
-      statsBox.innerHTML=`
-        <div class="stat-card"><b>${total}</b><span>Total Match Finished</span></div>
-        <div class="stat-card"><b>${uniq.size}</b><span>Pemain Unik</span></div>
-        <div class="stat-card"><b>${total?Math.round(rounds/total):0}</b><span>Rata Ronde</span></div>
-        <div class="stat-card"><b>${penalty}</b><span>Total Penalti detik</span></div>
-      `;
-    }
-    if(debugBox) debugBox.textContent=`Debug: ${allCount} room total di DB, ${total} finished, filter ${cat}`;
-    if(all.length===0){
-      box.innerHTML=`<div class="status">Belum ada match untuk kategori ${cat}. Coba Semua.</div>`;
-      return;
-    }
-    const top=all.slice(0,50);
-    box.innerHTML = top.map(g=>{
-      const p1=g.player1||{}; const p2=g.player2||{};
-      const win=g.winner;
-      const date=g.startedAt?new Date(g.startedAt).toLocaleString("id-ID"):"-";
-      const catName=g.category||"umum";
-      const pp1=g.playerPenalty?.player1||0; const pp2=g.playerPenalty?.player2||0;
-      const safe = (s)=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-      return `<div class="history-row">
-        <div class="history-top"><span>🆔 ${safe(g.id)} • ${safe(catName.toUpperCase())}</span><span>${safe(date)}</span></div>
-        <div class="history-players">
-          <div class="history-p ${win==="player1"?"winner":"loser"}"><b>${safe(p1.name||"P1")}</b><br>${p1.score||0} poin<br>${pp1?`⚠️ ${pp1}s`:''}</div>
-          <div style="font-weight:900">VS</div>
-          <div class="history-p ${win==="player2"?"winner":"loser"}"><b>${safe(p2.name||"P2")}</b><br>${p2.score||0} poin<br>${pp2?`⚠️ ${pp2}s`:''}</div>
-        </div>
-        <div class="history-meta">Ronde: ${g.round||0} • Tali: ${g.ropePosition||0}% • ${g.winner?`Menang: ${safe(win==="player1"?(p1.name||"P1"):(p2.name||"P2"))}`:"Seri"} • Soal ke-${g.questionIndex||0}</div>
-      </div>`;
-    }).join("");
-  }catch(e){
-    console.error(e);
-    box.innerHTML='<div class="status error">Gagal load riwayat: '+e.message+'</div>';
-  }
+    const all=[]; snap.forEach(ch=>{const g=ch.val(); if(g.category && cat!=="semua" && g.category!==cat)return; all.push({id:ch.key,...g});});
+    all.sort((a,b)=>(Number(b.startedAt)||0)-(Number(a.startedAt)||0));
+    const total=all.length, players=new Set(), rounds=all.reduce((n,g)=>n+Number(g.round||0),0);
+    let penalties=0, correct=0, wrong=0;
+    all.forEach(g=>{if(g.player1?.id)players.add(g.player1.id);if(g.player2?.id)players.add(g.player2.id);penalties+=Number(g.playerPenalty?.player1||0)+Number(g.playerPenalty?.player2||0);(g.matchEvents||[]).forEach(e=>{if(e.type==="correct")correct++;if(e.type==="wrong")wrong++;});});
+    if(statsBox)statsBox.innerHTML=`<div class="history-stat"><b>${total}</b><span>PERTANDINGAN</span></div><div class="history-stat"><b>${players.size}</b><span>PEMAIN</span></div><div class="history-stat"><b>${total?Math.round(rounds/total):0}</b><span>RATA-RATA RONDE</span></div><div class="history-stat"><b>${penalties}s</b><span>TOTAL PENALTI</span></div>`;
+    if(debugBox)debugBox.textContent=`${total} pertandingan • ${correct} jawaban benar • ${wrong} jawaban salah`;
+    if(!all.length){box.innerHTML='<div class="status">Belum ada match untuk kategori ini.</div>';return;}
+    box.innerHTML=all.slice(0,50).map(g=>renderHistoryCard(g)).join("");
+  }catch(e){console.error("history error",e);box.innerHTML='<div class="status error">Gagal memuat riwayat: '+esc(e.message||"")+'</div>';}
 }
 
-
+function renderHistoryCard(g){
+  const p1=g.player1||{},p2=g.player2||{}, winner=g.winner||null;
+  const ev=Array.isArray(g.matchEvents)?g.matchEvents:[];
+  const statFor=slot=>{const es=ev.filter(e=>e.slot===slot), c=es.filter(e=>e.type==="correct").length,w=es.filter(e=>e.type==="wrong").length,t=c+w;return {correct:c,wrong:w,attempts:t,accuracy:t?Math.round(c/t*100):0,penalty:Number(g.playerPenalty?.[slot]||0),maxStreak:Number(g.maxStreak?.[slot]||0),timeouts:es.filter(e=>e.type==="timeout").length};};
+  const s1=statFor("player1"),s2=statFor("player2");
+  const cls1=winner==="player1"?"win":winner==="player2"?"lose":"draw", cls2=winner==="player2"?"win":winner==="player1"?"lose":"draw";
+  const date=g.startedAt?new Date(Number(g.startedAt)).toLocaleString("id-ID"):"-";
+  const result=winner?(winner==="player1"?`${esc(p1.name||"Player 1")} MENANG`:`${esc(p2.name||"Player 2")} MENANG`):"PERTANDINGAN SERI";
+  const timeline=ev.slice(-12).map(e=>{const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?`-5 / -${e.penalty||0}s`:"Waktu habis";return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} <span style="font-weight:600">${esc(e.question||"")}</span></span><span class="event-note">${note}</span></div>`;}).join("");
+  return `<article class="history-card">
+    <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())} • ${esc(g.id||"")}</span><span>${esc(date)}</span></div>
+    <div class="match-score">
+      <div class="team ${cls1}"><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
+      <div class="vs">VS</div>
+      <div class="team ${cls2}"><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
+    </div>
+    <div class="match-meta"><span class="pill">🏆 ${result}</span><span class="pill">🔢 ${Number(g.round||0)} ronde</span><span class="pill">🪢 ${Number(g.ropePosition||0)}%</span><span class="pill">⏱️ ${Number(g.durationSeconds||0)} detik</span></div>
+    <div class="detail-grid">
+      <div class="detail-box"><h4>🔵 ${esc(p1.name||"PLAYER 1")}</h4><div class="detail-line"><span>Benar</span><b>${s1.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s1.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s1.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s1.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s1.maxStreak} 🔥</b></div></div>
+      <div class="detail-box"><h4>🔴 ${esc(p2.name||"PLAYER 2")}</h4><div class="detail-line"><span>Benar</span><b>${s2.correct}</b></div><div class="detail-line"><span>Salah</span><b>${s2.wrong}</b></div><div class="detail-line"><span>Akurasi</span><b>${s2.accuracy}%</b></div><div class="detail-line"><span>Penalti</span><b>${s2.penalty}s</b></div><div class="detail-line"><span>Max streak</span><b>${s2.maxStreak} 🔥</b></div></div>
+    </div>
+    ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b>${timeline}</div>`:""}
+    <div class="match-footer">ID MATCH: ${esc(g.id||"")} • ${s1.attempts+s2.attempts} percobaan tercatat</div>
+  </article>`;
+}
 
 // auto reload saat ganti filter
 document.addEventListener("DOMContentLoaded", ()=>{
-  const c = document.getElementById("lbCategory");
-  const s = document.getElementById("lbSort");
-  if(c) c.addEventListener("change", loadLeaderboard);
-  if(s) s.addEventListener("change", loadLeaderboard);
+  const c = document.getElementById("historyFilter");
+  if(c) c.addEventListener("change", loadHistory);
+  document.getElementById("historyRefreshBtn")?.addEventListener("click", loadHistory);
+  document.getElementById("historyHomeBtn")?.addEventListener("click", ()=>show("home"));
 });
 
 
@@ -1052,7 +917,7 @@ function renderResult(d){
     if(me){sfxWin();buzz([80,40,80,40,140])}
     else if(winner && !me){sfxLose();buzz(200)}
   }
-  if(mySlot!=="spectator")recordLeaderboard(d); // v2.1: semua pemain boleh trigger, flag transaction cegah double
+  if(mySlot!=="spectator") archiveMatchHistory(d);
 }
 
 $("playAgainBtn").onclick=async()=>{
@@ -1063,7 +928,7 @@ $("playAgainBtn").onclick=async()=>{
     await update(ref(db,"games/"+roomId),{
       status:"waiting",ropePosition:0,round:0,questionIndex:0,winner:null,
       "player1/score":0,"player2/score":0,
-      streakP1:0,streakP2:0,suddenDeathCounter:0,leaderboardRecorded:false,
+      streakP1:0,streakP2:0,suddenDeathCounter:0,matchEvents:[],maxStreak:{player1:0,player2:0},historyRecorded:false,
       questionOrder:buildOrder(category)
     });
   }
