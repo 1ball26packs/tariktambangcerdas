@@ -560,7 +560,7 @@ async function loadQuestionsFromCSV(){
     questions=parseCSV(csv);
     refreshCategoryOptions();
     questionsReady=true;
-    if(status)status.textContent=`📚 ${questions.length} soal siap dimainkan`;
+    if(status)status.textContent=`📚 ${questions.length} soal tersedia untuk ditaklukan`;
     console.log(`Tug of War V2.8: ${questions.length} soal dimuat dari questions.csv`);
   }catch(e){
     questions=fallbackQuestions.slice();
