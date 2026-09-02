@@ -145,16 +145,20 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .lb-rank{width:34px}
 .lb-name{flex:1}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
-.header {
-         display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-  .logo {
-      width: 100%; /* responsive di HP */
-           height: auto; /* jaga rasio */
-      display: block;
-    }
+@keyframes tugTug {
+  0%, 100% { transform: translateX(0) skewX(0) scaleX(1); }
+  15% { transform: translateX(-18%) skewX(-8deg) scaleX(1.08); }
+  30% { transform: translateX(16%) skewX(8deg) scaleX(1.08); }
+  45% { transform: translateX(-12%) skewX(-6deg) scaleX(1.05); }
+  60% { transform: translateX(10%) skewX(5deg) scaleX(1.04); }
+  75% { transform: translateX(-5%) skewX(-3deg); }
+  85% { transform: translateX(3%) skewX(2deg); }
+}
+
+.anim-tug {
+  animation: tugTug 0.85s cubic-bezier(.68,-0.4,.32,1.4) infinite;
+  transform-origin: center;
+}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,11 +168,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <div class="app">
 
 <section id="home" class="screen active">
-<div><header class="header">
-    <img src="logo.webp" 
-         alt="Logo Tarik Tambang Cerdas" 
-         class="logo">
-  </header></div> 
+<div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
   <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
   <div class="card">
     <label for="name">Nama pemain</label>
