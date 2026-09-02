@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tug of War — V2.9</title>
+<title>Tarik Tambang! Cerdas!</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
@@ -257,25 +257,23 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <section id="history" class="screen">
   <h2 style="text-align:center">📜 Riwayat Pertandingan</h2>
   <div class="card" style="padding:12px">
-    <div id="gameStats" class="history-stats"></div>
     <div class="history-filter">
       <select id="historyFilter">
         <option value="semua">🎲 Semua Kategori</option>
-        <option value="umum">🧠 Umum</option>
-        <option value="mtk">🔢 MTK</option>
-        <option value="logika">🧩 Logika</option>
       </select>
       <button class="btn small" id="historyRefreshBtn">🔄 Refresh</button>
     </div>
     <div id="historyList"><div class="spinner"></div></div>
+    <div id="historyPagination" class="history-pagination"></div>
     <div class="mini" id="historyDebug" style="margin-top:8px"></div>
   </div>
   <button class="btn secondary" id="historyHomeBtn" style="margin-top:8px">🏠 Home</button>
   <style>
-    .history-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-    .history-stat{background:var(--yellow);border:3px solid var(--ink);border-radius:10px;padding:8px;text-align:center}
-    .history-stat b{display:block;font-size:22px;line-height:1}.history-stat span{font-size:10px;font-weight:900}
     .history-filter{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
+    .history-pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
+    .history-pagination button{border:3px solid var(--ink);border-radius:10px;background:#fff;font-weight:900;padding:7px 14px;cursor:pointer}
+    .history-pagination button:disabled{opacity:.4;cursor:not-allowed}
+    .history-pagination span{font-size:12px;font-weight:900}
     .history-card{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px;margin:10px 0;box-shadow:3px 3px 0 var(--ink);overflow:hidden}
     .history-card.is-open{box-shadow:4px 4px 0 var(--ink)}
     .history-summary{cursor:pointer;position:relative}
@@ -294,7 +292,6 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.detail-box{border:2px dashed var(--ink);border-radius:9px;padding:7px;font-size:10px}.detail-box h4{margin:0 0 5px;font-size:11px}.detail-line{display:flex;justify-content:space-between;gap:5px;margin:2px 0}.detail-line b{font-weight:900}
     .timeline{margin-top:9px;border-top:2px dashed var(--ink);padding-top:7px}.event{display:grid;grid-template-columns:34px 1fr auto;gap:5px;align-items:center;font-size:9px;padding:3px 0}.event-icon{font-size:14px;text-align:center}.event-name{font-weight:900}.event-note{opacity:.7;text-align:right}
     .match-footer{margin-top:8px;text-align:center;font-size:9px;font-weight:900;opacity:.65}
-    @media(min-width:600px){.history-stats{grid-template-columns:repeat(4,1fr)}}
   </style>
 </section>
 
@@ -536,12 +533,25 @@ function parseCSV(text){
   return result;
 }
 
+const CATEGORY_LABELS={umum:"🌍 Pengetahuan Umum",mtk:"➗ Matematika",logika:"🧠 Logika",sains:"🔬 Sains",sejarah:"🏛️ Sejarah",geografi:"🗺️ Geografi",olahraga:"⚽ Olahraga",teknologi:"💻 Teknologi",bahasa:"🔤 Bahasa"};
+
+function categoryOptionsHTML(cats){
+  return '<option value="semua">🎲 Semua Kategori</option>'+cats.map(cat=>`<option value="${esc(cat)}">${CATEGORY_LABELS[cat]||"📚 "+cat.replace(/\b\w/g,m=>m.toUpperCase())}</option>`).join("");
+}
+
 function refreshCategoryOptions(){
   const select=$("category"); if(!select)return;
   const current=select.value||"semua";
-  const labels={umum:"🌍 Pengetahuan Umum",mtk:"➗ Matematika",logika:"🧠 Logika",sains:"🔬 Sains",sejarah:"🏛️ Sejarah",geografi:"🗺️ Geografi",olahraga:"⚽ Olahraga",teknologi:"💻 Teknologi",bahasa:"🔤 Bahasa"};
   const cats=[...new Set(questions.map(q=>q.cat).filter(Boolean))].sort();
-  select.innerHTML='<option value="semua">🎲 Semua Kategori</option>'+cats.map(cat=>`<option value="${esc(cat)}">${labels[cat]||"📚 "+cat.replace(/\b\w/g,m=>m.toUpperCase())}</option>`).join("");
+  select.innerHTML=categoryOptionsHTML(cats);
+  select.value=cats.includes(current)?current:"semua";
+}
+
+function refreshHistoryFilterOptions(){
+  const select=$("historyFilter"); if(!select)return;
+  const current=select.value||"semua";
+  const cats=[...new Set(questions.map(q=>q.cat).filter(Boolean))].sort();
+  select.innerHTML=categoryOptionsHTML(cats);
   select.value=cats.includes(current)?current:"semua";
 }
 
@@ -553,12 +563,14 @@ async function loadQuestionsFromCSV(){
     const csv=await res.text();
     questions=parseCSV(csv);
     refreshCategoryOptions();
+    refreshHistoryFilterOptions();
     questionsReady=true;
     if(status)status.textContent=`📚 ${questions.length} soal siap dimainkan`;
     console.log(`Tug of War V2.8: ${questions.length} soal dimuat dari questions.csv`);
   }catch(e){
     questions=fallbackQuestions.slice();
     refreshCategoryOptions();
+    refreshHistoryFilterOptions();
     questionsReady=true;
     if(status)status.textContent=`📚 CSV tidak terbaca — memakai ${questions.length} soal bawaan`;
     console.warn("questions.csv gagal dimuat, fallback ke soal bawaan:",e);
@@ -933,27 +945,47 @@ async function archiveMatchHistory(d){
   }
 }
 
+const HISTORY_PAGE_SIZE=10;
+let historyAll=[];
+let historyPage=1;
+
 async function loadHistory(){
-  const box=document.getElementById("historyList"), statsBox=document.getElementById("gameStats"), debugBox=document.getElementById("historyDebug");
+  const box=document.getElementById("historyList"), pagBox=document.getElementById("historyPagination"), debugBox=document.getElementById("historyDebug");
   const cat=document.getElementById("historyFilter")?.value || "semua";
   if(!box)return;
   box.innerHTML='<div class="spinner"></div>';
+  if(pagBox)pagBox.innerHTML='';
   try{
     const snap=await get(ref(db,"matchHistory"));
     if(!snap.exists()){
       box.innerHTML='<div class="status">Belum ada riwayat pertandingan.</div>';
-      if(statsBox)statsBox.innerHTML=''; if(debugBox)debugBox.textContent='matchHistory kosong'; return;
+      if(debugBox)debugBox.textContent='matchHistory kosong'; historyAll=[]; return;
     }
     const all=[]; snap.forEach(ch=>{const g=ch.val(); if(g.category && cat!=="semua" && g.category!==cat)return; all.push({id:ch.key,...g});});
     all.sort((a,b)=>(Number(b.startedAt)||0)-(Number(a.startedAt)||0));
-    const total=all.length, players=new Set(), rounds=all.reduce((n,g)=>n+Number(g.round||0),0);
-    let penalties=0, correct=0, wrong=0;
-    all.forEach(g=>{if(g.player1?.id)players.add(g.player1.id);if(g.player2?.id)players.add(g.player2.id);penalties+=Number(g.playerPenalty?.player1||0)+Number(g.playerPenalty?.player2||0);(g.matchEvents||[]).forEach(e=>{if(e.type==="correct")correct++;if(e.type==="wrong")wrong++;});});
-    if(statsBox)statsBox.innerHTML=`<div class="history-stat"><b>${total}</b><span>PERTANDINGAN</span></div><div class="history-stat"><b>${players.size}</b><span>PEMAIN</span></div><div class="history-stat"><b>${total?Math.round(rounds/total):0}</b><span>RATA-RATA RONDE</span></div><div class="history-stat"><b>${penalties}s</b><span>TOTAL PENALTI</span></div>`;
-    if(debugBox)debugBox.textContent=`${total} pertandingan • ${correct} jawaban benar • ${wrong} jawaban salah`;
+    historyAll=all; historyPage=1;
+    if(debugBox)debugBox.textContent=`${all.length} pertandingan ditemukan`;
     if(!all.length){box.innerHTML='<div class="status">Belum ada match untuk kategori ini.</div>';return;}
-    box.innerHTML=all.slice(0,50).map(g=>renderHistoryCard(g)).join("");
+    renderHistoryPage();
   }catch(e){console.error("history error",e);box.innerHTML='<div class="status error">Gagal memuat riwayat: '+esc(e.message||"")+'</div>';}
+}
+
+function renderHistoryPage(){
+  const box=document.getElementById("historyList"), pagBox=document.getElementById("historyPagination");
+  if(!box)return;
+  const totalPages=Math.max(1,Math.ceil(historyAll.length/HISTORY_PAGE_SIZE));
+  historyPage=Math.min(Math.max(1,historyPage),totalPages);
+  const start=(historyPage-1)*HISTORY_PAGE_SIZE;
+  const pageItems=historyAll.slice(start,start+HISTORY_PAGE_SIZE);
+  box.innerHTML=pageItems.map(g=>renderHistoryCard(g)).join("");
+  if(pagBox){
+    if(totalPages<=1){pagBox.innerHTML='';}
+    else{
+      pagBox.innerHTML=`<button id="historyPrevBtn" ${historyPage<=1?"disabled":""}>← Sebelumnya</button><span>Halaman ${historyPage} / ${totalPages}</span><button id="historyNextBtn" ${historyPage>=totalPages?"disabled":""}>Berikutnya →</button>`;
+      document.getElementById("historyPrevBtn")?.addEventListener("click",()=>{historyPage--;renderHistoryPage();box.scrollIntoView({behavior:"smooth",block:"start"});});
+      document.getElementById("historyNextBtn")?.addEventListener("click",()=>{historyPage++;renderHistoryPage();box.scrollIntoView({behavior:"smooth",block:"start"});});
+    }
+  }
 }
 
 function renderHistoryCard(g){
@@ -998,7 +1030,7 @@ function renderHistoryCard(g){
       <div class="match-meta">
         <span class="pill">🏆 ${result}</span>
         <span class="pill">🔢 ${Number(g.round||0)} ronde</span>
-        <span class="pill">🪢 ${Number(g.ropePosition||0)}%</span>
+        <span class="pill">${Math.abs(Number(g.ropePosition||0))>=100?"🪢 Tarik Tambang":"📊 Skor"}</span>
         <span class="pill">⏱️ ${Number(g.durationSeconds||0)} detik</span>
       </div>
       <div class="history-toggle"><span class="toggle-open">▼ LIHAT DETAIL STATISTIK</span><span class="toggle-close">▲ SEMBUNYIKAN DETAIL</span></div>
