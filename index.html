@@ -1,75 +1,11 @@
 
-<!-- POPUP ATURAN v2.5 -->
-<div id="rulesModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header">
-      <span class="modal-emoji">📜</span>
-      <h2>ATURAN MAIN KITA!</h2>
-    </div>
-    <div class="modal-body">
-      <div class="rule-grid">
-        <div class="rule-item correct">
-          <span class="rule-icon">✅</span>
-          <div>
-            <b>BENAR +10 POIN</b>
-            <p>Tali ketarik 10% ke lawan.<br>3x benar beruntun = COMBO 20%!</p>
-          </div>
-        </div>
-        <div class="rule-item wrong">
-          <span class="rule-icon">❌</span>
-          <div>
-            <b>SALAH -5 POIN</b>
-            <p>Berlaku per percobaan!<br>Salah 2x = -10, salah 3x = -15</p>
-          </div>
-        </div>
-        <div class="rule-item penalty">
-          <span class="rule-icon">⏱️</span>
-          <div>
-            <b>PENALTI -5 DETIK & -5% TALI</b>
-            <p>Waktu kepotong 5 detik + tali keseret lawan 5%.<br>Streak combo reset!</p>
-          </div>
-        </div>
-        <div class="rule-item win">
-          <span class="rule-icon">🏆</span>
-          <div>
-            <b>CARA MENANG</b>
-            <p>1. Tarik tali sampai 100% (selisih 10 jawaban)<br>2. Skor tertinggi setelah 100 soal</p>
-          </div>
-        </div>
-      </div>
-      <label class="modal-check"><input type="checkbox" id="dontShowRules"> Jangan tampilkan lagi</label>
-    </div>
-    <button class="btn" id="closeRulesBtn">🔥 MENGERTI, MAIN!</button>
-  </div>
-</div>
-<style>
-.modal-overlay{position:fixed;inset:0;background:rgba(20,10,5,.85);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal-card{background:var(--paper,#fff8e7);border:4px solid var(--ink,#241b17);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:420px;width:100%;padding:18px;animation:popIn .25s ease-out}
-@keyframes popIn{from{transform:scale(.9) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.modal-header{text-align:center;margin-bottom:12px}
-.modal-header h2{margin:6px 0 0;font-size:22px}
-.modal-emoji{font-size:40px}
-.modal-body{margin:12px 0}
-.rule-grid{display:grid;gap:10px}
-.rule-item{display:flex;gap:10px;padding:10px;border:3px solid var(--ink);border-radius:14px;background:#fff}
-.rule-item.correct{background:#91e6ac}
-.rule-item.wrong{background:#ff9a9a}
-.rule-item.penalty{background:#ffe082}
-.rule-item.win{background:#b3d9ff}
-.rule-icon{font-size:24px;flex-shrink:0;margin-top:2px}
-.rule-item b{display:block;font-size:14px;margin-bottom:2px}
-.rule-item p{margin:0;font-size:12px;line-height:1.3;opacity:.9}
-.modal-check{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:700;cursor:pointer}
-.modal-check input{width:16px;height:16px}
-#closeRulesBtn{width:100%;margin-top:12px}
-</style>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tug of War — V2</title>
+<title>Tug of War — V2.9</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
@@ -126,7 +62,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .react-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 .question-card{margin:12px;border:4px solid var(--ink);border-radius:24px;padding:16px;background:#fff;box-shadow:5px 5px 0 var(--ink)}
 .qnum{text-align:center;font-size:12px;font-weight:1000;opacity:.65}
-.question{font-family:'Comic Neue',cursive;text-align:center;font-size:23px;font-weight:900;margin:8px 0 14px;line-height:1.2}
+.question{font-family:'Comic Neue',cursive;text-align:center;font-size:23px;font-weight:900;margin:8px 0 14px;line-height:1.18;min-height:78px;height:clamp(78px,18vh,145px);display:flex;align-items:center;justify-content:center;overflow:hidden;overflow-wrap:anywhere;word-break:break-word;padding:2px 4px;max-width:100%}.question-card{overflow:hidden;max-width:calc(100% - 24px)}.answers{min-width:0}.answer{min-width:0;overflow-wrap:anywhere;word-break:break-word}
 .answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .answer{font-family:'Comic Neue',cursive;border:3px solid var(--ink);border-radius:13px;padding:13px 8px;background:#fff;font-weight:1000;box-shadow:3px 3px 0 var(--ink)}
 .answer:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
@@ -166,11 +102,75 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+<!-- POPUP ATURAN v2.5 -->
+<div id="rulesModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-emoji">📜</span>
+      <h2>ATURAN MAIN KITA!</h2>
+    </div>
+    <div class="modal-body">
+      <div class="rule-grid">
+        <div class="rule-item correct">
+          <span class="rule-icon">✅</span>
+          <div>
+            <b>BENAR +10 POIN</b>
+            <p>Tali ketarik 10% ke lawan.<br>3x benar beruntun = COMBO 20%!</p>
+          </div>
+        </div>
+        <div class="rule-item wrong">
+          <span class="rule-icon">❌</span>
+          <div>
+            <b>SALAH -5 POIN</b>
+            <p>Berlaku per percobaan!<br>Salah 2x = -10, salah 3x = -15</p>
+          </div>
+        </div>
+        <div class="rule-item penalty">
+          <span class="rule-icon">⏱️</span>
+          <div>
+            <b>PENALTI -5 DETIK & -5% TALI</b>
+            <p>Waktu kepotong 5 detik + tali keseret lawan 5%.<br>Streak combo reset!</p>
+          </div>
+        </div>
+        <div class="rule-item win">
+          <span class="rule-icon">🏆</span>
+          <div>
+            <b>CARA MENANG</b>
+            <p>1. Tarik tali sampai 100% (selisih 10 jawaban)<br>2. Skor tertinggi setelah 100 soal</p>
+          </div>
+        </div>
+      </div>
+      <label class="modal-check"><input type="checkbox" id="dontShowRules"><span>Jangan tampilkan lagi</span></label>
+    </div>
+    <button class="btn" id="closeRulesBtn">🔥 MENGERTI, MAIN!</button>
+  </div>
+</div>
+<style>
+.modal-overlay{position:fixed;inset:0;background:rgba(20,10,5,.85);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-card{background:var(--paper,#fff8e7);border:4px solid var(--ink,#241b17);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:420px;width:100%;padding:18px;animation:popIn .25s ease-out}
+@keyframes popIn{from{transform:scale(.9) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-header{text-align:center;margin-bottom:12px}
+.modal-header h2{margin:6px 0 0;font-size:22px}
+.modal-emoji{font-size:40px}
+.modal-body{margin:12px 0}
+.rule-grid{display:grid;gap:10px}
+.rule-item{display:flex;gap:10px;padding:10px;border:3px solid var(--ink);border-radius:14px;background:#fff}
+.rule-item.correct{background:#91e6ac}
+.rule-item.wrong{background:#ff9a9a}
+.rule-item.penalty{background:#ffe082}
+.rule-item.win{background:#b3d9ff}
+.rule-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.rule-item b{display:block;font-size:14px;margin-bottom:2px}
+.rule-item p{margin:0;font-size:12px;line-height:1.3;opacity:.9}
+.modal-check{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:13px;font-weight:900;cursor:pointer;user-select:none;padding:8px 10px;border:3px solid var(--ink);border-radius:10px;background:#fff;line-height:1.2}.modal-check input{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:22px;height:22px;min-width:22px;max-width:22px;min-height:22px;max-height:22px;flex-shrink:0;margin:0;padding:0;border:3px solid var(--ink);border-radius:5px;background:#fff;display:grid;place-items:center;cursor:pointer;vertical-align:middle}.modal-check input::after{content:"✓";font-size:15px;font-weight:1000;line-height:1;color:var(--ink);transform:scale(0);transition:transform .08s}.modal-check input:checked{background:var(--yellow)}.modal-check input:checked::after{transform:scale(1)}.modal-check span{flex:1}.modal-check:has(input:focus-visible){box-shadow:0 0 0 4px #ffe58a}
+#closeRulesBtn{width:100%;margin-top:12px}
+</style>
 <div class="app">
 
 <section id="home" class="screen active">
 <div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
   <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
+  <div id="questionLoadStatus" class="hint" style="margin-top:-18px;margin-bottom:14px">📚 Memuat bank soal...</div>
   <div class="card">
     <label for="name">Nama pemain</label>
     <input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off">
@@ -503,6 +503,89 @@ let questions = [
 ];
 
 
+// --- V2.8: bank soal dari questions.csv ---
+const fallbackQuestions = questions.slice();
+let questionsReady = false;
+
+function parseCSV(text){
+  text = text.replace(/^\uFEFF/, "");
+  const rows=[]; let row=[], cell="", quoted=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], next=text[i+1];
+    if(ch==='"'){
+      if(quoted && next==='"'){cell+='"';i++;}
+      else quoted=!quoted;
+    }else if(ch===',' && !quoted){row.push(cell);cell="";}
+    else if((ch==='\n'||ch==='\r') && !quoted){
+      if(ch==='\r' && next==='\n')i++;
+      row.push(cell);cell="";
+      if(row.some(v=>v.trim()!==""))rows.push(row);
+      row=[];
+    }else cell+=ch;
+  }
+  if(cell!=="" || row.length){row.push(cell);if(row.some(v=>v.trim()!==""))rows.push(row);}
+  if(rows.length<2) throw new Error("CSV kosong atau tidak memiliki data.");
+  const headers=rows[0].map(h=>h.trim().toLowerCase());
+  const need=["category","question","option_a","option_b","option_c","option_d","answer"];
+  const missing=need.filter(h=>!headers.includes(h));
+  if(missing.length) throw new Error("Kolom CSV kurang: "+missing.join(", "));
+  const ix=Object.fromEntries(need.map(h=>[h,headers.indexOf(h)]));
+  const result=[];
+  rows.slice(1).forEach((r,n)=>{
+    const q=(r[ix.question]||"").trim();
+    const a=[ix.option_a,ix.option_b,ix.option_c,ix.option_d].map(i=>(r[i]||"").trim());
+    const ans=(r[ix.answer]||"").trim().toUpperCase();
+    if(!q || a.some(v=>!v) || !/^[ABCD]$/.test(ans)) return;
+    result.push({q,a,c:"ABCD".indexOf(ans),cat:(r[ix.category]||"umum").trim().toLowerCase()||"umum"});
+  });
+  if(!result.length) throw new Error("Tidak ada soal CSV yang valid.");
+  return result;
+}
+
+function refreshCategoryOptions(){
+  const select=$("category"); if(!select)return;
+  const current=select.value||"semua";
+  const labels={umum:"🌍 Pengetahuan Umum",mtk:"➗ Matematika",logika:"🧠 Logika",sains:"🔬 Sains",sejarah:"🏛️ Sejarah",geografi:"🗺️ Geografi",olahraga:"⚽ Olahraga",teknologi:"💻 Teknologi",bahasa:"🔤 Bahasa"};
+  const cats=[...new Set(questions.map(q=>q.cat).filter(Boolean))].sort();
+  select.innerHTML='<option value="semua">🎲 Semua Kategori</option>'+cats.map(cat=>`<option value="${esc(cat)}">${labels[cat]||"📚 "+cat.replace(/\b\w/g,m=>m.toUpperCase())}</option>`).join("");
+  select.value=cats.includes(current)?current:"semua";
+}
+
+async function loadQuestionsFromCSV(){
+  const status=$("questionLoadStatus");
+  try{
+    const res=await fetch("questions.csv",{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const csv=await res.text();
+    questions=parseCSV(csv);
+    refreshCategoryOptions();
+    questionsReady=true;
+    if(status)status.textContent=`📚 ${questions.length} soal siap dimainkan`;
+    console.log(`Tug of War V2.8: ${questions.length} soal dimuat dari questions.csv`);
+  }catch(e){
+    questions=fallbackQuestions.slice();
+    refreshCategoryOptions();
+    questionsReady=true;
+    if(status)status.textContent=`📚 CSV tidak terbaca — memakai ${questions.length} soal bawaan`;
+    console.warn("questions.csv gagal dimuat, fallback ke soal bawaan:",e);
+  }
+}
+
+function fitQuestionText(){
+  const el=$("question"); if(!el)return;
+  el.style.fontSize="23px";
+  requestAnimationFrame(()=>{
+    let size=23;
+    const min=12;
+    while(size>min && el.scrollHeight>el.clientHeight+1){
+      size-=0.5;
+      el.style.fontSize=size+"px";
+    }
+  });
+}
+
+
+
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active"); if(id==="history"){loadHistory();}}
 function cleanName(v){return (v||"").trim().slice(0,18)}
 function makeCode(){return Math.random().toString(36).slice(2,7).toUpperCase()}
@@ -567,6 +650,7 @@ $("createBtn").onclick=async()=>{
   const name=cleanName($("name").value);
   const category=$("category").value||"semua";
   if(!name){alert("Masukkan nama pemain.");$("name").focus();return}
+  if(!questionsReady){alert("Bank soal masih dimuat. Coba lagi sebentar.");return}
   try{
     await ensureAuth();
     roomId=makeCode(); mySlot="player1";
@@ -592,6 +676,7 @@ $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
   $("joinError").classList.add("hidden");
   if(!name||code.length!==5){$("joinError").textContent="Isi nama dan kode 5 karakter."; $("joinError").classList.remove("hidden");return}
+  if(!questionsReady){$("joinError").textContent="Bank soal masih dimuat. Coba lagi sebentar."; $("joinError").classList.remove("hidden");return}
   try{
     await ensureAuth();
     const r=ref(db,"games/"+code), snap=await get(r);
@@ -670,6 +755,7 @@ function renderGame(d){
   $("qNum").textContent=`SOAL ${Math.min(d.round||1,ROUND_LIMIT)} / ${ROUND_LIMIT}`;
   const qi=Number(d.questionIndex)||0; const order=d.questionOrder&&d.questionOrder.length?d.questionOrder:[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
   $("question").textContent=q.q;
+  fitQuestionText();
   if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;buildAnswers(q)}
   startLocalTimer(d);
   if(d.winner!==undefined && d.status==="finished")renderResult(d);
@@ -1026,6 +1112,7 @@ function cleanup(){
 }
 
 (async function init(){
+  await loadQuestionsFromCSV();
   await ensureAuth();
   await tryResume();
 })();
@@ -1040,8 +1127,10 @@ function initRulesModal(){
   const hidden = localStorage.getItem("hideRulesPopup");
   if(hidden === "1"){
     modal.style.display = "none";
+    if(dontShow) dontShow.checked = true;
   } else {
     modal.style.display = "flex";
+    if(dontShow) dontShow.checked = false;
   }
   
   closeBtn?.addEventListener("click", ()=>{
@@ -1063,6 +1152,7 @@ function initRulesModal(){
   };
 }
 document.addEventListener("DOMContentLoaded", initRulesModal);
+window.addEventListener("resize", ()=>{if($("game")?.classList.contains("active"))fitQuestionText();});
 // fallback kalau DOMContentLoaded sudah lewat
 if(document.readyState !== "loading"){ initRulesModal(); }
 
