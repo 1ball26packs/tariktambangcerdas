@@ -39,7 +39,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .timer{border:4px solid var(--ink);border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000;background:#fff}
 .spec-badge{text-align:center;font-size:12px;font-weight:800;opacity:.7;padding:2px 0 4px}
 .arena{margin:8px 12px 0;border:4px solid var(--ink);border-radius:24px;background:url('tug-bg.webp') center center/100% 100% no-repeat;position:relative;overflow:hidden;aspect-ratio:16/7;height:auto;min-height:0;display:flex;align-items:center;justify-content:center}
-.tug-wrap{position:absolute;left:50%;bottom:34px;width:70%;transform:translateX(-50%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:3}
+.tug-wrap{position:absolute;left:50%;bottom:10px;width:70%;transform:translateX(-50%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:3}
 .tug-scene{display:block;width:100%;height:auto;animation:idleSway 1.8s ease-in-out infinite}
 .tug-scene.pulling{animation:idleSway 1.8s ease-in-out infinite,pullPulse .4s ease}
 @keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
@@ -95,7 +95,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-<!-- POPUP ATURAN v2.5 -->
+<!-- POPUP ATURAN v2.6 -->
 <div id="rulesModal" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
@@ -108,28 +108,28 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
           <span class="rule-icon">✅</span>
           <div>
             <b>BENAR +10 POIN</b>
-            <p>Tali ketarik 10% ke lawan.<br>3x benar beruntun = COMBO 20%!</p>
+            <p>Tali tertarik 10% ke sisi kamu.<br>3x benar beruntun = <b>COMBO</b>, tarikan 20%!</p>
           </div>
         </div>
         <div class="rule-item wrong">
           <span class="rule-icon">❌</span>
           <div>
             <b>SALAH -5 POIN</b>
-            <p>Berlaku per percobaan!<br>Salah 2x = -10, salah 3x = -15</p>
+            <p>Satu soal hanya bisa dijawab sekali.<br>Salah = -5 poin, tali bergeser 5% ke arah lawan.</p>
           </div>
         </div>
         <div class="rule-item penalty">
           <span class="rule-icon">⏱️</span>
           <div>
             <b>PENALTI -5 DETIK & -5% TALI</b>
-            <p>Waktu kepotong 5 detik + tali keseret lawan 5%.<br>Streak combo reset!</p>
+            <p>Waktu berkurang 5 detik.<br>Streak combo reset saat salah atau timeout.</p>
           </div>
         </div>
         <div class="rule-item win">
           <span class="rule-icon">🏆</span>
           <div>
             <b>CARA MENANG</b>
-            <p>1. Tarik tali sampai 100% (selisih 10 jawaban)<br>2. Skor tertinggi setelah 100 soal</p>
+            <p><b>1.</b> Tali mencapai 100% → langsung menang.<br><b>2.</b> Jika 100 soal selesai, skor tertinggi menang.<br><b>3.</b> Jika skor sama, posisi tali menjadi penentu.<br><b>4.</b> Jika skor dan posisi tali sama-sama seimbang → SERI.</p>
           </div>
         </div>
       </div>
@@ -821,6 +821,10 @@ function setButtons(disabled){document.querySelectorAll(".answer").forEach(b=>b.
 
 async function answer(choice,q,btn){
   if(answered||mySlot==="spectator")return;
+  // Lock this question immediately so one player cannot submit multiple
+  // attempts for the same question.
+  answered=true;
+  setButtons(true);
   const correct=choice===q.c;
   btn.classList.add(correct?"correct":"wrong");
   const streakKey=mySlot==="player1"?"streakP1":"streakP2";
@@ -828,9 +832,6 @@ async function answer(choice,q,btn){
     $("gameMessage").textContent=`💥 SALAH! -5 POIN & -${penaltySeconds} DETIK!`;
     sfxWrong(); buzz([80,40,80,40]);
     // v2.4: sistem poin +10 benar / -5 salah (berlaku per percobaan)
-    runTransaction(ref(db,`games/${roomId}/${mySlot}/score`), cur=>{
-      return (Number(cur||0) - 5);
-    }).catch(()=>{});
     runTransaction(ref(db,`games/${roomId}/${streakKey}`),()=>0).catch(()=>{});
     const wrongRef=ref(db,"games/"+roomId);
     runTransaction(wrongRef,d=>{
@@ -847,11 +848,17 @@ async function answer(choice,q,btn){
     setTimeout(()=>{btn.classList.remove("wrong");$("gameMessage").textContent=""},900);
     return;
   }
-  answered=true;setButtons(true);
   const gameRef=ref(db,"games/"+roomId);
+  const submittedRound = Number(currentRound);
+  const submittedQuestionIndex = Number(currentQuestionIndex);
   try{
     const result=await runTransaction(gameRef,d=>{
       if(!d||d.status!=="playing")return d;
+      // Reject stale clicks from a previous round/question.
+      if(Number(d.round||1)!==submittedRound ||
+         Number(d.questionIndex||0)!==submittedQuestionIndex){
+        return d;
+      }
       const order=d.questionOrder||[];
       const orderLen=order.length||questions.length;
       const my=d[mySlot]||{};
@@ -873,8 +880,12 @@ async function answer(choice,q,btn){
         d.status="finished";d.winner=mySlot;
       }else if((d.round||1)>=Math.min(ROUND_LIMIT, orderLen)){
         d.status="finished";
-        const s1=(d.player1&&d.player1.score)||0, s2=(d.player2&&d.player2.score)||0;
-        d.winner = s1===s2?null:(s1>s2?"player1":"player2");
+        const s1=Number((d.player1&&d.player1.score)||0);
+        const s2=Number((d.player2&&d.player2.score)||0);
+        const finalRope=Number(d.ropePosition||0);
+        d.winner = s1===s2
+          ? (finalRope===0 ? null : (finalRope>0 ? "player2" : "player1"))
+          : (s1>s2 ? "player1" : "player2");
       }else{
         d.round=(d.round||1)+1;
         d.questionIndex=((d.questionIndex||0)+1)%orderLen;
