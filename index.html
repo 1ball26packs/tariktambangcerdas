@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tarik Tambang! Cerdas!</title>
+<title>Tug of War — V2.9</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
@@ -38,13 +38,9 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .score{font-size:22px}
 .timer{border:4px solid var(--ink);border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:1000;background:#fff}
 .spec-badge{text-align:center;font-size:12px;font-weight:800;opacity:.7;padding:2px 0 4px}
-.arena{margin:8px 12px 0;border:4px solid var(--ink);border-radius:24px;background:#bfe8ff;position:relative;overflow:hidden;height:245px;display:flex;align-items:center;justify-content:center}
-.cloud{position:absolute;width:90px;height:30px;background:#fff;border:3px solid var(--ink);border-radius:30px;top:28px;left:18px}
-.cloud:after{content:"";position:absolute;width:45px;height:45px;background:#fff;border:3px solid var(--ink);border-radius:50%;left:20px;top:-22px}
-.cloud2{left:auto;right:15px;top:65px;transform:scale(.7)}
-.ground{position:absolute;bottom:0;height:65px;width:100%;background:#7dce62;border-top:4px solid var(--ink)}
+.arena{margin:8px 12px 0;border:4px solid var(--ink);border-radius:24px;background:url('tug-bg.webp') center center/cover no-repeat;position:relative;overflow:hidden;height:245px;display:flex;align-items:center;justify-content:center}
 .tug-wrap{position:absolute;left:50%;bottom:34px;width:70%;transform:translateX(-50%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:3}
-.tug-scene{display:block;width:100%;height:auto;animation:idleSway 1.8s ease-in-out infinite}
+.tug-scene{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 #fff);animation:idleSway 1.8s ease-in-out infinite}
 .tug-scene.pulling{animation:idleSway 1.8s ease-in-out infinite,pullPulse .4s ease}
 @keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.4) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
@@ -220,7 +216,6 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   </div>
   <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
-    <div class="cloud"></div><div class="cloud cloud2"></div><div class="ground"></div>
     <div class="tug-wrap" id="tugWrap"><img src="tug-characters.webp" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
     <div class="arena-note">POSISI TALI</div>
     <div class="reactionFloat" id="reactionFloat"></div>
