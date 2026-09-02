@@ -44,7 +44,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .cloud2{left:auto;right:15px;top:65px;transform:scale(.7)}
 .ground{position:absolute;bottom:0;height:65px;width:100%;background:#7dce62;border-top:4px solid var(--ink)}
 .tug-wrap{position:absolute;left:50%;bottom:34px;width:70%;transform:translateX(-50%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:3}
-.tug-scene{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 #fff);animation:idleSway 1.8s ease-in-out infinite}
+.tug-scene{display:block;width:100%;height:auto;animation:idleSway 1.8s ease-in-out infinite}
 .tug-scene.pulling{animation:idleSway 1.8s ease-in-out infinite,pullPulse .4s ease}
 @keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.4) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
