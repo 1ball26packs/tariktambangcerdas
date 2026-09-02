@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ffcf33">
-<title>Tarik Tambang, Cerdas!</title>
+<title>Tug of War — V2.9</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#241b17;--yellow:#ffd447;--red:#ef4b4b;--blue:#4c8dff;--green:#35b96b;--paper:#fffaf0}
@@ -43,16 +43,11 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .cloud:after{content:"";position:absolute;width:45px;height:45px;background:#fff;border:3px solid var(--ink);border-radius:50%;left:20px;top:-22px}
 .cloud2{left:auto;right:15px;top:65px;transform:scale(.7)}
 .ground{position:absolute;bottom:0;height:65px;width:100%;background:#7dce62;border-top:4px solid var(--ink)}
-.rope-wrap{position:absolute;width:92%;height:100px;display:flex;align-items:center;justify-content:center;z-index:2}
-.rope{position:absolute;width:86%;height:12px;background:#b56b32;border:3px solid var(--ink);border-radius:20px;transition:transform .35s cubic-bezier(.2,.9,.3,1)}
-.rope:after{content:"";position:absolute;left:50%;top:-24px;transform:translateX(-50%);width:9px;height:60px;background:#e8d5a5;border:3px solid var(--ink)}
-.flag{position:absolute;left:50%;top:-33px;transform:translateX(-50%);font-size:26px;z-index:4}
-.character{position:absolute;bottom:25px;font-size:72px;z-index:3;filter:drop-shadow(3px 4px 0 #fff);animation:idleSway 1.8s ease-in-out infinite}
-.c1{left:8%}.c2{right:8%;transform:scaleX(-1)}
-.character.pulling{animation:pullPulse .4s ease}
+.tug-wrap{position:absolute;left:50%;bottom:34px;width:70%;transform:translateX(-50%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:3}
+.tug-scene{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 #fff);animation:idleSway 1.8s ease-in-out infinite}
+.tug-scene.pulling{animation:idleSway 1.8s ease-in-out infinite,pullPulse .4s ease}
 @keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.c2{animation:idleSway 1.8s ease-in-out infinite}
-@keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.5) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
+@keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.4) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
 .arena-note{position:absolute;bottom:6px;z-index:5;font-size:11px;font-weight:900}
 .reactionFloat{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6}
 .reactionFloat span{position:absolute;bottom:40px;font-size:32px;animation:floatUp 1.4s ease-out forwards}
@@ -83,11 +78,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
 .logo-tarik {
   animation: tugTug 2s infinite ease-in-out;
-  width: 80%;
+  width: 100%;
   height: auto;
-  width: 80%;
-  display: block;
-  margin: auto;
 }
 @keyframes tugTug {
   0%,100% { transform: translateX(0) rotate(0); }
@@ -229,8 +221,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
     <div class="cloud"></div><div class="cloud cloud2"></div><div class="ground"></div>
-    <div class="character c1">🤼</div><div class="character c2">🤼</div>
-    <div class="rope-wrap"><div class="flag">🚩</div><div id="rope" class="rope"></div></div>
+    <div class="tug-wrap" id="tugWrap"><img src="tug-characters.png" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
     <div class="arena-note">POSISI TALI</div>
     <div class="reactionFloat" id="reactionFloat"></div>
   </div>
@@ -563,7 +554,7 @@ async function loadQuestionsFromCSV(){
     questions=parseCSV(csv);
     refreshCategoryOptions();
     questionsReady=true;
-    if(status)status.textContent=`📚 ${questions.length} soal tersedia untuk ditaklukan`;
+    if(status)status.textContent=`📚 ${questions.length} soal siap dimainkan`;
     console.log(`Tug of War V2.8: ${questions.length} soal dimuat dari questions.csv`);
   }catch(e){
     questions=fallbackQuestions.slice();
@@ -751,10 +742,10 @@ function renderGame(d){
   $("p1Score").textContent=p1.score||0;$("p2Score").textContent=p2.score||0;
   const pos=clampRope(d.ropePosition);
   if(pos!==lastRopePos){
-    pulseCharacter(pos<lastRopePos?"c1":"c2");
+    pulseCharacter();
   }
   lastRopePos=pos;
-  $("rope").style.transform=`translateX(${pos*1.7}px)`;
+  $("tugWrap").style.transform=`translateX(calc(-50% + ${pos*1.7}px))`;
   $("qNum").textContent=`SOAL ${Math.min(d.round||1,ROUND_LIMIT)} / ${ROUND_LIMIT}`;
   const qi=Number(d.questionIndex)||0; const order=d.questionOrder&&d.questionOrder.length?d.questionOrder:[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
   $("question").textContent=q.q;
@@ -764,8 +755,8 @@ function renderGame(d){
   if(d.winner!==undefined && d.status==="finished")renderResult(d);
 }
 
-function pulseCharacter(cls){
-  const el=document.querySelector("."+cls);
+function pulseCharacter(){
+  const el=$("tugScene");
   if(!el)return;
   el.classList.add("pulling");
   setTimeout(()=>el.classList.remove("pulling"),400);
