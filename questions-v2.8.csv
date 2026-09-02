@@ -62,7 +62,6 @@ olahraga,"Dalam sepak bola, kartu merah berarti pemain...",Mendapat bonus,Dikelu
 bahasa,Sinonim kata “indah” adalah...,Elok,Buruk,Kasar,Lemah,A
 bahasa,Antonim kata “tinggi” adalah...,Besar,Rendah,Panjang,Luas,B
 bahasa,Kata baku yang benar adalah...,Aktifitas,Aktivitas,Aktifvitas,Aktifitaz,B
-bahasa,Kata baku yang benar adalah...,Apotek,Apotik,Apoteq,Apotiek,A
 bahasa,Puisi biasanya disusun dalam bentuk...,Bait,Tabel,Daftar,Kolom,A
 bahasa,Riwayat hidup yang ditulis oleh diri sendiri disebut...,Biografi,Autobiografi,Fabel,Legenda,B
 bahasa,Kata “bermain” termasuk kata...,Kerja,Benda,Sifat,Bilangan,A
@@ -89,3 +88,364 @@ logika,"Jika 3 kotak masing-masing berisi 6 kelereng, jumlahnya...",9,12,18,24,C
 logika,Semua mawar adalah bunga. Yang pasti benar adalah...,Semua bunga mawar,Mawar termasuk bunga,Tidak ada mawar,Bunga bukan tanaman,B
 logika,"Pola 2, 5, 8, 11, ... berikutnya...",12,13,14,15,C
 logika,"Pola 1, 4, 9, 16, ... berikutnya...",20,24,25,36,C
+umum,Planet yang dikenal sebagai Planet Merah adalah...,Venus,Mars,Jupiter,Merkurius,B
+umum,Alat yang digunakan untuk mengukur suhu disebut...,Barometer,Termometer,Higrometer,Anemometer,B
+umum,Benua terluas di dunia adalah...,Afrika,Eropa,Asia,Australia,C
+umum,Samudra terluas di dunia adalah...,Atlantik,Hindia,Arktik,Pasifik,D
+umum,Hewan yang mengalami metamorfosis sempurna adalah...,Kucing,Ayam,Kupu-kupu,Ikan,C
+umum,Sumber energi utama bagi kehidupan di Bumi adalah...,Bulan,Matahari,Angin,Batu bara,B
+umum,Bagian tumbuhan yang umumnya berfungsi menyerap air dari tanah adalah...,Bunga,Akar,Buah,Batang,B
+umum,Satuan dasar untuk mengukur massa dalam SI adalah...,Meter,Sekon,Kilogram,Liter,C
+umum,Alat untuk melihat benda yang sangat jauh seperti bintang adalah...,Mikroskop,Teleskop,Periskop,Termometer,B
+umum,Hewan yang termasuk kelompok mamalia adalah...,Katak,Penyu,Lumba-lumba,Buaya,C
+umum,Gas yang paling banyak terdapat di atmosfer Bumi adalah...,Oksigen,Nitrogen,Karbon dioksida,Hidrogen,B
+umum,Bentuk Bumi yang paling tepat digambarkan sebagai...,Kubus,Bola sempurna,Geoida,Piramida,C
+umum,Alat untuk mengukur waktu secara sederhana adalah...,Jam,Kompas,Neraca,Jangka sorong,A
+umum,Proses perubahan air menjadi uap karena pemanasan disebut...,Membeku,Menguap,Mengembun,Mencair,B
+umum,Hewan yang aktif terutama pada malam hari disebut...,Diurnal,Nocturnal,Herbivora,Omnivora,B
+umum,Bagian tubuh manusia yang berfungsi memompa darah adalah...,Paru-paru,Hati,Jantung,Ginjal,C
+umum,Benda yang dapat ditarik kuat oleh magnet adalah...,Kayu,Plastik,Besi,Kertas,C
+umum,Warna yang dihasilkan dari campuran biru dan kuning adalah...,Hijau,Ungu,Oranye,Cokelat,A
+umum,Organ tubuh yang digunakan untuk bernapas adalah...,Lambung,Paru-paru,Usus,Pankreas,B
+umum,Kumpulan bintang yang tampak membentuk pola tertentu disebut...,Galaksi,Rasi bintang,Orbit,Satelit,B
+umum,Satu lusin berjumlah...,10,11,12,13,C
+umum,Hari setelah Jumat adalah...,Kamis,Sabtu,Minggu,Senin,B
+umum,Alat untuk memotong kertas adalah...,Gunting,Penggaris,Stapler,Penghapus,A
+umum,Buah yang dikenal kaya akan vitamin C adalah...,Jeruk,Nasi,Telur,Keju,A
+umum,Hewan yang dikenal sebagai raja hutan adalah...,Harimau,Singa,Serigala,Beruang,B
+umum,Logam yang memiliki simbol kimia Au adalah...,Perak,Emas,Besi,Tembaga,B
+umum,Planet terbesar dalam tata surya adalah...,Saturnus,Bumi,Jupiter,Neptunus,C
+umum,Satelit alami Bumi adalah...,Mars,Bulan,Matahari,Venus,B
+umum,Air mendidih pada tekanan normal pada suhu sekitar...,0°C,50°C,100°C,200°C,C
+umum,Hewan yang memakan tumbuhan terutama disebut...,Karnivora,Herbivora,Insektivora,Piscivora,B
+umum,Alat untuk mengetahui arah utara adalah...,Kompas,Termometer,Barometer,Kalkulator,A
+umum,Pelangi biasanya terdiri dari berapa warna utama yang dikenal dalam pelajaran dasar?,5,6,7,8,C
+umum,Benda yang mengorbit sebuah planet disebut...,Satelit,Kompas,Meteorologi,Komet saja,A
+umum,Sistem peredaran darah manusia mengedarkan...,Udara saja,Darah,Makanan saja,Air hujan,B
+umum,Bahan yang paling umum digunakan untuk membuat kaca adalah...,Pasir silika,Kayu,Karet,Kapas,A
+umum,Kertas dibuat terutama dari bahan dasar...,Serat kayu,Besi,Batu,Minyak goreng,A
+umum,Hewan yang memiliki delapan kaki adalah...,Laba-laba,Kupu-kupu,Belalang,Cacing,A
+umum,Bagian mata yang memberi warna pada mata disebut...,Kornea,Iris,Retina,Pupil,B
+umum,Zat yang dibutuhkan manusia untuk membangun dan memperbaiki jaringan tubuh adalah...,Protein,Garam,Air saja,Karbon dioksida,A
+umum,Alat musik yang dimainkan dengan cara dipukul adalah...,Biola,Drum,Seruling,Gitar,B
+sejarah,Proklamasi Kemerdekaan Indonesia dibacakan pada tanggal...,17 Agustus 1945,20 Mei 1908,28 Oktober 1928,10 November 1945,A
+sejarah,Tokoh yang membacakan Proklamasi Kemerdekaan Indonesia adalah...,Mohammad Hatta,Soekarno,Sutan Sjahrir,Ki Hajar Dewantara,B
+sejarah,Tokoh yang mendampingi Soekarno saat Proklamasi adalah...,Mohammad Hatta,Ahmad Yani,Tan Malaka,Diponegoro,A
+sejarah,Organisasi Budi Utomo berdiri pada tahun...,1905,1908,1928,1945,B
+sejarah,Sumpah Pemuda diperingati setiap tanggal...,20 Mei,17 Agustus,28 Oktober,10 November,C
+sejarah,Peristiwa Bandung Lautan Api terjadi pada tahun...,1945,1946,1947,1948,B
+sejarah,Hari Pahlawan diperingati pada...,10 November,1 Juni,2 Mei,21 April,A
+sejarah,VOC merupakan perusahaan dagang yang didirikan oleh...,Belanda,Inggris,Portugis,Spanyol,A
+sejarah,Kerajaan Majapahit mencapai masa kejayaan pada masa pemerintahan...,Hayam Wuruk,Airlangga,Mulawarman,Purnawarman,A
+sejarah,Patih Majapahit yang terkenal dengan Sumpah Palapa adalah...,Gajah Mada,Ken Arok,Adityawarman,Raden Wijaya,A
+sejarah,Candi Borobudur merupakan peninggalan bercorak...,Hindu,Buddha,Islam,Kristen,B
+sejarah,Candi Prambanan dikenal sebagai kompleks candi bercorak...,Buddha,Hindu,Islam,Konghucu,B
+sejarah,Kerajaan Kutai dikenal sebagai salah satu kerajaan Hindu tertua di...,Jawa,Sumatra,Kalimantan,Sulawesi,C
+sejarah,Kerajaan Sriwijaya dikenal kuat sebagai kerajaan...,Maritim,Agraris saja,Pegunungan,Nomaden,A
+sejarah,Ki Hajar Dewantara dikenal sebagai tokoh penting dalam bidang...,Pendidikan,Perdagangan,Pelayaran,Pertambangan,A
+sejarah,Hari Pendidikan Nasional diperingati setiap...,2 Mei,21 April,1 Juni,10 November,A
+sejarah,R.A. Kartini dikenal sebagai tokoh yang memperjuangkan...,Emansipasi perempuan,Kemerdekaan India,Revolusi industri,Pelayaran,A
+sejarah,Perang Diponegoro berlangsung pada abad...,17,18,19,20,C
+sejarah,Pangeran Diponegoro memimpin perlawanan terhadap...,Belanda,Jepang,Portugis,Inggris,A
+sejarah,Pendudukan Jepang di Indonesia dimulai pada tahun...,1930,1942,1945,1950,B
+sejarah,BPUPKI dibentuk dalam rangka...,Mempersiapkan kemerdekaan Indonesia,Membentuk VOC,Mendirikan kerajaan,Menghapus sekolah,A
+sejarah,Peristiwa Rengasdengklok berkaitan erat dengan...,Persiapan Proklamasi,Perang Diponegoro,Sumpah Pemuda,Konferensi Asia Afrika,A
+sejarah,Konferensi Asia Afrika pertama kali diselenggarakan di...,Jakarta,Bandung,Surabaya,Yogyakarta,B
+sejarah,Konferensi Asia Afrika berlangsung pada tahun...,1945,1950,1955,1960,C
+sejarah,Tokoh yang dikenal sebagai pendiri Taman Siswa adalah...,Ki Hajar Dewantara,Soekarno,Mohammad Hatta,Douwes Dekker,A
+sejarah,Semboyan pendidikan Ki Hajar Dewantara yang terkenal adalah...,Tut Wuri Handayani,Bhinneka Tunggal Ika,Merdeka atau Mati,Jas Merah,A
+sejarah,Kerajaan Mataram Kuno banyak meninggalkan peninggalan berupa...,Candi,Benteng modern,Rel kereta,Pelabuhan baja,A
+sejarah,Situs manusia purba Sangiran berada di...,Jawa Tengah,Bali,Papua,Sumatra Barat,A
+sejarah,Naskah Proklamasi diketik oleh...,Sayuti Melik,Wikana,Chaerul Saleh,Ahmad Soebardjo,A
+sejarah,Bendera Merah Putih yang dikibarkan saat Proklamasi dijahit oleh...,Fatmawati,Kartini,Dewi Sartika,Cut Nyak Dien,A
+sejarah,Lagu Indonesia Raya diciptakan oleh...,W.R. Supratman,Ismail Marzuki,Kusbini,C. Simanjuntak,A
+sejarah,Semboyan 'Bhinneka Tunggal Ika' berasal dari karya sastra zaman...,Majapahit,Sriwijaya,Kutai,Tarumanegara,A
+sejarah,Perang Padri berlangsung terutama di wilayah...,Sumatra Barat,Jawa Barat,Bali,Maluku,A
+sejarah,Tuanku Imam Bonjol merupakan tokoh dalam...,Perang Padri,Perang Aceh,Perang Jawa,Perang Banjar,A
+sejarah,Cut Nyak Dien dikenal sebagai pahlawan dari...,Aceh,Jawa,Bali,Maluku,A
+sejarah,Pattimura memimpin perlawanan rakyat di wilayah...,Maluku,Aceh,Jawa Tengah,Kalimantan,A
+sejarah,Sultan Hasanuddin merupakan pahlawan dari...,Sulawesi Selatan,Jawa Timur,Sumatra Selatan,Papua,A
+sejarah,Julukan Sultan Hasanuddin adalah...,Ayam Jantan dari Timur,Singa Padang Pasir,Harimau Jawa,Elang Nusantara,A
+sejarah,Tan Malaka dikenal sebagai salah satu tokoh...,Pergerakan nasional,Kerajaan Hindu,Pelayaran Portugis,Penjelajahan samudra,A
+geografi,Ibu kota Provinsi Jawa Barat adalah...,Bandung,Semarang,Serang,Bogor,A
+geografi,Ibu kota Provinsi Jawa Tengah adalah...,Surabaya,Semarang,Bandung,Yogyakarta,B
+geografi,Ibu kota Provinsi Jawa Timur adalah...,Malang,Surabaya,Kediri,Madiun,B
+geografi,Pulau terbesar di Indonesia adalah...,Jawa,Kalimantan,Bali,Madura,B
+geografi,Pulau yang dikenal sebagai Pulau Dewata adalah...,Lombok,Bali,Sumbawa,Flores,B
+geografi,Selat yang memisahkan Pulau Jawa dan Sumatra adalah...,Selat Sunda,Selat Bali,Selat Makassar,Selat Karimata,A
+geografi,Selat yang memisahkan Bali dan Jawa adalah...,Selat Bali,Selat Sunda,Selat Lombok,Selat Malaka,A
+geografi,Laut yang berada di antara Kalimantan dan Sulawesi adalah...,Laut Jawa,Laut Flores,Laut Sulawesi,Laut Arafura,C
+geografi,Danau Toba terletak di provinsi...,Sumatra Utara,Sumatra Barat,Riau,Jambi,A
+geografi,Gunung tertinggi di Indonesia adalah...,Semeru,Kerinci,Puncak Jaya,Rinjani,C
+geografi,Gunung Rinjani berada di pulau...,Lombok,Bali,Jawa,Sumatra,A
+geografi,Sungai terpanjang di Indonesia adalah...,Kapuas,Mahakam,Musi,Barito,A
+geografi,Sungai Kapuas berada di provinsi...,Kalimantan Barat,Kalimantan Timur,Kalimantan Selatan,Kalimantan Tengah,A
+geografi,Garis khatulistiwa melewati wilayah Indonesia bagian...,Tengah ekuator,Selatan saja,Utara saja,Barat saja,A
+geografi,Benua terkecil adalah...,Australia,Eropa,Antarktika,Amerika Selatan,A
+geografi,Gunung Everest berada di pegunungan...,Andes,Himalaya,Alpen,Rocky,B
+geografi,Sungai Nil terkenal mengalir di benua...,Asia,Afrika,Eropa,Australia,B
+geografi,Gurun Sahara terletak di...,Afrika,Asia,Australia,Amerika Selatan,A
+geografi,Samudra di sebelah timur benua Afrika adalah...,Atlantik,Pasifik,Hindia,Arktik,C
+geografi,Garis bujur digunakan terutama untuk menentukan...,Waktu,Curah hujan,Ketinggian,Jenis tanah,A
+geografi,Garis lintang digunakan untuk menentukan posisi...,Utara-selatan,Timur-barat saja,Kedalaman laut,Jenis batuan,A
+geografi,Peta yang menunjukkan relief atau ketinggian permukaan bumi disebut peta...,Topografi,Politik,Penduduk,Cuaca,A
+geografi,Peta yang menunjukkan persebaran penduduk termasuk peta...,Tematik,Navigasi laut,Kontur,Geologi saja,A
+geografi,Gunung api berbentuk kerucut umumnya terbentuk akibat...,Aktivitas vulkanik,Pasang surut,Angin saja,Hujan saja,A
+geografi,Gempa yang disebabkan pergerakan lempeng bumi disebut gempa...,Tektonik,Buatan,Termal,Meteorologi,A
+geografi,Wilayah yang lebih tinggi daripada daerah sekitarnya dan memiliki lereng disebut...,Pegunungan,Dataran rendah,Delta,Pantai,A
+geografi,Dataran yang relatif rendah dan luas disebut...,Dataran rendah,Pegunungan,Lembah,Tebing,A
+geografi,Pertemuan sungai dengan laut sering membentuk...,Muara,Puncak,Kawah,Gletser,A
+geografi,Endapan di muara sungai yang membentuk daratan baru disebut...,Delta,Gurun,Karst,Tundra,A
+geografi,Hutan bakau banyak tumbuh di wilayah...,Pesisir,Puncak gunung,Gurun,Padang salju,A
+geografi,Wilayah karst umumnya didominasi oleh batuan...,Kapur,Granit,Besi,Batu bara,A
+geografi,Proses pengikisan tanah oleh air atau angin disebut...,Erosi,Sedimentasi,Evaporasi,Kondensasi,A
+geografi,Proses pengendapan material hasil erosi disebut...,Sedimentasi,Erosi,Sublimasi,Insolasi,A
+geografi,Lapisan atmosfer tempat terjadinya sebagian besar cuaca adalah...,Troposfer,Stratosfer,Mesosfer,Termosfer,A
+geografi,Lapisan atmosfer yang banyak mengandung ozon adalah...,Stratosfer,Troposfer,Eksosfer,Mesosfer,A
+geografi,Alat untuk mengukur curah hujan disebut...,Ombrometer,Anemometer,Barometer,Termometer,A
+geografi,Alat untuk mengukur kecepatan angin disebut...,Anemometer,Higrometer,Ombrometer,Seismograf,A
+geografi,Alat untuk mengukur tekanan udara disebut...,Barometer,Termometer,Kompas,Odometer,A
+geografi,Alat untuk mencatat getaran gempa adalah...,Seismograf,Barometer,Anemometer,Hidrometer,A
+sains,Rumus kimia air adalah...,CO2,H2O,O2,NaCl,B
+sains,Gas yang diperlukan manusia untuk respirasi adalah...,Nitrogen,Oksigen,Helium,Karbon monoksida,B
+sains,Proses tumbuhan membuat makanan sendiri disebut...,Fotosintesis,Respirasi,Fermentasi,Transpirasi,A
+sains,Pigmen hijau pada daun disebut...,Klorofil,Hemoglobin,Melanin,Keratin,A
+sains,Satuan gaya dalam SI adalah...,Joule,Newton,Watt,Pascal,B
+sains,Satuan energi dalam SI adalah...,Joule,Newton,Volt,Ohm,A
+sains,Satuan daya listrik adalah...,Watt,Ampere,Volt,Ohm,A
+sains,Arus listrik diukur dalam satuan...,Volt,Ampere,Watt,Joule,B
+sains,Tegangan listrik diukur dalam satuan...,Volt,Ampere,Ohm,Watt,A
+sains,Hambatan listrik diukur dalam satuan...,Ohm,Volt,Joule,Newton,A
+sains,Benda yang menghambat aliran listrik disebut...,Konduktor,Isolator,Magnet,Generator,B
+sains,Logam umumnya merupakan penghantar listrik yang...,Baik,Buruk,Tidak sama sekali,Selalu nol,A
+sains,Air dalam keadaan padat disebut...,Uap,Es,Embun,Kabut,B
+sains,Perubahan gas menjadi cair disebut...,Menguap,Mengembun,Membeku,Mencair,B
+sains,Perubahan padat menjadi gas secara langsung disebut...,Sublimasi,Kondensasi,Mencair,Membeku,A
+sains,Perubahan cair menjadi padat disebut...,Membeku,Menguap,Mengembun,Menyublim,A
+sains,Bagian sel yang mengatur aktivitas sel adalah...,Nukleus,Dinding sel,Vakuola,Ribosom,A
+sains,Organel tempat berlangsungnya fotosintesis adalah...,Mitokondria,Kloroplas,Nukleus,Ribosom,B
+sains,Organel yang dikenal sebagai tempat respirasi sel adalah...,Mitokondria,Kloroplas,Vakuola,Sentriol,A
+sains,DNA merupakan singkatan dari...,Deoxyribonucleic Acid,Dynamic Nuclear Atom,Double Nitrogen Acid,Deoxygenated Nucleic Atom,A
+sains,Partikel penyusun atom yang bermuatan negatif adalah...,Proton,Neutron,Elektron,Nukleon,C
+sains,Partikel atom yang tidak bermuatan adalah...,Proton,Neutron,Elektron,Ion,B
+sains,Partikel atom yang bermuatan positif adalah...,Elektron,Neutron,Proton,Foton,C
+sains,Pusat atom disebut...,Elektron,Nukleus,Kulit,Ion,B
+sains,Bunyi membutuhkan medium untuk...,Merambat,Membeku,Menguap,Berkarat,A
+sains,Cahaya dapat merambat tanpa medium karena termasuk...,Gelombang elektromagnetik,Gelombang mekanik,Gelombang air,Gelombang tanah,A
+sains,Kecepatan cahaya di ruang hampa kira-kira...,3 × 10^8 m/s,3 × 10^5 m/s,3 × 10^3 m/s,3 × 10^2 m/s,A
+sains,Gaya tarik bumi terhadap benda disebut...,Gravitasi,Gesekan,Magnet,Apung,A
+sains,Gaya yang menghambat gerak dua permukaan yang bersentuhan disebut...,Gesekan,Gravitasi,Pegas,Magnet,A
+sains,Energi yang dimiliki benda karena geraknya disebut energi...,Potensial,Kinetik,Kimia,Nuklir,B
+sains,Energi yang tersimpan karena posisi benda disebut energi...,Kinetik,Potensial,Bunyi,Cahaya,B
+sains,Perubahan energi pada lampu listrik terutama dari listrik menjadi...,Cahaya dan panas,Gerak saja,Kimia,Gravitasi,A
+sains,Cermin yang menghasilkan bayangan tegak dan diperkecil adalah...,Cermin cembung,Cermin datar,Cermin cekung,Prisma,A
+sains,Lensa yang digunakan untuk membantu penderita rabun jauh adalah lensa...,Cekung,Cembung,Datar,Silinder air,A
+sains,Lensa yang digunakan untuk membantu penderita rabun dekat adalah lensa...,Cekung,Cembung,Datar,Prisma,B
+sains,Planet terdekat dengan Matahari adalah...,Venus,Merkurius,Bumi,Mars,B
+sains,Planet yang memiliki cincin paling terkenal adalah...,Mars,Saturnus,Merkurius,Venus,B
+sains,Benda langit yang mengelilingi Matahari pada lintasan tertentu disebut...,Planet,Awan,Nebula saja,Bintang jatuh,A
+sains,Lapisan paling luar Bumi disebut...,Kerak,Mantel,Inti luar,Inti dalam,A
+sains,Bagian Bumi yang sangat panas dan berada paling dalam disebut...,Kerak,Mantel,Inti,Troposfer,C
+teknologi,CPU pada komputer berfungsi terutama untuk...,Memproses instruksi,Mencetak dokumen,Menghasilkan suara saja,Menyimpan kertas,A
+teknologi,RAM digunakan komputer terutama untuk...,Penyimpanan sementara saat program berjalan,Mencetak foto,Menghubungkan listrik rumah,Mendinginkan monitor,A
+teknologi,SSD merupakan perangkat untuk...,Penyimpanan data,Menghasilkan sinyal Wi-Fi saja,Menampilkan gambar,Merekam suara saja,A
+teknologi,GPU terutama dirancang untuk menangani...,Pemrosesan grafis,Pencetakan,Pengisian baterai,Pemindaian sidik jari,A
+teknologi,Sistem operasi berfungsi sebagai...,"Penghubung pengguna, aplikasi, dan perangkat keras",Kabel jaringan,Jenis monitor,Bahasa pemrograman saja,A
+teknologi,Contoh sistem operasi komputer adalah...,Windows,HDMI,USB,DDR,A
+teknologi,HTML digunakan terutama untuk...,Menyusun struktur halaman web,Mengedit audio analog,Mengukur suhu,Mengatur tegangan listrik,A
+teknologi,CSS digunakan terutama untuk...,Mengatur tampilan halaman web,Menyimpan file BIOS,Menghitung daya listrik,Mengganti baterai,A
+teknologi,JavaScript pada web digunakan terutama untuk...,Membuat halaman interaktif,Membuat kabel,Mencetak dokumen,Mengukur jaringan listrik,A
+teknologi,URL adalah alamat untuk...,Menunjuk sumber daya di internet,Mengukur kecepatan CPU,Mengatur suhu,Mengisi baterai,A
+teknologi,HTTP merupakan protokol yang banyak digunakan untuk...,Komunikasi web,Komunikasi Bluetooth saja,Mengontrol printer secara mekanis,Mengukur bandwidth,A
+teknologi,HTTPS menambahkan keamanan melalui...,Enkripsi koneksi,Memperbesar monitor,Menghapus RAM,Menambah kapasitas baterai,A
+teknologi,Wi-Fi digunakan untuk...,Jaringan nirkabel,Pencetakan tanpa tinta saja,Pendinginan CPU,Penyimpanan optik,A
+teknologi,Bluetooth dirancang untuk komunikasi...,Nirkabel jarak dekat,Satelit jarak jauh,Kabel bawah laut,Radio AM saja,A
+teknologi,USB adalah singkatan dari...,Universal Serial Bus,United System Board,Universal Storage Box,User Signal Bridge,A
+teknologi,HDMI umum digunakan untuk mengirim...,Audio dan video digital,Listrik rumah,Data GPS saja,Udara bertekanan,A
+teknologi,QR Code dapat digunakan untuk...,Menyimpan informasi yang dapat dipindai,Menghasilkan listrik,Mendinginkan ponsel,Mengukur berat,A
+teknologi,Cloud storage berarti penyimpanan data pada...,Server yang diakses melalui jaringan,RAM lokal saja,Layar monitor,Kartu suara analog,A
+teknologi,Phishing adalah upaya untuk...,Menipu pengguna agar memberikan informasi sensitif,Mempercepat CPU,Membersihkan virus secara otomatis,Mengompres video,A
+teknologi,Malware adalah istilah umum untuk...,Perangkat lunak berbahaya,Perangkat keras baru,Jenis monitor,Bahasa markup,A
+teknologi,Backup berarti...,Membuat salinan data untuk pemulihan,Menghapus semua data,Mengganti CPU,Mematikan internet,A
+teknologi,Password yang kuat sebaiknya...,Panjang dan sulit ditebak,Menggunakan nama sendiri saja,Sama untuk semua akun,Hanya terdiri dari angka 1234,A
+teknologi,2FA digunakan untuk meningkatkan...,Keamanan akun,Kecerahan layar,Kecepatan printer,Kapasitas RAM,A
+teknologi,Database digunakan untuk...,Menyimpan dan mengelola data terstruktur,Mendinginkan komputer,Menghasilkan cahaya,Mengukur suara,A
+teknologi,SQL adalah bahasa yang banyak digunakan untuk...,Mengelola database relasional,Mengedit gambar,Mengatur kamera,Membuat kabel,A
+teknologi,API memungkinkan...,Aplikasi saling berkomunikasi,Monitor menyimpan listrik,Keyboard menjadi printer,Baterai menghasilkan internet,A
+teknologi,Git digunakan terutama untuk...,Version control,Mengukur suhu CPU,Mengedit foto secara manual,Mengganti hard disk,A
+teknologi,GitHub banyak digunakan untuk...,Hosting dan kolaborasi proyek kode,Menjual kabel,Mengukur sinyal TV,Mengisi baterai,A
+teknologi,Domain adalah bagian dari alamat internet yang berfungsi sebagai...,Nama yang mudah dikenali untuk sebuah situs,Jenis RAM,Driver GPU,Kabel data,A
+teknologi,Browser digunakan untuk...,Mengakses dan menampilkan halaman web,Mengukur arus listrik,Mengompres baterai,Mencetak kartu,A
+teknologi,Contoh browser adalah...,Chrome,Excel,Android,Linux,A
+teknologi,Format gambar yang mendukung transparansi adalah...,PNG,TXT,CSV,MP3,A
+teknologi,Format audio yang umum digunakan adalah...,MP3,PNG,HTML,CSV,A
+teknologi,Format file yang umum digunakan untuk data tabel adalah...,CSV,MP3,JPG,EXE,A
+teknologi,Firewall berfungsi untuk...,Menyaring lalu lintas jaringan,Menambah ukuran monitor,Mendinginkan CPU,Mengubah gambar,A
+teknologi,IP address digunakan untuk...,Mengidentifikasi perangkat/interface dalam jaringan,Mencetak dokumen,Mengatur volume speaker,Mengukur suhu,A
+teknologi,Router berfungsi terutama untuk...,Meneruskan paket antarjaringan,Menyimpan foto secara permanen,Menampilkan video,Menghasilkan suara,A
+teknologi,Modem digunakan untuk...,Menghubungkan jaringan lokal dengan layanan komunikasi internet tertentu,Mencetak dokumen,Mengedit video,Mendinginkan laptop,A
+teknologi,Bluetooth dan Wi-Fi sama-sama menggunakan komunikasi...,Nirkabel,Kabel optik saja,Kertas,Magnet permanen,A
+teknologi,AI merupakan singkatan dari...,Artificial Intelligence,Automatic Internet,Advanced Interface,Analog Information,A
+olahraga,Jumlah pemain sepak bola dalam satu tim yang berada di lapangan adalah...,9,10,11,12,C
+olahraga,Permainan bola basket menggunakan keranjang yang disebut...,Goal,Ring,Net,Base,B
+olahraga,Jumlah pemain bola voli dalam satu tim di lapangan adalah...,5,6,7,8,B
+olahraga,"Dalam bulu tangkis, alat untuk memukul shuttlecock disebut...",Bet,Raket,Tongkat,Stik,B
+olahraga,Lari jarak pendek sering disebut...,Sprint,Maraton,Jogging,Estafet,A
+olahraga,Lari maraton memiliki jarak resmi sekitar...,"21,1 km","42,195 km",50 km,10 km,B
+olahraga,Olahraga renang dilakukan di...,Kolam atau perairan,Lapangan rumput,Ring,Lintasan sepeda saja,A
+olahraga,"Dalam tenis, alat untuk memukul bola adalah...",Raket,Tongkat golf,Bet kasti,Stik hoki,A
+olahraga,Olahraga yang menggunakan papan dan ombak adalah...,Selancar,Anggar,Panahan,Atletik,A
+olahraga,Olahraga yang menggunakan busur dan anak panah adalah...,Panahan,Anggar,Renang,Senam,A
+olahraga,"Dalam tinju, pertandingan dilakukan di dalam...",Ring,Kolam,Lapangan,Lintasan,A
+olahraga,Olahraga angkat beban terutama melatih...,Kekuatan,Kecepatan membaca,Keseimbangan mata saja,Kelenturan jari,A
+olahraga,Pemanasan sebelum olahraga bertujuan membantu...,Mempersiapkan tubuh,Membuat tubuh langsung lelah,Menghentikan denyut nadi,Mengurangi gerak,A
+olahraga,Pendinginan dilakukan setelah olahraga untuk membantu tubuh...,Kembali secara bertahap ke kondisi istirahat,Berhenti bernapas,Meningkatkan cedera,Tidak bergerak selamanya,A
+olahraga,"Dalam sepak bola, pemain selain kiper tidak boleh menyentuh bola dengan...",Kaki,Kepala,Tangan secara sengaja,Dada,C
+olahraga,Penjaga gawang dalam sepak bola disebut...,Striker,Goalkeeper,Libero,Setter,B
+olahraga,"Dalam bola voli, pemain yang bertugas mengatur serangan biasanya disebut...",Setter,Goalkeeper,Striker,Catcher,A
+olahraga,"Dalam bola basket, memasukkan bola dari luar garis tiga angka bernilai...",1,2,3,4,C
+olahraga,"Dalam bulu tangkis, satu permainan pada sistem rally point umumnya dimainkan hingga...",11,15,21,25,C
+olahraga,"Dalam tenis meja, alat pemukul bola disebut...",Bet,Raket,Tongkat,Sarung tangan,A
+olahraga,Lapangan atletik untuk lari berbentuk umum...,Oval,Segitiga,Lingkaran sempurna,Persegi,A
+olahraga,Lompat jauh bertujuan memperoleh...,Jarak lompatan sejauh mungkin,Waktu tidur terlama,Lemparan tertinggi,Jumlah putaran terbanyak,A
+olahraga,Tolak peluru termasuk cabang olahraga...,Atletik,Akuatik,Beladiri,Permainan bola,A
+olahraga,Lempar lembing menggunakan alat berbentuk...,Tongkat panjang runcing,Bola kecil,Cakram,Pita,A
+olahraga,Senam yang dilakukan dengan iringan musik dan gerakan berirama disebut...,Senam ritmik,Senam lantai saja,Tinju,Panahan,A
+olahraga,Olahraga judo berasal dari...,Jepang,Brasil,Mesir,Kanada,A
+olahraga,Taekwondo berasal dari...,Korea,Italia,Kenya,Argentina,A
+olahraga,Karate berkembang dari...,Jepang,Norwegia,Peru,Mesir,A
+olahraga,"Dalam baseball, alat untuk memukul bola disebut...",Bat,Raket,Bet tenis meja,Tongkat hoki,A
+olahraga,Golf dimainkan dengan memasukkan bola ke dalam...,Lubang,Keranjang,Ring,Gawang besar,A
+olahraga,Olahraga bersepeda menggunakan...,Sepeda,Papan selancar,Raket,Busur,A
+olahraga,"Triathlon terdiri dari renang, bersepeda, dan...",Lari,Tinju,Panahan,Senam,A
+olahraga,Olahraga yang memadukan gerakan bela diri dan teknik kuncian di atas matras adalah...,Gulat,Golf,Renang,Panahan,A
+olahraga,"Dalam sepak bola, tendangan dari sudut lapangan disebut...",Corner kick,Free throw,Serve,Kick-off,A
+olahraga,Pertandingan bola voli dimulai dengan...,Servis,Dribel,Kick-off,Toss basket,A
+olahraga,"Dalam basket, membawa bola dengan memantulkannya ke lantai disebut...",Dribbling,Passing,Shooting,Blocking,A
+olahraga,"Dalam sepak bola, operan kepada rekan satu tim disebut...",Passing,Dribbling,Heading,Tackling,A
+olahraga,Gerakan menyundul bola dalam sepak bola disebut...,Heading,Passing,Serving,Smashing,A
+olahraga,"Dalam bulu tangkis, pukulan keras menukik ke area lawan disebut...",Smash,Drop shot,Lob,Drive,A
+olahraga,"Dalam voli, pukulan serangan keras ke area lawan disebut...",Smash,Dribble,Lay-up,Pitch,A
+bahasa,Lawan kata 'tinggi' adalah...,Panjang,Rendah,Besar,Lebar,B
+bahasa,Lawan kata 'cepat' adalah...,Lambat,Kuat,Jauh,Keras,A
+bahasa,Persamaan kata 'indah' adalah...,Buruk,Elok,Lemah,Kasar,B
+bahasa,Persamaan kata 'cerdas' adalah...,Pandai,Malas,Lambat,Bingung,A
+bahasa,Kata baku yang tepat adalah...,Resiko,Risiko,Resikko,Riziko,B
+bahasa,Kata 'berlari' mendapat imbuhan...,ber-,me-,di-,ter-,A
+bahasa,Kata dasar dari 'membaca' adalah...,Baca,Membaca,Bacaan,Pembaca,A
+bahasa,Kalimat yang digunakan untuk meminta informasi disebut kalimat...,Berita,Tanya,Perintah,Seru,B
+bahasa,Kalimat yang berisi perintah disebut kalimat...,Tanya,Perintah,Berita,Pasif,B
+bahasa,Tanda baca yang digunakan pada akhir kalimat tanya adalah...,Titik,Koma,Tanda tanya,Titik dua,C
+bahasa,Tanda baca yang lazim digunakan pada akhir kalimat berita adalah...,Titik,Tanda tanya,Tanda seru,Koma,A
+bahasa,Kata yang menunjukkan pelaku dalam kalimat disebut...,Subjek,Predikat,Objek,Keterangan,A
+bahasa,Bagian kalimat yang menerangkan tindakan subjek disebut...,Predikat,Subjek,Objek,Pelengkap saja,A
+bahasa,"Kata yang menunjukkan nama orang, tempat, atau benda disebut...",Nomina,Verba,Adjektiva,Adverbia,A
+bahasa,Kata yang menyatakan tindakan disebut...,Verba,Nomina,Adjektiva,Numeralia,A
+bahasa,Kata yang menerangkan sifat disebut...,Adjektiva,Nomina,Verba,Konjungsi,A
+bahasa,Kata 'dan' termasuk...,Konjungsi,Nomina,Verba,Interjeksi,A
+bahasa,Ungkapan 'besar kepala' berarti...,Sombong,Sakit kepala,Sangat tinggi,Pandai memasak,A
+bahasa,Ungkapan 'buah tangan' berarti...,Oleh-oleh,Buah yang dibawa,Tangan besar,Hasil kebun,A
+bahasa,Ungkapan 'kambing hitam' berarti...,Pihak yang disalahkan,Hewan berwarna hitam,Orang yang kuat,Peternak,A
+bahasa,Peribahasa 'besar pasak daripada tiang' berarti...,Pengeluaran lebih besar daripada pendapatan,Rumah sangat besar,Tiang lebih kuat,Bekerja sangat keras,A
+bahasa,Peribahasa 'bagai pinang dibelah dua' berarti...,Sangat mirip,Sangat jauh,Sangat berbeda,Tidak cocok,A
+bahasa,Lawan kata 'optimistis' adalah...,Pesimistis,Aktif,Produktif,Realistis,A
+bahasa,Persamaan kata 'abadi' adalah...,Kekal,Sementara,Pendek,Luntur,A
+bahasa,Persamaan kata 'teliti' adalah...,Cermat,Ceroboh,Cepat,Kasar,A
+bahasa,Lawan kata 'hemat' adalah...,Boros,Rajin,Cermat,Sederhana,A
+bahasa,Lawan kata 'jujur' adalah...,Bohong,Baik,Sopan,Ramah,A
+bahasa,Kata 'rumah-rumah' merupakan bentuk...,Kata ulang,Kata majemuk,Singkatan,Akronim,A
+bahasa,Gabungan dua kata yang menghasilkan makna tertentu disebut...,Kata majemuk,Kata ulang,Singkatan,Imbuhan,A
+bahasa,Singkatan dari 'dan lain-lain' adalah...,dll.,dkk.,dsb.,dst.,A
+bahasa,Singkatan 'dkk.' berarti...,dan kawan-kawan,dan lain-lain,dan sebagainya,dengan keterangan,A
+bahasa,Kalimat 'Adik membaca buku' memiliki predikat...,Adik,membaca,buku,Adik membaca,B
+bahasa,Kalimat 'Ibu memasak nasi' memiliki objek...,Ibu,memasak,nasi,memasak nasi,C
+bahasa,Kata 'sangat' pada 'sangat indah' berfungsi menerangkan...,Keterangan tingkat,Subjek,Objek,Pelaku,A
+bahasa,Paragraf yang gagasan utamanya berada di awal disebut paragraf...,Deduktif,Induktif,Campuran,Naratif,A
+bahasa,Paragraf yang gagasan utamanya berada di akhir disebut paragraf...,Induktif,Deduktif,Deskriptif,Argumentatif,A
+bahasa,Teks yang bertujuan menggambarkan suatu objek secara rinci disebut teks...,Deskripsi,Prosedur,Eksposisi,Persuasi,A
+mtk,Hasil dari 15 + 27 adalah...,40,41,42,43,C
+mtk,Hasil dari 64 - 29 adalah...,33,34,35,36,C
+mtk,Hasil dari 8 × 7 adalah...,54,56,58,60,B
+mtk,Hasil dari 81 ÷ 9 adalah...,7,8,9,10,C
+mtk,Hasil dari 12 × 12 adalah...,124,134,144,154,C
+mtk,Hasil dari 100 - 37 adalah...,63,64,67,73,A
+mtk,Hasil dari 25 + 38 adalah...,53,63,73,83,B
+mtk,Hasil dari 144 ÷ 12 adalah...,10,11,12,13,C
+mtk,Hasil dari 9 × 11 adalah...,88,99,109,119,B
+mtk,Hasil dari 72 ÷ 8 adalah...,8,9,10,11,B
+mtk,Hasil dari 3² adalah...,6,8,9,12,C
+mtk,Hasil dari 5² adalah...,10,15,20,25,D
+mtk,Hasil dari √81 adalah...,7,8,9,10,C
+mtk,Hasil dari √144 adalah...,10,11,12,13,C
+mtk,"Jika x + 7 = 15, maka x = ...",6,7,8,9,C
+mtk,"Jika x - 9 = 6, maka x = ...",13,14,15,16,C
+mtk,"Jika 3x = 21, maka x = ...",6,7,8,9,B
+mtk,"Jika 2x + 4 = 14, maka x = ...",4,5,6,7,B
+mtk,Setengah dari 80 adalah...,20,30,40,50,C
+mtk,25% dari 200 adalah...,25,40,50,75,C
+mtk,10% dari 350 adalah...,25,35,45,55,B
+mtk,3/4 dari 100 adalah...,50,60,75,80,C
+mtk,1/5 dari 100 adalah...,10,20,25,50,B
+mtk,Pecahan yang setara dengan 1/2 adalah...,2/3,2/4,3/5,4/10,B
+mtk,Bilangan prima terkecil adalah...,0,1,2,3,C
+mtk,Bilangan prima setelah 7 adalah...,8,9,10,11,D
+mtk,FPB dari 12 dan 18 adalah...,3,4,6,9,C
+mtk,KPK dari 4 dan 6 adalah...,8,10,12,24,C
+mtk,Keliling persegi dengan sisi 8 cm adalah...,16 cm,24 cm,32 cm,64 cm,C
+mtk,Luas persegi dengan sisi 9 cm adalah...,18 cm²,36 cm²,72 cm²,81 cm²,D
+mtk,Luas persegi panjang 12 cm × 5 cm adalah...,17 cm²,34 cm²,60 cm²,120 cm²,C
+mtk,Keliling persegi panjang dengan panjang 10 cm dan lebar 4 cm adalah...,14 cm,20 cm,28 cm,40 cm,C
+mtk,Jumlah sudut dalam segitiga adalah...,90°,180°,270°,360°,B
+mtk,Sudut yang besarnya 90° disebut sudut...,Lancip,Siku-siku,Tumpul,Refleks,B
+mtk,Sudut yang kurang dari 90° disebut sudut...,Lancip,Siku-siku,Tumpul,Lurus,A
+mtk,Sudut 180° disebut sudut...,Lancip,Siku-siku,Lurus,Refleks,C
+mtk,1 meter sama dengan...,10 cm,50 cm,100 cm,1000 cm,C
+mtk,1 kilogram sama dengan...,10 gram,100 gram,500 gram,1000 gram,D
+mtk,2 jam sama dengan...,60 menit,90 menit,120 menit,180 menit,C
+mtk,3 hari sama dengan...,48 jam,60 jam,72 jam,96 jam,C
+logika,"Lanjutan pola 2, 4, 6, 8, ... adalah...",9,10,11,12,B
+logika,"Lanjutan pola 5, 10, 15, 20, ... adalah...",22,24,25,30,C
+logika,"Lanjutan pola 3, 6, 12, 24, ... adalah...",36,42,48,52,C
+logika,"Lanjutan pola 81, 27, 9, 3, ... adalah...",0,1,2,6,B
+logika,"Lanjutan pola 1, 4, 9, 16, ... adalah...",20,24,25,36,C
+logika,"Lanjutan pola 10, 20, 40, 80, ... adalah...",100,120,140,160,D
+logika,"Lanjutan pola 100, 90, 80, 70, ... adalah...",50,60,65,75,B
+logika,"Lanjutan pola 1, 1, 2, 3, 5, ... adalah...",6,7,8,9,C
+logika,Semua A adalah B. Semua B adalah C. Kesimpulan yang benar adalah...,Semua A adalah C,Semua C adalah A,Tidak ada A yang C,Sebagian C bukan B,A
+logika,"Jika hari ini Senin, tiga hari lagi adalah...",Selasa,Rabu,Kamis,Jumat,C
+logika,"Jika A lebih besar dari B, dan B lebih besar dari C, maka...",A < C,A = C,A > C,B < C,C
+logika,"Jika semua burung memiliki sayap dan elang adalah burung, maka...",Elang memiliki sayap,Semua sayap adalah elang,Elang bukan burung,Tidak ada kesimpulan,A
+logika,Mana yang berbeda dari yang lain?,Apel,Mangga,Jeruk,Wortel,D
+logika,Mana yang tidak sekelompok?,Merah,Biru,Hijau,Segitiga,D
+logika,"Jika 2 + 3 = 10 dan 3 + 4 = 21 dengan pola tertentu, maka 4 + 5 = ...",27,30,36,45,D
+logika,Sebuah jam menunjukkan pukul 03.00. Sudut antara jarum jam dan menit adalah...,0°,45°,90°,180°,C
+logika,"Jika semua X adalah Y, tetapi tidak semua Y adalah X, hubungan yang tepat adalah...",X merupakan bagian dari Y,X sama dengan Y,Y merupakan bagian dari X,X dan Y tidak berhubungan,A
+logika,Ayah lebih tua dari Budi. Budi lebih tua dari Cici. Siapa yang paling muda?,Ayah,Budi,Cici,Tidak dapat ditentukan,C
+logika,Ani lebih tinggi dari Budi. Cici lebih tinggi dari Ani. Siapa paling tinggi?,Ani,Budi,Cici,Sama tinggi,C
+logika,"Jika 5 orang berjabat tangan satu kali dengan setiap orang lain, jumlah jabat tangan adalah...",5,10,15,20,B
+logika,Ada 4 kotak. Setiap kotak berisi 3 bola. Jumlah bola seluruhnya...,7,10,12,14,C
+logika,"Jika 1 = 3, 2 = 6, 3 = 9, maka 5 = ...",12,15,18,20,B
+logika,Sebuah angka dikali 2 lalu ditambah 3 menghasilkan 13. Angka itu adalah...,4,5,6,7,B
+logika,"Jika semua mawar adalah bunga, maka pernyataan yang pasti benar adalah...",Mawar termasuk bunga,Semua bunga adalah mawar,Tidak ada bunga yang mawar,Mawar bukan bunga,A
+logika,Urutan dari terkecil ke terbesar yang benar adalah...,"0, 1, 2, 3","3, 2, 1, 0","1, 0, 3, 2","2, 0, 3, 1",A
+logika,"Jika sebuah pola bertambah 7 setiap langkah: 4, 11, 18, 25, ... angka berikutnya adalah...",30,31,32,33,C
+logika,"Jika sebuah pola berkurang 4: 30, 26, 22, 18, ... angka berikutnya adalah...",12,13,14,15,C
+logika,Dina berada di depan Eko. Eko berada di depan Fajar. Siapa yang berada paling belakang?,Dina,Eko,Fajar,Tidak diketahui,C
+logika,"Jika hari ini Rabu, dua hari sebelum hari ini adalah...",Minggu,Senin,Selasa,Jumat,B
+logika,"Jika semua ikan hidup di air dan ikan mas adalah ikan, maka...",Ikan mas hidup di air,Semua yang hidup di air adalah ikan mas,Ikan mas hidup di darat,Tidak ada kesimpulan,A
+logika,Manakah pasangan yang memiliki hubungan sama: Dokter : Rumah Sakit = Guru : ...,Pasar,Sekolah,Bandara,Stadion,B
+logika,Manakah pasangan yang memiliki hubungan sama: Pensil : Menulis = Gunting : ...,Menghapus,Memotong,Mewarnai,Mengukur,B
+logika,"Manakah yang paling berbeda: 2, 4, 6, 9, 10",2,6,9,10,C
+logika,"Jika 3 buku berharga Rp15.000, harga 1 buku dengan harga sama adalah...",Rp3.000,Rp4.000,Rp5.000,Rp6.000,C
+logika,"Jika 6 apel dibagi rata kepada 2 orang, setiap orang mendapat...",2,3,4,6,B
+logika,Sebuah bus berangkat pukul 08.00 dan perjalanan berlangsung 2 jam. Bus tiba pukul...,09.00,10.00,11.00,12.00,B
+logika,"Jika semua kendaraan membutuhkan energi untuk bergerak dan mobil adalah kendaraan, maka...",Mobil membutuhkan energi untuk bergerak,Semua energi adalah mobil,Mobil tidak bergerak,Kendaraan bukan mobil,A
+logika,Urutan alfabetis yang benar adalah...,"Bola, Buku, Batu","Batu, Bola, Buku","Buku, Batu, Bola","Bola, Batu, Buku",D
+logika,"Jika satu kotak berisi 5 pensil, maka 7 kotak berisi...",30,35,40,45,B
+bahasa,Kata yang tepat untuk melengkapi kalimat 'Mereka ... di halaman sekolah' adalah...,bermain,bermainlah,permainan,dimainkan,A
+bahasa,Kata 'kebersihan' dibentuk dari kata dasar...,bersih,bersihkan,membersihkan,bersihan,A
+bahasa,Kalimat yang paling efektif adalah...,Para siswa-siswa belajar di kelas.,Para siswa sedang belajar di kelas.,Para siswa semuanya sedang belajar-belajar.,Siswa-siswa para sedang belajar.,B
+geografi,Negara yang dikenal sebagai Negeri Sakura adalah...,Korea Selatan,Jepang,Thailand,Vietnam,B
+logika,"Jika setiap segitiga memiliki tiga sisi dan bentuk X adalah segitiga, maka X memiliki...",Dua sisi,Tiga sisi,Empat sisi,Lima sisi,B
+sejarah,Peristiwa Sumpah Pemuda berlangsung dalam Kongres Pemuda yang kedua pada tahun...,1926,1928,1930,1945,B
+bahasa,Lawan kata 'sulit' adalah...,Mudah,Lambat,Panjang,Kecil,A
