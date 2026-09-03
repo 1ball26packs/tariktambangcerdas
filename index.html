@@ -68,6 +68,12 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .mini{font-size:12px;text-align:center;font-weight:800;opacity:.65;margin-top:12px}
 .hidden{display:none!important}
 .row{display:flex;gap:10px}.row>*{flex:1}
+.name-avatar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.avatar-picker{width:92px;height:50px;display:flex;align-items:center;gap:6px;border:3px solid var(--ink);border-radius:13px;background:#fff;padding:5px 7px;cursor:pointer;overflow:hidden}
+.avatar-picker input{display:none}.avatar-preview{width:38px;height:38px;min-width:38px;border:2px solid var(--ink);border-radius:50%;object-fit:cover;background:#ffe58a}.avatar-label{font-size:10px;font-weight:1000;line-height:1.05;text-align:center}
+.history-avatar{width:42px;height:42px;border:2px solid var(--ink);border-radius:50%;object-fit:cover;background:#ffe58a;display:block;margin:0 auto 4px}
+.team-avatar-wrap{min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
 .spinner{width:28px;height:28px;border:4px solid #ddd;border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .lb-row{display:flex;align-items:center;gap:10px;border:3px solid var(--ink);border-radius:12px;padding:8px 12px;margin-bottom:8px;background:#fff9e8;font-weight:900}
@@ -164,8 +170,14 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
   <div id="questionLoadStatus" class="hint" style="margin-top:-18px;margin-bottom:14px">📚 Memuat bank soal...</div>
   <div class="card">
-    <label for="name">Nama pemain</label>
-    <input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off">
+    <div class="name-avatar-row">
+      <div><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
+      <label class="avatar-picker" title="Upload avatar">
+        <img id="avatarPreview" class="avatar-preview" alt="Avatar">
+        <span class="avatar-label">📷<br>AVATAR</span>
+        <input id="avatarInput" type="file" accept="image/*">
+      </label>
+    </div>
     <label for="category" style="margin-top:15px">Kategori soal</label>
     <select id="category">
       <option value="semua">🎲 Semua Kategori</option>
@@ -183,8 +195,14 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <section id="join" class="screen">
   <h2>🔗 Gabung Game</h2>
   <div class="card">
-    <label for="joinName">Nama pemain</label>
-    <input id="joinName" maxlength="18" placeholder="Nama kamu" autocomplete="off">
+    <div class="name-avatar-row">
+      <div><label for="joinName">Nama pemain</label><input id="joinName" maxlength="18" placeholder="Nama kamu" autocomplete="off"></div>
+      <label class="avatar-picker" title="Upload avatar">
+        <img id="joinAvatarPreview" class="avatar-preview" alt="Avatar">
+        <span class="avatar-label">📷<br>AVATAR</span>
+        <input id="joinAvatarInput" type="file" accept="image/*">
+      </label>
+    </div>
     <label for="joinCode" style="margin-top:15px">Kode permainan</label>
     <input id="joinCode" maxlength="5" placeholder="ABCDE" style="text-transform:uppercase;text-align:center;letter-spacing:5px;font-weight:1000">
     <button class="btn" id="joinBtn">🚀 GABUNG</button>
@@ -329,6 +347,8 @@ const POINT_WRONG = -5; // v2.4: +10 benar / -5 salah per percobaan
 
 // --- state lokal ---
 let uid = null, roomId = null, mySlot = null, roomUnsub = null;
+let playerAvatar = "";
+const DEFAULT_AVATAR = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" rx="48" fill="#ffe58a"/><text x="48" y="62" text-anchor="middle" font-size="48">👤</text></svg>`);
 let answered = false, timerInterval = null, localRound = 0;
 let roundDeadline = 0;
 let lastReactionTs = 0;
@@ -615,6 +635,34 @@ function buildOrder(category){
   return shuffle(idxs.length?idxs:[...questions.keys()]);
 }
 
+function setupAvatarPicker(inputId, previewId){
+  const input=$(inputId), preview=$(previewId);
+  if(!input||!preview)return;
+  preview.src=DEFAULT_AVATAR;
+  input.addEventListener("change",()=>{
+    const file=input.files?.[0]; if(!file)return;
+    if(!file.type.startsWith("image/")){alert("Pilih file gambar.");input.value="";return;}
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const size=64, canvas=document.createElement("canvas"); canvas.width=size;canvas.height=size;
+        const ctx=canvas.getContext("2d");
+        const scale=Math.max(size/img.width,size/img.height);
+        const w=img.width*scale,h=img.height*scale;
+        ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+        const data=canvas.toDataURL("image/jpeg",0.72);
+        preview.src=data;
+        if(inputId==="avatarInput") playerAvatar=data;
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getAvatar(value){return value||DEFAULT_AVATAR}
+
 async function ensureAuth(){
   if(uid)return uid;
   const cred=await signInAnonymously(auth);
@@ -674,7 +722,7 @@ $("createBtn").onclick=async()=>{
     roomId=makeCode(); mySlot="player1";
     const room={
       status:"waiting", hostId:uid, createdAt:serverTimestamp(),
-      player1:{id:uid,name,score:0,connected:true},
+      player1:{id:uid,name,avatar:playerAvatar,score:0,connected:true},
       player2:null, ropePosition:0, round:0, questionIndex:0,
       questionOrder:buildOrder(category), category,
       streakP1:0, streakP2:0, suddenDeathCounter:0, matchEvents:[], maxStreak:{player1:0,player2:0}, historyRecorded:false,
@@ -692,6 +740,7 @@ $("historyBtn").onclick=()=>show("history");
 
 $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
+  const joinAvatar = $("joinAvatarPreview")?.src || DEFAULT_AVATAR;
   $("joinError").classList.add("hidden");
   if(!name||code.length!==5){$("joinError").textContent="Isi nama dan kode 5 karakter."; $("joinError").classList.remove("hidden");return}
   if(!questionsReady){$("joinError").textContent="Bank soal masih dimuat. Coba lagi sebentar."; $("joinError").classList.remove("hidden");return}
@@ -715,7 +764,7 @@ $("joinBtn").onclick=async()=>{
       listenRoom(); renderLobby(); show(data.status==="playing"?"game":"lobby"); return;
     }
     roomId=code;mySlot="player2";
-    await update(r,{player2:{id:uid,name,score:0,connected:true}});
+    await update(r,{player2:{id:uid,name,avatar:joinAvatar,score:0,connected:true}});
     await onDisconnect(ref(db,`games/${roomId}/player2/connected`)).set(false);
     saveSession(); listenRoom();renderLobby();show("lobby");
   }catch(e){$("joinError").textContent=e.message;$("joinError").classList.remove("hidden")}
@@ -1048,9 +1097,9 @@ function renderHistoryCard(g){
     <div class="history-summary" role="button" tabindex="0">
       <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())}</span><span>${esc(date)}</span></div>
       <div class="match-score">
-        <div class="team ${cls1}"><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
+        <div class="team ${cls1}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p1.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
         <div class="vs">VS</div>
-        <div class="team ${cls2}"><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
+        <div class="team ${cls2}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p2.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
       </div>
       <div class="match-meta">
         <span class="pill">🏆 ${result}</span>
@@ -1163,6 +1212,8 @@ function cleanup(){
 }
 
 (async function init(){
+  setupAvatarPicker("avatarInput","avatarPreview");
+  setupAvatarPicker("joinAvatarInput","joinAvatarPreview");
   await loadQuestionsFromCSV();
   await ensureAuth();
   await tryResume();
