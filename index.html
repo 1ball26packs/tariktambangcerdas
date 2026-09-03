@@ -818,8 +818,24 @@ function saveSession(){ if(roomId && mySlot && mySlot!=="spectator") localStorag
 function clearSession(){ localStorage.removeItem("tow_session"); updateResumeButton(false); }
 function updateResumeButton(showIt=true){const b=$("resumeBtn"); if(b)b.classList.toggle("hidden",!showIt)}
 async function hasResumableSession(){
-  const raw=localStorage.getItem("tow_session"); if(!raw)return false;
-  try{const saved=JSON.parse(raw); if(!saved?.roomId||!saved?.mySlot)return false; const snap=await get(ref(db,"games/"+saved.roomId)); if(!snap.exists())return false; const d=snap.val(); return d.status!=="finished" && !!d[saved.mySlot] && d[saved.mySlot].id===uid;}catch{return false}
+  const raw=localStorage.getItem("tow_session"); 
+  if(!raw)return false;
+  try{
+    const saved=JSON.parse(raw); 
+    if(!saved?.roomId||!saved?.mySlot)return false;
+    // Ensure uid is set before checking
+    if(!uid) await ensureAuth();
+    const snap=await get(ref(db,"games/"+saved.roomId)); 
+    if(!snap.exists())return false; 
+    const d=snap.val(); 
+    // Safely check if player slot exists and has valid structure
+    const playerData = d[saved.mySlot];
+    if(!playerData || !playerData.id) return false;
+    return d.status!=="finished" && playerData.id===uid;
+  }catch(e){
+    console.error("hasResumableSession error:", e);
+    return false;
+  }
 }
 async function tryResume(){
   const raw=localStorage.getItem("tow_session");
@@ -1123,7 +1139,7 @@ async function answer(choice,q,btn){
         // A normal completed round breaks a consecutive-timeout streak.
         d.suddenDeathCounter=0;
         if(a.correct!==b.correct){
-          const delta=a.correct?(Number(d.streakP1||0)>=3?-(5*COMBO_MULTIPLIER):-5):(Number(d.streakP2||0)>=3?(5*COMBO_MULTIPLIER):5);
+          const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
           d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
         }
         d.feedbackUntil=nowServer()+3000;
@@ -1282,7 +1298,7 @@ async function timeOut(round){
       // If exactly one player answered correctly before timeout, that answer
       // still gets its normal pull. Both unanswered means no normal pull.
       if(a.correct!==b.correct){
-        const delta=a.correct?(Number(d.streakP1||0)>=3?-(5*COMBO_MULTIPLIER):-5):(Number(d.streakP2||0)>=3?(5*COMBO_MULTIPLIER):5);
+        const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
         d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
       }
       d.feedbackUntil=now+3000;
