@@ -215,6 +215,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="modal-card settings-card">
     <div class="modal-header"><h2>⚙️ PENGATURAN</h2></div>
     <audio id="soundtrackAudio" loop preload="auto"></audio>
+    <audio id="victoryAudio" preload="auto"></audio>
     <div class="settings-section">
       <label>🎵 Soundtrack</label>
       <select id="soundtrackSelect">
@@ -224,6 +225,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
         <option value="3">🎵 Lagu 3</option>
       </select>
       <div class="mini">Pilih soundtrack bawaan game. File diletakkan di folder yang sama dengan HTML: <b>lagu1.mp3</b>, <b>lagu2.mp3</b>, dan <b>lagu3.mp3</b>.</div>
+      <label class="settings-toggle"><input type="checkbox" id="victorySoundToggle"> 🔔 Efek kemenangan</label>
     </div>
     <button class="btn" id="closeSettingsBtn">✓ SELESAI</button>
   </div>
@@ -827,6 +829,7 @@ $("closeSettingsBtn").onclick=()=>$("settingsModal").style.display="none";
 $("settingsModal").addEventListener("click",e=>{if(e.target.id==="settingsModal")$("settingsModal").style.display="none"});
 
 const SOUNDTRACK_FILES={1:"lagu1.mp3",2:"lagu2.mp3",3:"lagu3.mp3"};
+const VICTORY_AUDIO_FILE="menang.mp3";
 async function playSelectedSoundtrack(){
   const n=localStorage.getItem("tow_track_selected")||"none";
   const a=$("soundtrackAudio");
@@ -840,8 +843,18 @@ async function playSelectedSoundtrack(){
 }
 function loadLocalSettings(){
   $("soundtrackSelect").value=localStorage.getItem("tow_track_selected")||"none";
+  const v=$("victorySoundToggle"); if(v) v.checked=localStorage.getItem("tow_victory_sound")!=="off";
+}
+function playVictoryAudio(){
+  const a=$("victoryAudio");
+  if(!a || localStorage.getItem("tow_victory_sound") === "off") return;
+  if(!a.src || !a.src.endsWith(VICTORY_AUDIO_FILE)) a.src=VICTORY_AUDIO_FILE;
+  a.currentTime=0;
+  a.volume=1;
+  a.play().catch(()=>{});
 }
 $("soundtrackSelect").onchange=async e=>{localStorage.setItem("tow_track_selected",e.target.value);await playSelectedSoundtrack()};
+$("victorySoundToggle")?.addEventListener("change",e=>localStorage.setItem("tow_victory_sound",e.target.checked?"on":"off"));
 $("settingsModal").addEventListener("click",async e=>{if(e.target.id==="settingsModal")$("settingsModal").style.display="none"});
 loadLocalSettings();
 // Mulai soundtrack setelah interaksi pengguna agar browser mengizinkan autoplay.
@@ -1311,6 +1324,7 @@ function launchVictory(d){
     el.textContent="."; conf.appendChild(el);
   }
   buzz([80,40,100,40,160]);
+  playVictoryAudio();
   let n=3; count.textContent=n; clearInterval(victoryCountdownTimer);
   victoryCountdownTimer=setInterval(()=>{
     n--; count.textContent=Math.max(0,n);
