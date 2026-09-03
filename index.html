@@ -78,7 +78,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .victory-name{font-size:28px;font-weight:1000;line-height:1.05;text-transform:uppercase;overflow-wrap:anywhere}
 .victory-title{font-family:'Bangers',cursive;font-size:58px;letter-spacing:3px;line-height:.95;color:var(--red);text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);transform:rotate(-2deg);margin:8px 0}
 .victory-score{font-size:18px;font-weight:1000;margin-top:8px}.victory-score b{font-size:28px}
-.victory-count{margin-top:12px;font-size:14px;font-weight:1000}.victory-count span{display:inline-grid;place-items:center;width:34px;height:34px;border:3px solid var(--ink);border-radius:50%;background:#fff;font-size:18px;margin-left:5px}
+.victory-count{margin-top:12px;font-size:14px;font-weight:1000}.victory-count span{display:none}.victory-close{margin-top:16px;width:100%}
 .victory-card::before,.victory-card::after{content:'🎉';position:absolute;font-size:34px;top:16px;animation:sideParty 1s infinite alternate}.victory-card::before{left:14px}.victory-card::after{right:14px;transform:scaleX(-1)}
 @keyframes sideParty{to{transform:translateY(-8px) rotate(12deg)}}
 .victory-card::after{animation-name:sidePartyR}.victory-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.confetti-piece{position:absolute;top:-30px;width:9px;height:15px;border:2px solid var(--ink);animation:confettiFall var(--fall) linear forwards;transform:rotate(var(--rot));font-size:0}.confetti-piece:nth-child(3n){width:7px;height:7px;border-radius:50%}.confetti-piece:nth-child(4n){height:11px;transform:rotate(45deg)}
@@ -174,8 +174,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
         <div class="rule-item penalty">
           <span class="rule-icon">⏱️</span>
           <div>
-            <b>TANPA PENALTI WAKTU</b>
-            <p>Salah tidak mengurangi waktu. Timer hanya menjadi batas waktu untuk menjawab.</p>
+            <b>WAKTU HABIS = SALAH</b>
+            <p>Jika tidak menjawab sampai waktu habis, dianggap salah: -5 poin. Jika hanya satu pemain yang tidak menjawab, tali bergeser 5% ke arah pemain yang menjawab benar.</p>
           </div>
         </div>
         <div class="rule-item win">
@@ -227,7 +227,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
         <option value="2">🎵 Lagu 2</option>
         <option value="3">🎵 Lagu 3</option>
       </select>
-      <div class="mini">Pilih soundtrack bawaan game. File diletakkan di folder yang sama dengan HTML: <b>lagu1.mp3</b>, <b>lagu2.mp3</b>, dan <b>lagu3.mp3</b>.</div>
+      <div class="mini">Pilih soundtrack biar semangat</div>
           </div>
     <button class="btn" id="closeSettingsBtn">✓ SELESAI</button>
   </div>
@@ -243,7 +243,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <section id="home" class="screen active">
 <div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
   <div class="tag">⚡ Jawab tepat! Tarik kuat! Menang! ⚡</div>
-   <div class="card">
+    <div class="card">
     <div class="name-avatar-row">
       <div class="name-field"><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
       <div class="avatar-field"><label for="avatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
@@ -312,7 +312,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
     <div class="tug-wrap" id="tugWrap"><img src="tug-characters.webp" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
-        <div class="reactionFloat" id="reactionFloat"></div>
+    <div class="arena-note">POSISI TALI</div>
+    <div class="reactionFloat" id="reactionFloat"></div>
   </div>
   <div class="reactions" id="reactions">
     <button class="react-btn" data-emoji="😂">😂</button>
@@ -338,7 +339,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <div id="victoryName" class="victory-name">PEMAIN</div>
     <div class="victory-title">MENANG!</div>
     <div class="victory-score">SKOR AKHIR <b id="victoryScore">0</b></div>
-    <div class="victory-count">HASIL AKHIR <span id="victoryCountdown">3</span></div>
+    <div class="victory-count">HASIL AKHIR</div>
+    <button class="btn victory-close" id="closeVictoryBtn">✓ TUTUP HASIL KEMENANGAN</button>
   </div>
 </div>
 
@@ -668,7 +670,7 @@ async function loadQuestionsFromCSV(){
     refreshHistoryFilterOptions();
     questionsReady=true;
     if(status)status.textContent=`📚 ${questions.length} soal siap dimainkan`;
-    console.log(`Tug of War V2.8: ${questions.length} soal dimuat dari questions.csv`);
+    console.log(`Tug of War V2.9: ${questions.length} soal dimuat dari questions.csv`);
   }catch(e){
     questions=fallbackQuestions.slice();
     refreshCategoryOptions();
@@ -1019,6 +1021,8 @@ async function answer(choice,q,btn){
       if(!d||d.status!=="playing")return d;
       if(Number(d.round||1)!==submittedRound || Number(d.questionIndex||0)!==submittedQuestionIndex)return d;
       d.roundAnswers=d.roundAnswers||{};
+      // Setelah timeout/feedback dimulai, jawaban baru tidak boleh masuk lagi.
+      if(d.feedbackUntil || d.roundAnswers[mySlot])return d;
       d.roundAnswers[mySlot]={choice:Number(choice),correct:!!correct,answer:q.a?.[choice]||"",answeredAt:Date.now()};
       d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
       d.matchEvents.push({type:correct?"correct":"wrong",slot:mySlot,round:Number(d.round||1),questionIndex:Number(d.questionIndex||0),question:q.q||"",answer:q.a?.[choice]||"",correctAnswer:q.a?.[q.c]||"",points:correct?10:-5,at:Date.now()});
@@ -1066,7 +1070,7 @@ function showRoundFeedback(d){
   const status=(slot,p)=>{
     const a=ra[slot];
     if(!a)return `<div class="feedback-player">${esc(p.name||slot)}<br>Menunggu jawaban…</div>`;
-    return `<div class="feedback-player ${a.correct?"ok":"no"}">${esc(p.name||slot)}<br>${a.correct?"✅ BENAR +10":"❌ SALAH -5"}</div>`;
+    return `<div class="feedback-player ${a.correct?"ok":"no"}">${esc(p.name||slot)}<br>${a.correct?"✅ BENAR +10":(a.notAnswered?"⏱️ TIDAK MENJAWAB -5":"❌ SALAH -5")}</div>`;
   };
   $("feedbackPlayers").innerHTML=status("player1",p1)+status("player2",p2);
   modal.classList.remove("hidden");
@@ -1117,33 +1121,43 @@ function startLocalTimer(d){
 }
 
 async function timeOut(round){
-  if(timeoutRound===round)return;timeoutRound=round;
+  if(timeoutRound===round)return; timeoutRound=round;
   const r=ref(db,"games/"+roomId);
   await runTransaction(r,d=>{
-    if(!d||d.status!=="playing"||d.round!==round)return d;
+    if(!d||d.status!=="playing"||Number(d.round)!==Number(round))return d;
+    // Jika ronde sudah selesai oleh jawaban kedua pemain, jangan proses timeout lagi.
+    if(d.feedbackUntil)return d;
+    const qIndex=Number(d.questionIndex||0);
     const order=d.questionOrder||[];
-    const orderLen=order.length||questions.length;
-    const sd=(d.suddenDeathCounter||0)+1;
-    if(sd>=SUDDEN_DEATH_TIMEOUTS){
-      d.suddenDeathCounter=0;
-      let pos=d.ropePosition||0;
-      if(pos>0)pos=Math.max(0,pos-SUDDEN_DEATH_NUDGE);
-      else if(pos<0)pos=Math.min(0,pos+SUDDEN_DEATH_NUDGE);
-      d.ropePosition=pos;
-    }else{
-      d.suddenDeathCounter=sd;
+    const q=questions[Number(order[qIndex]||0)] || questions[0] || {};
+    d.roundAnswers=d.roundAnswers||{};
+    const now=Date.now();
+    // Pemain yang belum menjawab dianggap salah dan mendapat -5.
+    for(const slot of ["player1","player2"]){
+      if(!d.roundAnswers[slot]){
+        d.roundAnswers[slot]={choice:null,correct:false,answer:"",answeredAt:now,notAnswered:true};
+        d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+        d.matchEvents.push({type:"wrong",slot,round:Number(d.round||round),questionIndex:qIndex,question:q.q||"",answer:"",correctAnswer:q.a?.[q.c]||"",points:-5,notAnswered:true,at:now});
+      }
     }
-    d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
-    d.matchEvents.push({type:"timeout",round:Number(d.round||round),questionIndex:Number(d.questionIndex||0),at:Date.now()});
-    if((d.round||1)>=Math.min(ROUND_LIMIT, orderLen)){
-      d.status="finished";
-      const s1=(d.player1&&d.player1.score)||0, s2=(d.player2&&d.player2.score)||0;
-      d.winner = s1===s2?null:(s1>s2?"player1":"player2");
-    }else{
-      d.round=(d.round||1)+1;
-      d.questionIndex=((d.questionIndex||0)+1)%orderLen;
-      d.roundStartedAt={".sv":"timestamp"};d.timeLeft=20;
+    const a=d.roundAnswers.player1,b=d.roundAnswers.player2;
+    const p1=d.player1||{},p2=d.player2||{};
+    // Skor hanya dihitung sekali, saat feedback pertama kali dibuat.
+    p1.score=Number(p1.score||0)+(a.correct?10:-5);
+    p2.score=Number(p2.score||0)+(b.correct?10:-5);
+    d.player1=p1; d.player2=p2;
+    d.streakP1=a.correct?(Number(d.streakP1||0)+1):0;
+    d.streakP2=b.correct?(Number(d.streakP2||0)+1):0;
+    d.suddenDeathCounter=0;
+    // Tali bergerak hanya bila tepat satu pemain benar.
+    if(a.correct!==b.correct){
+      const delta=a.correct?-5:5;
+      d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
     }
+    d.feedbackUntil=now+3000;
+    d.feedbackRound=Number(d.round||round);
+    d.feedbackCorrectAnswer=q.a?.[q.c]||"";
+    d.feedbackTriggeredByTimeout=true;
     return d;
   }).catch(()=>{});
 }
@@ -1228,7 +1242,7 @@ function renderHistoryCard(g){
       accuracy:t?Math.round(c/t*100):0,
       penalty:Number(g.playerPenalty?.[slot]||0),
       maxStreak:Number(g.maxStreak?.[slot]||0),
-      timeouts:es.filter(e=>e.type==="timeout").length
+      timeouts:es.filter(e=>e.type==="timeout"||e.notAnswered).length
     };
   };
   const s1=statFor("player1"),s2=statFor("player2");
@@ -1241,7 +1255,7 @@ function renderHistoryCard(g){
   const timeline=ev.slice().sort((a,b)=>Number(a.at||0)-Number(b.at||0)).map(e=>{
     const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));
     const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";
-    const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?`-5 / -${e.penalty||0}s`:"Waktu habis";
+    const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?(e.notAnswered?"⏱️ TIDAK MENJAWAB -5":"-5"):"Waktu habis";
     const q=e.question?`<span class="event-question">${esc(e.question)}</span>`:"";
     return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} ${q}</span><span class="event-note">${note}</span></div>`;
   }).join("");
@@ -1328,8 +1342,7 @@ function launchVictory(d){
   $("victoryAvatar").src=getAvatar(wp.avatar);
   $("victoryName").textContent=wp.name||"PEMAIN";
   $("victoryScore").textContent=Number(wp.score||0);
-  const count=$("victoryCountdown");
-  overlay.classList.add("show");
+  clearInterval(victoryCountdownTimer);
   const conf=$("victoryConfetti"); conf.innerHTML="";
   for(let i=0;i<42;i++){
     const el=document.createElement("i"); el.className="confetti-piece";
@@ -1342,12 +1355,14 @@ function launchVictory(d){
   }
   buzz([80,40,100,40,160]);
   playVictoryAudio();
-  let n=3; count.textContent=n; clearInterval(victoryCountdownTimer);
-  victoryCountdownTimer=setInterval(()=>{
-    n--; count.textContent=Math.max(0,n);
-    if(n<=0){clearInterval(victoryCountdownTimer);setTimeout(()=>overlay.classList.remove("show"),450)}
-  },1000);
+  // Tidak ada auto-close. Pemain menutup sendiri dengan tombol.
+  overlay.classList.add("show");
 }
+
+$("closeVictoryBtn")?.addEventListener("click",()=>{
+  $("victoryOverlay")?.classList.remove("show");
+  clearInterval(victoryCountdownTimer);
+});
 
 function renderResult(d){
   clearInterval(timerInterval);
