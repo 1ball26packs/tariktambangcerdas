@@ -170,14 +170,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
             <p>Satu soal hanya bisa dijawab sekali.<br>Salah = -5 poin, tali bergeser 5% ke arah lawan.</p>
           </div>
         </div>
-        <div class="rule-item penalty">
-          <span class="rule-icon">⏱️</span>
-          <div>
-            <b>TANPA PENALTI WAKTU</b>
-            <p>Salah tidak mengurangi waktu. Timer hanya menjadi batas waktu untuk menjawab.</p>
-          </div>
-        </div>
-        <div class="rule-item win">
+              <div class="rule-item win">
           <span class="rule-icon">🏆</span>
           <div>
             <b>CARA MENANG</b>
@@ -225,8 +218,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
         <option value="3">🎵 Lagu 3</option>
       </select>
       <div class="mini">Pilih soundtrack bawaan game. File diletakkan di folder yang sama dengan HTML: <b>lagu1.mp3</b>, <b>lagu2.mp3</b>, dan <b>lagu3.mp3</b>.</div>
-      <label class="settings-toggle"><input type="checkbox" id="victorySoundToggle"> 🔔 Efek kemenangan</label>
-    </div>
+          </div>
     <button class="btn" id="closeSettingsBtn">✓ SELESAI</button>
   </div>
 </div>
@@ -240,9 +232,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 
 <section id="home" class="screen active">
 <div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
-  <div class="tag">⚡ Jawab cepat. Tarik kuat. Menang! ⚡</div>
-  <div id="questionLoadStatus" class="hint" style="margin-top:-18px;margin-bottom:14px">📚 Memuat bank soal...</div>
-  <div class="card">
+    <div class="card">
     <div class="name-avatar-row">
       <div class="name-field"><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
       <div class="avatar-field"><label for="avatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
@@ -311,7 +301,6 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
     <div class="tug-wrap" id="tugWrap"><img src="tug-characters.webp" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
-    <div class="arena-note">POSISI TALI</div>
     <div class="reactionFloat" id="reactionFloat"></div>
   </div>
   <div class="reactions" id="reactions">
@@ -435,7 +424,7 @@ const POINT_WRONG = -5; // v2.4: +10 benar / -5 salah per percobaan
 let uid = null, roomId = null, mySlot = null, roomUnsub = null;
 let playerAvatar = "";
 const DEFAULT_AVATAR = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" rx="48" fill="#ffe58a"/><text x="48" y="62" text-anchor="middle" font-size="48">👤</text></svg>`);
-let answered = false, timerInterval = null, localRound = 0;
+let answered = false, timerInterval = null, localRound = 0, currentRound = 0, currentQuestionIndex = 0;
 let roundDeadline = 0;
 let lastReactionTs = 0;
 let lastRopePos = 0;
@@ -843,18 +832,16 @@ async function playSelectedSoundtrack(){
 }
 function loadLocalSettings(){
   $("soundtrackSelect").value=localStorage.getItem("tow_track_selected")||"none";
-  const v=$("victorySoundToggle"); if(v) v.checked=localStorage.getItem("tow_victory_sound")!=="off";
 }
 function playVictoryAudio(){
   const a=$("victoryAudio");
-  if(!a || localStorage.getItem("tow_victory_sound") === "off") return;
+  if(!a) return;
   if(!a.src || !a.src.endsWith(VICTORY_AUDIO_FILE)) a.src=VICTORY_AUDIO_FILE;
   a.currentTime=0;
   a.volume=1;
   a.play().catch(()=>{});
 }
 $("soundtrackSelect").onchange=async e=>{localStorage.setItem("tow_track_selected",e.target.value);await playSelectedSoundtrack()};
-$("victorySoundToggle")?.addEventListener("change",e=>localStorage.setItem("tow_victory_sound",e.target.checked?"on":"off"));
 $("settingsModal").addEventListener("click",async e=>{if(e.target.id==="settingsModal")$("settingsModal").style.display="none"});
 loadLocalSettings();
 // Mulai soundtrack setelah interaksi pengguna agar browser mengizinkan autoplay.
@@ -945,6 +932,7 @@ function renderGame(d){
   $("tugWrap").style.transform=`translateX(calc(-50% + ${pos*1.7}px))`;
   $("qNum").textContent=`SOAL ${Math.min(d.round||1,ROUND_LIMIT)} / ${ROUND_LIMIT}`;
   const qi=Number(d.questionIndex)||0; const order=d.questionOrder&&d.questionOrder.length?d.questionOrder:[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
+  currentRound=Number(d.round||1); currentQuestionIndex=qi;
   $("question").textContent=q.q;
   fitQuestionText();
   fitAnswerTexts();
