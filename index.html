@@ -974,7 +974,7 @@ function renderGame(d){
   $("question").textContent=q.q;
   fitQuestionText();
   fitAnswerTexts();
-  if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;buildAnswers(q)}
+  if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;timeoutRound=0;buildAnswers(q)}
   if(d.feedbackUntil){
     showRoundFeedback(d);
     setButtons(true);
@@ -1060,6 +1060,12 @@ async function answer(choice,q,btn){
         if(a.correct!==b.correct){
           const delta=a.correct?(Number(d.streakP1||0)>=3?20:5):(Number(d.streakP2||0)>=3?-20:-5);
           d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
+        }
+        if(Math.abs(Number(d.ropePosition||0))>=100){
+          d.status="finished";
+          d.winner=Number(d.ropePosition||0)<0?"player1":"player2";
+          d.feedbackUntil=null; d.feedbackRound=null;
+          return d;
         }
         d.feedbackUntil=Date.now()+3000;
         d.feedbackRound=Number(d.round||1);
@@ -1147,9 +1153,9 @@ function startLocalTimer(d){
 }
 
 async function timeOut(round){
-  if(timeoutRound===round)return; timeoutRound=round;
+  if(timeoutRound===round)return;
   const r=ref(db,"games/"+roomId);
-  await runTransaction(r,d=>{
+  const result=await runTransaction(r,d=>{
     if(!d||d.status!=="playing"||Number(d.round)!==Number(round))return d;
     // Jika ronde sudah selesai oleh jawaban kedua pemain, jangan proses timeout lagi.
     if(d.feedbackUntil)return d;
@@ -1183,12 +1189,19 @@ async function timeOut(round){
       const delta=a.correct?(Number(d.streakP1||0)>=3?20:5):(Number(d.streakP2||0)>=3?-20:-5);
       d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
     }
+    if(Math.abs(Number(d.ropePosition||0))>=100){
+      d.status="finished";
+      d.winner=Number(d.ropePosition||0)<0?"player1":"player2";
+      d.feedbackUntil=null; d.feedbackRound=null;
+      return d;
+    }
     d.feedbackUntil=now+3000;
     d.feedbackRound=Number(d.round||round);
     d.feedbackCorrectAnswer=q.a?.[q.c]||"";
     d.feedbackTriggeredByTimeout=true;
     return d;
-  }).catch(()=>{});
+  }).catch(()=>null);
+  if(result?.committed) timeoutRound=round;
 }
 
 async function archiveMatchHistory(d){
@@ -1447,8 +1460,9 @@ $("playAgainBtn").onclick=async()=>{
       status:"waiting",ropePosition:0,round:0,questionIndex:0,winner:null,
       "player1/score":0,"player2/score":0,
       streakP1:0,streakP2:0,suddenDeathCounter:0,matchEvents:[],maxStreak:{player1:0,player2:0},historyRecorded:false,
-      questionOrder:buildOrder(category),usedQuestions:[]
+      questionOrder:buildOrder(category),usedQuestions:[],roundAnswers:null,feedbackUntil:null,feedbackRound:null,startedAt:null,roundStartedAt:null,timeLeft:20
     });
+    victoryShownForRoom=null; victoryAudioPlayedForRoom=null; timeoutRound=0;
   }
   $("gameMessage").textContent="Menunggu host memulai...";
   show("lobby");
