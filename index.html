@@ -68,9 +68,17 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .mini{font-size:12px;text-align:center;font-weight:800;opacity:.65;margin-top:12px}
 .hidden{display:none!important}
 .row{display:flex;gap:10px}.row>*{flex:1}
-.name-avatar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
-.avatar-picker{width:92px;height:50px;display:flex;align-items:center;gap:6px;border:3px solid var(--ink);border-radius:13px;background:#fff;padding:5px 7px;cursor:pointer;overflow:hidden}
-.avatar-picker input{display:none}.avatar-preview{width:38px;height:38px;min-width:38px;border:2px solid var(--ink);border-radius:50%;object-fit:cover;background:#ffe58a}.avatar-label{font-size:10px;font-weight:1000;line-height:1.05;text-align:center}
+.name-avatar-row{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:10px;align-items:start}
+.name-field,.avatar-field{min-width:0}
+.name-field>label,.avatar-field>label:first-child{display:block;font-weight:900;margin-bottom:7px;line-height:1.1}
+.avatar-picker{width:82px;height:53px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;border:3px solid var(--ink);border-radius:13px;background:#fff;padding:4px;cursor:pointer;overflow:hidden;transition:.12s}
+.avatar-picker:hover{background:#fff8d6}
+.avatar-picker:active{transform:translateY(2px)}
+.avatar-picker input{display:none}
+.avatar-preview{width:38px;height:38px;min-width:38px;border:2px solid var(--ink);border-radius:50%;object-fit:cover;background:#ffe58a;display:block}
+.avatar-label{font-size:0;font-weight:1000;line-height:1}
+.avatar-label::after{content:"📷";font-size:18px}
+@media(max-width:380px){.name-avatar-row{grid-template-columns:minmax(0,1fr) 72px;gap:8px}.avatar-picker{width:72px}.avatar-preview{width:34px;height:34px;min-width:34px}.avatar-label::after{font-size:16px}}
 .history-avatar{width:42px;height:42px;border:2px solid var(--ink);border-radius:50%;object-fit:cover;background:#ffe58a;display:block;margin:0 auto 4px}
 .team-avatar-wrap{min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 
@@ -171,12 +179,12 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div id="questionLoadStatus" class="hint" style="margin-top:-18px;margin-bottom:14px">📚 Memuat bank soal...</div>
   <div class="card">
     <div class="name-avatar-row">
-      <div><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
-      <label class="avatar-picker" title="Upload avatar">
+      <div class="name-field"><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
+      <div class="avatar-field"><label for="avatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
         <img id="avatarPreview" class="avatar-preview" alt="Avatar">
-        <span class="avatar-label">📷<br>AVATAR</span>
+        <span class="avatar-label">📷 PILIH FOTO</span>
         <input id="avatarInput" type="file" accept="image/*">
-      </label>
+      </label></div>
     </div>
     <label for="category" style="margin-top:15px">Kategori soal</label>
     <select id="category">
@@ -188,6 +196,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <button class="btn" id="createBtn">🎮 BUAT PERMAINAN</button>
     <button class="btn secondary" id="showJoinBtn">🔗 GABUNG PERMAINAN</button>
     <button class="btn secondary" id="historyBtn">📜 RIWAYAT MATCH</button>
+    <button class="btn secondary" id="rulesBtn">📖 ATURAN MAIN</button>
   </div>
   <div class="hint">1ball26packs@2026</div>
 </section>
@@ -196,12 +205,12 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <h2>🔗 Gabung Game</h2>
   <div class="card">
     <div class="name-avatar-row">
-      <div><label for="joinName">Nama pemain</label><input id="joinName" maxlength="18" placeholder="Nama kamu" autocomplete="off"></div>
-      <label class="avatar-picker" title="Upload avatar">
+      <div class="name-field"><label for="joinName">Nama pemain</label><input id="joinName" maxlength="18" placeholder="Nama kamu" autocomplete="off"></div>
+      <div class="avatar-field"><label for="joinAvatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
         <img id="joinAvatarPreview" class="avatar-preview" alt="Avatar">
-        <span class="avatar-label">📷<br>AVATAR</span>
+        <span class="avatar-label">📷 PILIH FOTO</span>
         <input id="joinAvatarInput" type="file" accept="image/*">
-      </label>
+      </label></div>
     </div>
     <label for="joinCode" style="margin-top:15px">Kode permainan</label>
     <input id="joinCode" maxlength="5" placeholder="ABCDE" style="text-transform:uppercase;text-align:center;letter-spacing:5px;font-weight:1000">
@@ -737,6 +746,7 @@ $("createBtn").onclick=async()=>{
 $("showJoinBtn").onclick=()=>show("join");
 $("backBtn").onclick=()=>show("home");
 $("historyBtn").onclick=()=>show("history");
+$("rulesBtn").onclick=()=>window.openRulesPopup?.();
 
 $("joinBtn").onclick=async()=>{
   const name=cleanName($("joinName").value), code=$("joinCode").value.trim().toUpperCase();
