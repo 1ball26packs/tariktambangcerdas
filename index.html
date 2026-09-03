@@ -12,7 +12,7 @@
 body{margin:0;background:#17120f;color:var(--ink);font-family:'Comic Neue',Arial,sans-serif;min-height:100vh}
 button,input,select{font:inherit}
 button{cursor:pointer}
-.app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
+.app{width:100%;background-image:radial-gradient(#241b17 1px,transparent 1px);background-size:18px 18px;max-width:520px;min-height:100vh;margin:auto;background:var(--paper);overflow:hidden;position:relative}
 .screen{display:none;background: rgb(254 217 12);min-height:100vh;padding:22px 18px 28px}
 .screen.active{display:flex;flex-direction:column;justify-content: center;}
 .logo{font-family:'Bangers',cursive;letter-spacing:1px;text-align:center;font-weight:1000;font-size:42px;line-height:.9;text-transform:uppercase;text-shadow:3px 3px 0 #fff,6px 6px 0 var(--ink);letter-spacing:5px;margin:28px 0 12px;transform:rotate(-2deg)}
@@ -45,6 +45,17 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 @keyframes idleSway{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes pullPulse{0%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}50%{filter:drop-shadow(3px 4px 0 #fff) brightness(1.4) drop-shadow(0 0 12px #ffd447)}100%{filter:drop-shadow(3px 4px 0 #fff) brightness(1)}}
 .arena-note{position:absolute;bottom:6px;z-index:5;font-size:11px;font-weight:900}
+.rope-track-wrap{margin:10px 12px 0}
+.rope-track{position:relative;height:16px;border:3px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff;box-shadow:3px 3px 0 var(--ink)}
+.rope-track::before,.rope-track::after{content:'';position:absolute;top:0;bottom:0;width:50%}
+.rope-track::before{left:0;background:var(--blue)}
+.rope-track::after{right:0;background:var(--red)}
+.rope-mid{position:absolute;top:-3px;bottom:-3px;left:50%;width:3px;background:var(--ink);transform:translateX(-50%);z-index:2}
+.rope-knot{position:absolute;top:50%;left:50%;width:26px;height:26px;background:var(--yellow);border:3px solid var(--ink);border-radius:50%;transform:translate(-50%,-50%);transition:left .35s cubic-bezier(.2,.9,.3,1);display:flex;align-items:center;justify-content:center;font-size:14px;z-index:3;box-shadow:2px 2px 0 var(--ink)}
+.rope-knot.near-win{animation:knotPulse .5s infinite alternate}
+@keyframes knotPulse{to{transform:translate(-50%,-50%) scale(1.2);box-shadow:0 0 10px 3px #ffd447}}
+.rope-track-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:1000;margin-top:4px;opacity:.8;padding:0 2px}
+.rope-status{text-align:center;font-size:12px;font-weight:900;margin-top:3px;min-height:15px}
 .reactionFloat{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:6}
 .reactionFloat span{position:absolute;bottom:40px;font-size:32px;animation:floatUp 1.4s ease-out forwards}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(.6)}20%{transform:translateY(-20px) scale(1.2)}100%{opacity:0;transform:translateY(-150px) scale(1)}}
@@ -324,6 +335,14 @@ html,body{min-height:100%;}body{min-height:100dvh;}
   <div class="arena">
     <div class="tug-wrap" id="tugWrap"><img src="tug-characters.webp" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
     <div class="reactionFloat" id="reactionFloat"></div>
+  </div>
+  <div class="rope-track-wrap">
+    <div class="rope-track" id="ropeTrack">
+      <div class="rope-mid"></div>
+      <div class="rope-knot" id="ropeKnot">🪢</div>
+    </div>
+    <div class="rope-track-labels"><span id="ropeLabelP1">P1</span><span id="ropeLabelP2">P2</span></div>
+    <div class="rope-status" id="ropeStatus"></div>
   </div>
   <div class="reactions" id="reactions">
     <button class="react-btn" data-emoji="😂">😂</button>
@@ -986,6 +1005,7 @@ function renderGame(d){
   }
   lastRopePos=pos;
   $("tugWrap").style.transform=`translateX(calc(-50% + ${pos*1.7}px))`;
+  updateRopeTrack(pos,p1.name||"P1",p2.name||"P2");
   if(d.status==="finished"){
     hideRoundFeedback();
     clearInterval(timerInterval);
@@ -1017,6 +1037,27 @@ function pulseCharacter(){
   if(!el)return;
   el.classList.add("pulling");
   setTimeout(()=>el.classList.remove("pulling"),400);
+}
+
+function updateRopeTrack(pos,p1Name,p2Name){
+  const knot=$("ropeKnot");
+  if(!knot)return;
+  const leftPct=50+(pos/100)*50; // pos -100..100 -> 0%..100%
+  knot.style.left=leftPct+"%";
+  const distToWin=100-Math.abs(pos);
+  knot.classList.toggle("near-win", pos!==0 && distToWin<=20);
+  const p1Label=$("ropeLabelP1"), p2Label=$("ropeLabelP2");
+  if(p1Label)p1Label.textContent=p1Name;
+  if(p2Label)p2Label.textContent=p2Name;
+  const status=$("ropeStatus");
+  if(!status)return;
+  if(pos===0){
+    status.textContent="⚖️ SEIMBANG";
+  }else if(pos<0){
+    status.textContent=`🔵 ${p1Name} unggul — ${distToWin} lagi menang`;
+  }else{
+    status.textContent=`🔴 ${p2Name} unggul — ${distToWin} lagi menang`;
+  }
 }
 
 function showReaction(emoji){
