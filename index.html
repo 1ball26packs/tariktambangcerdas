@@ -328,7 +328,7 @@ html,body{min-height:100%;}body{min-height:100dvh;}
 <section id="game" class="screen game">
   <div class="game-head">
     <div class="player" id="p1Box"><img id="p1Avatar" class="game-avatar" alt="Avatar Player 1"><span id="p1Name">PLAYER 1</span><small>SKOR</small><span class="score" id="p1Score">0</span></div>
-    <div class="timer" id="timer">20</div>
+    <div class="timer" id="timer">15</div>
     <div class="player p2" id="p2Box"><img id="p2Avatar" class="game-avatar" alt="Avatar Player 2"><span id="p2Name">PLAYER 2</span><small>SKOR</small><span class="score" id="p2Score">0</span></div>
   </div>
   <div class="spec-badge" id="specBadge"></div>
@@ -873,7 +873,7 @@ $("createBtn").onclick=async()=>{
       player2:null, ropePosition:0, round:0, questionIndex:0,
       questionOrder:buildOrder(category), usedQuestions:[], category,
       streakP1:0, streakP2:0, suddenDeathCounter:0, matchEvents:[], maxStreak:{player1:0,player2:0}, historyRecorded:false,
-      startedAt:null, roundStartedAt:null, timeLeft:20, winner:null
+      startedAt:null, roundStartedAt:null, timeLeft:15, winner:null
     };
     await set(ref(db,"games/"+roomId),room);
     await onDisconnect(ref(db,`games/${roomId}/player1/connected`)).set(false);
@@ -978,7 +978,7 @@ function listenRoom(){
       update(ref(db,"games/"+roomId),{
         status:"playing",startedAt:serverTimestamp(),round:1,questionIndex:0,
         usedQuestions:[],
-        roundStartedAt:serverTimestamp(),timeLeft:20
+        roundStartedAt:serverTimestamp(),timeLeft:15
       });
     }
   });
@@ -1210,7 +1210,7 @@ async function finalizeFeedback(d){
     if(usedKey && !g.usedQuestions.includes(usedKey)) g.usedQuestions.push(usedKey);
     g.round=(g.round||1)+1;g.questionIndex=currentQi+1;
     g.roundAnswers=null;g.feedbackUntil=null;g.feedbackRound=null;
-    g.roundStartedAt={".sv":"timestamp"};g.timeLeft=20;
+    g.roundStartedAt={".sv":"timestamp"};g.timeLeft=15;
     return g;
   });
 }
@@ -1218,7 +1218,7 @@ async function finalizeFeedback(d){
 function startLocalTimer(d){
   clearInterval(timerInterval);
   const started=d.roundStartedAt;
-  const initial=Number(d.timeLeft)||20;
+  const initial=Number(d.timeLeft)||15;
   if(typeof started!=="number"){
     // Firebase server timestamps can briefly arrive unresolved. Never substitute
     // the client's clock here, otherwise players can get different deadlines.
