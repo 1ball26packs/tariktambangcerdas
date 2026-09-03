@@ -153,134 +153,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <style>
 html,body{min-height:100%;}body{min-height:100dvh;}
 .app{min-height:100dvh;box-sizing:border-box;}
-@media (min-width:900px) and (min-height:700px){.app{max-width:920px;margin:0 auto;padding-bottom:18px}.game{min-height:calc(100dvh - 24px);display:flex;flex-direction:column;justify-content:flex-start}.arena{min-height:clamp(180px,32vh,320px)}.question-card{margin-top:auto}.game-head{flex-shrink:0}}
-@media (max-height:700px){.game-head{margin-bottom:4px}.arena{min-height:150px}.question-card{margin-top:6px}.question{min-height:48px}.answers{gap:7px}.answer{min-height:42px;padding:8px}}
-
-/* =========================================================
-   DESKTOP FIX v2.1 — FIT TO VIEWPORT
-   Khusus layar besar. Tidak mengubah mobile/tablet.
-   ========================================================= */
-@media (min-width:900px) and (min-height:701px){
-  html,body{min-height:100%;}
-  body{padding:15px 0;overflow-x:hidden;overflow-y:auto;}
-
-  .app{
-    width:calc(100% - 30px);
-    max-width:920px;
-    min-height:auto;
-    height:auto;
-    margin:0 auto;
-    border:4px solid var(--ink);
-    border-radius:28px;
-    overflow:visible;
-  }
-
-  .screen{min-height:0;}
-
-  .game{
-    width:100%;
-    height:auto;
-    min-height:0;
-    padding:0 0 12px;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    overflow:visible;
-  }
-
-  .game-head{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px));
-    margin:0 auto;
-    padding:10px 0 6px;
-    grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);
-    gap:18px;
-  }
-  .player{min-width:0;padding:8px 12px;border-radius:16px;}
-  .game-avatar{width:42px;height:42px;}
-  .player small{font-size:11px}
-  .score{font-size:24px}
-  .timer{width:62px;height:62px;font-size:21px;}
-
-  .spec-badge{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px));
-    margin:0 auto;
-    padding:0 0 3px;
-    min-height:0;
-  }
-
-  /*
-     Kunci utama bug desktop:
-     arena tidak lagi mengambil tinggi tetap yang membuat seluruh match
-     terdorong ke bawah. Lebar arena juga dibatasi berdasarkan tinggi
-     viewport sehingga rasio 2:1 tetap terjaga.
-  */
-  .arena{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px),calc((100dvh - 405px)*2));
-    aspect-ratio:2 / 1;
-    height:auto;
-    min-height:0;
-    max-height:390px;
-    margin:5px auto 0;
-    border-radius:24px;
-  }
-  .tug-wrap{width:70%;bottom:8px}
-
-  .rope-track-wrap{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px));
-    margin:8px auto 0;
-  }
-  .rope-track{height:14px}
-  .rope-track-labels{font-size:10px;margin-top:3px}
-  .rope-status{font-size:11px;line-height:14px;min-height:14px}
-
-  .reactions{flex:0 0 auto;margin:7px auto 0;gap:7px}
-  .react-btn{font-size:18px;padding:5px 9px}
-  .message{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px));
-    min-height:20px;
-    margin:4px auto;
-    line-height:20px;
-  }
-
-  .question-card{
-    flex:0 0 auto;
-    width:min(880px,calc(100% - 40px));
-    margin:5px auto 0;
-    padding:12px 16px;
-    border-radius:20px;
-  }
-  .qnum{font-size:11px}
-  .question{
-    font-size:clamp(18px,2vw,25px);
-    min-height:58px;
-    height:clamp(58px,9vh,92px);
-    margin:6px 0 10px;
-    padding:3px 12px;
-  }
-  .answers{gap:9px}
-  .answer{
-    font-size:clamp(14px,1.25vw,18px);
-    min-height:48px;
-    padding:9px 10px;
-    border-radius:12px;
-  }
-}
-
-/* Desktop sangat lebar/tinggi: tetap tidak mengembang tanpa batas. */
-@media (min-width:1200px) and (min-height:900px){
-  .game-head{padding-top:12px}
-  .arena{max-height:390px}
-}
-
-/* Desktop tinggi pendek: semua elemen harus muat dalam satu viewport. */
-@media (min-width:900px) and (max-height:700px){
-  body{padding:8px 0;overflow-y:auto}
-  .app{width:calc(100% - 16px);height:calc(100dvh - 16px);min-height:0;border-radius:22px}
+.app{width:calc(100% - 16px);height:calc(100dvh - 16px);min-height:0;border-radius:22px}
   .screen{min-height:0}
   .game{height:auto;min-height:0;padding-bottom:6px;overflow:visible}
   .game-head{padding:5px 0 3px;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:12px}
@@ -357,6 +230,7 @@ html,body{min-height:100%;}body{min-height:100dvh;}
     <button class="btn" id="closeRulesBtn">🔥 MENGERTI, MAIN!</button>
   </div>
 </div>
+</style>
 <style>
 .modal-overlay{position:fixed;inset:0;background:rgba(20,10,5,.85);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal-card{background:var(--paper,#fff8e7);border:4px solid var(--ink,#241b17);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:420px;width:100%;padding:18px;animation:popIn .25s ease-out}
@@ -402,7 +276,26 @@ html,body{min-height:100%;}body{min-height:100dvh;}
 .icon-btn{display:inline-grid;place-items:center;width:48px;height:44px;margin:8px 4px 0;border:3px solid var(--ink);border-radius:12px;background:#fff;font-size:23px;font-weight:900;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
 .icon-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 .settings-card{max-width:460px}.settings-section{border:3px solid var(--ink);border-radius:14px;background:#fff;padding:11px;margin:10px 0}.settings-section>label{display:block;font-weight:1000;margin-bottom:7px}.settings-section select{margin-top:9px}.settings-section .mini{margin-top:6px}
-@media(max-width:520px){.icon-btn{width:44px;height:40px;font-size:20px}}
+@media(max-wi<style>
+@media (min-width:521px){body{padding:15px 0;overflow-x:hidden;overflow-y:auto}.app{box-sizing:border-box;border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
+
+@media (min-width:900px){
+  .app{width:calc(100% - 30px);max-width:920px;margin:0 auto;min-height:0;height:auto;overflow:visible}
+  .screen{min-height:0}
+  .game{height:auto;min-height:0;overflow:visible;display:flex;flex-direction:column}
+  .game-head{flex:0 0 auto;width:min(880px,calc(100% - 40px));margin:0 auto;padding:10px 0 6px;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);gap:18px}
+  .player{min-width:0;padding:8px 12px;border-radius:16px}.game-avatar{width:42px;height:42px}.player small{font-size:11px}.score{font-size:24px}.timer{width:62px;height:62px;font-size:21px}
+  .spec-badge{flex:0 0 auto;width:min(880px,calc(100% - 40px));margin:0 auto;padding:0 0 3px;min-height:0}
+  .arena{flex:0 0 auto;width:min(880px,calc(100% - 40px));aspect-ratio:2/1;height:auto;min-height:0;max-height:390px;margin:5px auto 0;border-radius:24px}
+  .tug-wrap{width:70%;bottom:8px}
+  .rope-track-wrap{flex:0 0 auto;width:min(880px,calc(100% - 40px));margin:8px auto 0}.rope-track{height:14px}.rope-track-labels{font-size:10px;margin-top:3px}.rope-status{font-size:11px;line-height:14px;min-height:14px}
+  .reactions{flex:0 0 auto;margin:7px auto 0;gap:7px}.react-btn{font-size:18px;padding:5px 9px}
+  .message{flex:0 0 auto;width:min(880px,calc(100% - 40px));min-height:20px;margin:4px auto;line-height:20px}
+  .question-card{flex:0 0 auto;width:min(880px,calc(100% - 40px));margin:5px auto 0;padding:12px 16px;border-radius:20px}
+  .qnum{font-size:11px}.question{font-size:clamp(18px,2vw,25px);min-height:58px;height:clamp(58px,9vh,92px);margin:6px 0 10px;padding:3px 12px}.answers{gap:9px}.answer{font-size:clamp(14px,1.25vw,18px);min-height:48px;padding:9px 10px;border-radius:12px}
+}
+@media (min-width:900px) and (max-height:700px){body{padding:8px 0}.app{width:calc(100% - 16px);min-height:0}.game-head{padding:5px 0 3px;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:12px}.game-avatar{width:34px;height:34px}.player{padding:5px 8px}.score{font-size:20px}.timer{width:52px;height:52px;font-size:18px}.arena{width:min(880px,calc(100% - 30px));max-height:230px;margin-top:3px}.tug-wrap{bottom:5px}.rope-track-wrap{margin-top:5px}.reactions{margin-top:4px}.react-btn{font-size:16px;padding:4px 8px}.message{margin:2px auto;min-height:16px;line-height:16px}.question-card{margin-top:3px;padding:9px 12px;border-radius:18px}.question{height:50px;min-height:50px;font-size:17px;margin:4px 0 6px}.answers{gap:6px}.answer{min-height:38px;padding:6px 8px;font-size:13px}}
+x){.icon-btn{width:44px;height:40px;font-size:20px}}
 </style>
 <div class="app">
 
