@@ -157,163 +157,149 @@ html,body{min-height:100%;}body{min-height:100dvh;}
 @media (max-height:700px){.game-head{margin-bottom:4px}.arena{min-height:150px}.question-card{margin-top:6px}.question{min-height:48px}.answers{gap:7px}.answer{min-height:42px;padding:8px}}
 
 /* =========================================================
-   DESKTOP FIX v2 — hanya untuk layar besar (>=900px)
-   Tidak mengubah layout mobile/tablet.
+   DESKTOP FIX v2.1 — FIT TO VIEWPORT
+   Khusus layar besar. Tidak mengubah mobile/tablet.
    ========================================================= */
 @media (min-width:900px) and (min-height:701px){
-  html,body{
-    min-height:100%;
-  }
-
-  body{
-    padding:15px 0;
-    overflow-x:hidden;
-  }
+  html,body{min-height:100%;}
+  body{padding:15px 0;overflow-x:hidden;overflow-y:auto;}
 
   .app{
     width:calc(100% - 30px);
     max-width:920px;
     min-height:calc(100dvh - 30px);
+    height:calc(100dvh - 30px);
     margin:0 auto;
     border:4px solid var(--ink);
     border-radius:28px;
     overflow:hidden;
   }
 
-  /* Jangan biarkan .screen setinggi viewport penuh di dalam .app.
-     Ini sebelumnya membuat tinggi internal melebihi frame desktop. */
-  .screen{
-    min-height:calc(100dvh - 38px);
-  }
+  .screen{min-height:0;}
 
   .game{
     width:100%;
-    min-height:calc(100dvh - 38px);
-    padding:0 0 18px;
+    height:100%;
+    min-height:0;
+    padding:0 0 12px;
     display:flex;
     flex-direction:column;
     justify-content:flex-start;
+    overflow:hidden;
   }
 
   .game-head{
+    flex:0 0 auto;
     width:min(880px,calc(100% - 40px));
     margin:0 auto;
-    padding:18px 0 10px;
-    grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);
-    gap:22px;
+    padding:10px 0 6px;
+    grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);
+    gap:18px;
   }
-
-  .player{
-    min-width:0;
-    padding:10px 12px;
-    border-radius:16px;
-  }
-
-  .game-avatar{
-    width:46px;
-    height:46px;
-  }
-
-  .player small{font-size:12px}
-  .score{font-size:26px}
-
-  .timer{
-    width:68px;
-    height:68px;
-    font-size:23px;
-    justify-self:center;
-  }
+  .player{min-width:0;padding:8px 12px;border-radius:16px;}
+  .game-avatar{width:42px;height:42px;}
+  .player small{font-size:11px}
+  .score{font-size:24px}
+  .timer{width:62px;height:62px;font-size:21px;}
 
   .spec-badge{
+    flex:0 0 auto;
     width:min(880px,calc(100% - 40px));
     margin:0 auto;
-    padding:1px 0 5px;
+    padding:0 0 3px;
+    min-height:0;
   }
 
-  /* Background arena kembali proporsional 2:1 pada desktop.
-     Ukurannya dibatasi agar tidak membesar berlebihan pada monitor lebar. */
+  /*
+     Kunci utama bug desktop:
+     arena tidak lagi mengambil tinggi tetap yang membuat seluruh match
+     terdorong ke bawah. Lebar arena juga dibatasi berdasarkan tinggi
+     viewport sehingga rasio 2:1 tetap terjaga.
+  */
   .arena{
-    width:min(880px,calc(100% - 40px));
+    flex:0 0 auto;
+    width:min(880px,calc(100% - 40px),calc((100dvh - 405px)*2));
     aspect-ratio:2 / 1;
+    height:auto;
     min-height:0;
     max-height:390px;
-    margin:8px auto 0;
+    margin:5px auto 0;
     border-radius:24px;
   }
-
-  .tug-wrap{
-    width:70%;
-    bottom:10px;
-  }
+  .tug-wrap{width:70%;bottom:8px}
 
   .rope-track-wrap{
+    flex:0 0 auto;
     width:min(880px,calc(100% - 40px));
-    margin:12px auto 0;
+    margin:8px auto 0;
   }
+  .rope-track{height:14px}
+  .rope-track-labels{font-size:10px;margin-top:3px}
+  .rope-status{font-size:11px;line-height:14px;min-height:14px}
 
-  .reactions{
-    margin:10px auto 0;
-  }
-
+  .reactions{flex:0 0 auto;margin:7px auto 0;gap:7px}
+  .react-btn{font-size:18px;padding:5px 9px}
   .message{
+    flex:0 0 auto;
     width:min(880px,calc(100% - 40px));
-    margin:8px auto;
+    min-height:20px;
+    margin:4px auto;
+    line-height:20px;
   }
 
-  /* Jangan dorong kartu soal secara paksa ke bawah.
-     Pada desktop tinggi, margin-top:auto sebelumnya menciptakan
-     ruang kosong yang terasa seperti layout rusak. */
   .question-card{
+    flex:0 0 auto;
     width:min(880px,calc(100% - 40px));
-    margin:10px auto 0;
-    padding:18px 20px;
-    border-radius:24px;
+    margin:5px auto 0;
+    padding:12px 16px;
+    border-radius:20px;
   }
-
+  .qnum{font-size:11px}
   .question{
-    font-size:clamp(20px,2.1vw,28px);
-    min-height:72px;
-    height:clamp(72px,11vh,116px);
-    margin:8px 0 14px;
-    padding:4px 14px;
+    font-size:clamp(18px,2vw,25px);
+    min-height:58px;
+    height:clamp(58px,9vh,92px);
+    margin:6px 0 10px;
+    padding:3px 12px;
   }
-
-  .answers{
-    gap:12px;
-  }
-
+  .answers{gap:9px}
   .answer{
-    font-size:clamp(15px,1.35vw,19px);
-    min-height:54px;
-    padding:12px 12px;
-    border-radius:14px;
+    font-size:clamp(14px,1.25vw,18px);
+    min-height:48px;
+    padding:9px 10px;
+    border-radius:12px;
   }
 }
 
-/* Desktop lebar dengan tinggi pendek: tetap rapat dan tidak overflow. */
+/* Desktop sangat lebar/tinggi: tetap tidak mengembang tanpa batas. */
+@media (min-width:1200px) and (min-height:900px){
+  .game-head{padding-top:12px}
+  .arena{max-height:390px}
+}
+
+/* Desktop tinggi pendek: semua elemen harus muat dalam satu viewport. */
 @media (min-width:900px) and (max-height:700px){
-  body{padding:8px 0}
-  .app{
-    width:calc(100% - 16px);
-    min-height:calc(100dvh - 16px);
-    border-radius:22px;
-  }
-  .screen,.game{min-height:calc(100dvh - 24px)}
-  .game-head{padding:8px 0 5px}
-  .game-avatar{width:38px;height:38px}
-  .player{padding:6px 10px}
-  .score{font-size:21px}
-  .timer{width:54px;height:54px;font-size:19px}
-  .arena{margin-top:5px;max-height:250px}
-  .rope-track-wrap{margin-top:7px}
-  .reactions{margin-top:6px}
-  .message{margin:4px auto}
-  .question-card{margin-top:5px;padding:12px 16px}
-  .question{height:58px;min-height:58px;font-size:19px;margin:5px 0 8px}
-  .answers{gap:7px}
-  .answer{min-height:42px;padding:8px 9px;font-size:14px}
+  body{padding:8px 0;overflow-y:auto}
+  .app{width:calc(100% - 16px);height:calc(100dvh - 16px);min-height:0;border-radius:22px}
+  .screen{min-height:0}
+  .game{height:100%;min-height:0;padding-bottom:6px;overflow:hidden}
+  .game-head{padding:5px 0 3px;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:12px}
+  .game-avatar{width:34px;height:34px}
+  .player{padding:5px 8px}
+  .score{font-size:20px}
+  .timer{width:52px;height:52px;font-size:18px}
+  .spec-badge{padding-bottom:1px}
+  .arena{width:min(880px,calc(100% - 30px),calc((100dvh - 285px)*2));max-height:230px;margin-top:3px}
+  .tug-wrap{bottom:5px}
+  .rope-track-wrap{margin-top:5px}
+  .reactions{margin-top:4px}
+  .react-btn{font-size:16px;padding:4px 8px}
+  .message{margin:2px auto;min-height:16px;line-height:16px}
+  .question-card{margin-top:3px;padding:9px 12px;border-radius:18px}
+  .question{height:50px;min-height:50px;font-size:17px;margin:4px 0 6px}
+  .answers{gap:6px}
+  .answer{min-height:38px;padding:6px 8px;font-size:13px}
 }
-
 </style>
 </head>
 <body>
