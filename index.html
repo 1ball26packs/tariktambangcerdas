@@ -68,9 +68,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .mini{font-size:12px;text-align:center;font-weight:800;opacity:.65;margin-top:12px}
 .hidden{display:none!important}
 /* VICTORY CELEBRATION */
-.victory-overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(20,10,5,.88);backdrop-filter:blur(5px);overflow:hidden}
-.victory-overlay.show{display:flex}
-.victory-card{position:relative;width:min(440px,94vw);text-align:center;border:5px solid var(--ink);border-radius:28px;background:var(--paper);box-shadow:10px 10px 0 var(--ink);padding:22px 18px 20px;animation:victoryPop .65s cubic-bezier(.2,1.35,.35,1) both;overflow:hidden}
+.victory-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(20,10,5,.88);backdrop-filter:blur(5px);overflow:hidden;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .9s ease,visibility 0s linear .9s}.victory-overlay.show{visibility:visible;opacity:1;pointer-events:auto;transition:opacity .9s ease,visibility 0s linear 0s}
+.victory-card{position:relative;width:min(440px,94vw);text-align:center;border:5px solid var(--ink);border-radius:28px;background:var(--paper);box-shadow:10px 10px 0 var(--ink);padding:22px 18px 20px;animation:victoryPop 1.15s cubic-bezier(.2,1.2,.35,1) .15s both;overflow:hidden}
 @keyframes victoryPop{0%{opacity:0;transform:scale(.55) rotate(-5deg)}65%{opacity:1;transform:scale(1.08) rotate(1deg)}100%{transform:scale(1) rotate(0)}}
 .victory-burst{font-size:42px;line-height:1;animation:victoryBounce .8s infinite alternate}
 @keyframes victoryBounce{to{transform:scale(1.15) rotate(4deg)}}
@@ -113,12 +112,12 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .lb-name{flex:1}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
 .logo-tarik {
-  animation: tugTug 2s infinite ease-in-out;
-  width: 80%;
+    animation: tugTug 2s infinite ease-in-out;
+  width: 90%;
   height: auto;
    display: block; /* Wajib ditambahkan jika aslinya tag <img> */
   margin: 0 auto; /* Mengatur kanan dan kiri otomatis tengah */
-  }
+}
 @keyframes tugTug {
   0%,100% { transform: translateX(0) rotate(0); }
   25% { transform: translateX(-8px) rotate(-2deg); }
@@ -130,7 +129,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   transform-origin: center;
 }
 
-.feedback-card{max-width:520px;text-align:center}.feedback-answer{font-size:18px;font-weight:1000;padding:12px;border:3px solid var(--ink);border-radius:12px;background:#fff}.feedback-players{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.feedback-player{border:3px solid var(--ink);border-radius:12px;padding:10px;background:#fff;font-weight:900}.feedback-player.ok{background:#d8ffd8}.feedback-player.no{background:#ffd8d8}.feedback-countdown{margin-top:14px;font-size:18px;font-weight:1000;animation:pulse .8s infinite alternate}@keyframes pulse{to{transform:scale(1.04)}}
+.feedback-card{max-width:520px;text-align:center}.feedback-answer{font-size:18px;font-weight:1000;padding:12px;border:3px solid var(--ink);border-radius:12px;background:#fff}.feedback-players{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.feedback-player{border:3px solid var(--ink);border-radius:12px;padding:10px;background:#fff;font-weight:900}.feedback-player.ok,.feedback-player.no{background:#fff}.feedback-countdown{margin-top:14px;font-size:18px;font-weight:1000;animation:pulse .8s infinite alternate}@keyframes pulse{to{transform:scale(1.04)}}
 @media(max-width:520px){.feedback-players{grid-template-columns:1fr}.feedback-card{max-width:92vw}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -172,7 +171,14 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
             <p>Satu soal hanya bisa dijawab sekali.<br>Salah = -5 poin, tali bergeser 5% ke arah lawan.</p>
           </div>
         </div>
-              <div class="rule-item win">
+        <div class="rule-item penalty">
+          <span class="rule-icon">⏱️</span>
+          <div>
+            <b>TANPA PENALTI WAKTU</b>
+            <p>Salah tidak mengurangi waktu. Timer hanya menjadi batas waktu untuk menjawab.</p>
+          </div>
+        </div>
+        <div class="rule-item win">
           <span class="rule-icon">🏆</span>
           <div>
             <b>CARA MENANG</b>
@@ -211,6 +217,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
     <div class="modal-header"><h2>⚙️ PENGATURAN</h2></div>
     <audio id="soundtrackAudio" loop preload="auto"></audio>
     <audio id="victoryAudio" preload="auto"></audio>
+<audio id="correctAudio" preload="auto"></audio>
+<audio id="wrongAudio" preload="auto"></audio>
     <div class="settings-section">
       <label>🎵 Soundtrack</label>
       <select id="soundtrackSelect">
@@ -234,7 +242,8 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 
 <section id="home" class="screen active">
 <div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
-    <div class="card">
+  <div class="tag">⚡ Jawab tepat! Tarik kuat! Menang! ⚡</div>
+   <div class="card">
     <div class="name-avatar-row">
       <div class="name-field"><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
       <div class="avatar-field"><label for="avatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
@@ -303,7 +312,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
   <div class="spec-badge" id="specBadge"></div>
   <div class="arena">
     <div class="tug-wrap" id="tugWrap"><img src="tug-characters.webp" class="tug-scene" id="tugScene" alt="Tarik tambang"></div>
-    <div class="reactionFloat" id="reactionFloat"></div>
+        <div class="reactionFloat" id="reactionFloat"></div>
   </div>
   <div class="reactions" id="reactions">
     <button class="react-btn" data-emoji="😂">😂</button>
@@ -783,8 +792,8 @@ function beep(freq=440,dur=120,type="sine",vol=0.15){
     osc.start();osc.stop(audioCtx.currentTime+dur/1000);
   }catch(e){}
 }
-function sfxCorrect(){beep(720,110,"square")}
-function sfxWrong(){beep(160,180,"sawtooth")}
+function sfxCorrect(){const a=$("correctAudio");if(!a)return;a.src="benar.mp3";a.currentTime=0;a.volume=.9;a.play().catch(()=>{})}
+function sfxWrong(){const a=$("wrongAudio");if(!a)return;a.src="salah.mp3";a.currentTime=0;a.volume=.9;a.play().catch(()=>{})}
 function sfxWin(){beep(523,120);setTimeout(()=>beep(659,120),120);setTimeout(()=>beep(784,220),240)}
 function sfxLose(){beep(140,320,"sawtooth")}
 function buzz(pattern){ if(navigator.vibrate)navigator.vibrate(pattern) }
@@ -932,6 +941,13 @@ function renderGame(d){
   }
   lastRopePos=pos;
   $("tugWrap").style.transform=`translateX(calc(-50% + ${pos*1.7}px))`;
+  if(d.status==="finished"){
+    hideRoundFeedback();
+    clearInterval(timerInterval);
+    setButtons(true);
+    renderResult(d);
+    return;
+  }
   $("qNum").textContent=`SOAL ${Math.min(d.round||1,ROUND_LIMIT)} / ${ROUND_LIMIT}`;
   const qi=Number(d.questionIndex)||0; const order=d.questionOrder&&d.questionOrder.length?d.questionOrder:[...Array(questions.length).keys()]; const q=questions[order[qi%order.length]];
   currentRound=Number(d.round||1); currentQuestionIndex=qi;
@@ -994,7 +1010,6 @@ async function answer(choice,q,btn){
   answered=true;
   setButtons(true);
   const correct=choice===q.c;
-  btn.classList.add(correct?"correct":"wrong");
   const streakKey=mySlot==="player1"?"streakP1":"streakP2";
   const submittedRound=Number(currentRound);
   const submittedQuestionIndex=Number(currentQuestionIndex);
@@ -1027,8 +1042,19 @@ async function answer(choice,q,btn){
       }
       return d;
     });
-    if(correct){sfxCorrect();buzz(30)}else{sfxWrong();buzz([80,40,80])}
   }catch(e){console.error("answer save",e);answered=false;setButtons(false)}
+}
+
+let feedbackSoundRound = null;
+function playFeedbackSound(d){
+  const round=Number(d.feedbackRound||d.round||0);
+  if(!round || feedbackSoundRound===round)return;
+  feedbackSoundRound=round;
+  const mine=(d.roundAnswers||{})[mySlot];
+  if(mySlot!=="spectator" && mine){
+    if(mine.correct) sfxCorrect(); else sfxWrong();
+    buzz(mine.correct?[30]:[70,40,70]);
+  }
 }
 
 function showRoundFeedback(d){
@@ -1044,6 +1070,7 @@ function showRoundFeedback(d){
   };
   $("feedbackPlayers").innerHTML=status("player1",p1)+status("player2",p2);
   modal.classList.remove("hidden");
+  playFeedbackSound(d);
   clearInterval(window.feedbackTimer);
   const tick=()=>{
     const left=Math.max(0,Math.ceil((Number(d.feedbackUntil||0)-Date.now())/1000));
@@ -1337,9 +1364,12 @@ function renderResult(d){
   $("finalP2Score").textContent=d.player2?.score||0;
   if(winner && victoryShownForRoom!==roomId){
     victoryShownForRoom=roomId;
+    hideRoundFeedback();
+    $("roundFeedbackModal")?.classList.add("hidden");
     $("result").classList.add("result-dramatic");
     setTimeout(()=>$("result").classList.remove("result-dramatic"),700);
-    launchVictory(d);
+    // Beri jeda agar popup hasil ronde benar-benar hilang sebelum victory screen masuk.
+    setTimeout(()=>launchVictory(d),900);
   }
   if(mySlot!=="spectator"){
     if(me){sfxWin();buzz([80,40,80,40,140])}
