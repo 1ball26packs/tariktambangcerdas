@@ -424,6 +424,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+let serverTimeOffset = 0;
+onValue(ref(db,".info/serverTimeOffset"), snap => {
+  const v = Number(snap.val());
+  if(Number.isFinite(v)) serverTimeOffset = v;
+});
+const nowServer = () => Date.now() + serverTimeOffset;
 
 const $ = id => document.getElementById(id);
 
@@ -974,7 +980,7 @@ function renderGame(d){
   $("question").textContent=q.q;
   fitQuestionText();
   fitAnswerTexts();
-  if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;timeoutRound=0;buildAnswers(q)}
+  if(localRound!==(d.round||1)){localRound=d.round||1;answered=false;buildAnswers(q)}
   if(d.feedbackUntil){
     showRoundFeedback(d);
     setButtons(true);
@@ -1030,20 +1036,19 @@ async function answer(choice,q,btn){
   answered=true;
   setButtons(true);
   const correct=choice===q.c;
-  const streakKey=mySlot==="player1"?"streakP1":"streakP2";
   const submittedRound=Number(currentRound);
   const submittedQuestionIndex=Number(currentQuestionIndex);
   const gameRef=ref(db,"games/"+roomId);
   try{
-    await runTransaction(gameRef,d=>{
+    const result=await runTransaction(gameRef,d=>{
       if(!d||d.status!=="playing")return d;
       if(Number(d.round||1)!==submittedRound || Number(d.questionIndex||0)!==submittedQuestionIndex)return d;
       d.roundAnswers=d.roundAnswers||{};
       // Setelah timeout/feedback dimulai, jawaban baru tidak boleh masuk lagi.
       if(d.feedbackUntil || d.roundAnswers[mySlot])return d;
-      d.roundAnswers[mySlot]={choice:Number(choice),correct:!!correct,answer:q.a?.[choice]||"",answeredAt:Date.now()};
+      d.roundAnswers[mySlot]={choice:Number(choice),correct:!!correct,answer:q.a?.[choice]||"",answeredAt:nowServer()};
       d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
-      d.matchEvents.push({type:correct?"correct":"wrong",slot:mySlot,round:Number(d.round||1),questionIndex:Number(d.questionIndex||0),question:q.q||"",answer:q.a?.[choice]||"",correctAnswer:q.a?.[q.c]||"",points:correct?10:-5,at:Date.now()});
+      d.matchEvents.push({type:correct?"correct":"wrong",slot:mySlot,round:Number(d.round||1),questionIndex:Number(d.questionIndex||0),question:q.q||"",answer:q.a?.[choice]||"",correctAnswer:q.a?.[q.c]||"",points:correct?10:-5,at:nowServer()});
       const a=d.roundAnswers.player1,b=d.roundAnswers.player2;
       if(a&&b&&!d.feedbackUntil){
         const p1=d.player1||{},p2=d.player2||{};
@@ -1055,25 +1060,38 @@ async function answer(choice,q,btn){
         d.maxStreak=d.maxStreak||{player1:0,player2:0};
         d.maxStreak.player1=Math.max(Number(d.maxStreak.player1||0),Number(d.streakP1||0));
         d.maxStreak.player2=Math.max(Number(d.maxStreak.player2||0),Number(d.streakP2||0));
+        // A normal completed round breaks a consecutive-timeout streak.
         d.suddenDeathCounter=0;
-        // Tali bergerak hanya bila tepat satu pemain benar. Combo 3x = tarikan 20%.
         if(a.correct!==b.correct){
-          const delta=a.correct?(Number(d.streakP1||0)>=3?20:5):(Number(d.streakP2||0)>=3?-20:-5);
+          const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
           d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
         }
-        if(Math.abs(Number(d.ropePosition||0))>=100){
-          d.status="finished";
-          d.winner=Number(d.ropePosition||0)<0?"player1":"player2";
-          d.feedbackUntil=null; d.feedbackRound=null;
-          return d;
-        }
-        d.feedbackUntil=Date.now()+3000;
+        d.feedbackUntil=nowServer()+3000;
         d.feedbackRound=Number(d.round||1);
         d.feedbackCorrectAnswer=q.a?.[q.c]||"";
       }
       return d;
     });
-  }catch(e){console.error("answer save",e);answered=false;setButtons(false)}
+    const after=result?.snapshot?.val?.();
+    // A transaction may legally commit without changing data when the submitted
+    // round is already stale. Do not leave the local UI locked in that case.
+    const accepted=!!after && Number(after.round||1)===submittedRound &&
+      Number(after.questionIndex||0)===submittedQuestionIndex &&
+      !!after.roundAnswers?.[mySlot];
+    if(!accepted){
+      answered=false;
+      setButtons(false);
+      if(after && Number(after.round||1)!==submittedRound){
+        // renderRoom/listener will refresh the current question; this just avoids
+        // a stale local lock while the realtime update is arriving.
+        localRound=0;
+      }
+    }
+  }catch(e){
+    console.error("answer save",e);
+    answered=false;
+    setButtons(false);
+  }
 }
 
 let feedbackSoundRound = null;
@@ -1112,10 +1130,10 @@ function showRoundFeedback(d){
 function hideRoundFeedback(){const m=$("roundFeedbackModal");if(m)m.classList.add("hidden");clearInterval(window.feedbackTimer)}
 
 async function finalizeFeedback(d){
-  if(!d.feedbackUntil || Date.now()<Number(d.feedbackUntil))return;
+  if(!d.feedbackUntil || nowServer()<Number(d.feedbackUntil))return;
   const r=ref(db,"games/"+roomId);
   await runTransaction(r,g=>{
-    if(!g||g.status!=="playing"||!g.feedbackUntil||Date.now()<Number(g.feedbackUntil))return g;
+    if(!g||g.status!=="playing"||!g.feedbackUntil||nowServer()<Number(g.feedbackUntil))return g;
     const order=g.questionOrder||[]; const orderLen=order.length||questions.length;
     const pos=Number(g.ropePosition||0);
     if(Math.abs(pos)>=100){g.status="finished";g.winner=pos<0?"player1":"player2";return g}
@@ -1141,13 +1159,21 @@ function startLocalTimer(d){
   clearInterval(timerInterval);
   const started=d.roundStartedAt;
   const initial=Number(d.timeLeft)||20;
-  if(!started){$("timer").textContent=initial;return}
-  let serverStart=typeof started==="number"?started:Date.now();
+  if(typeof started!=="number"){
+    // Firebase server timestamps can briefly arrive unresolved. Never substitute
+    // the client's clock here, otherwise players can get different deadlines.
+    $("timer").textContent=initial;
+    return;
+  }
+  const serverStart=started;
   roundDeadline=serverStart+initial*1000;
   const tick=()=>{
-    const left=Math.max(0,Math.ceil((roundDeadline-Date.now())/1000));
+    const left=Math.max(0,Math.ceil((roundDeadline-nowServer())/1000));
     $("timer").textContent=left;
-    if(left<=0){clearInterval(timerInterval);timeOut(d.round)}
+    if(left<=0){
+      clearInterval(timerInterval);
+      timeOut(d.round);
+    }
   };
   tick();timerInterval=setInterval(tick,250);
 }
@@ -1155,53 +1181,69 @@ function startLocalTimer(d){
 async function timeOut(round){
   if(timeoutRound===round)return;
   const r=ref(db,"games/"+roomId);
-  const result=await runTransaction(r,d=>{
-    if(!d||d.status!=="playing"||Number(d.round)!==Number(round))return d;
-    // Jika ronde sudah selesai oleh jawaban kedua pemain, jangan proses timeout lagi.
-    if(d.feedbackUntil)return d;
-    const qIndex=Number(d.questionIndex||0);
-    const order=d.questionOrder||[];
-    const q=questions[Number(order[qIndex])] || questions[0] || {};
-    d.roundAnswers=d.roundAnswers||{};
-    const now=Date.now();
-    // Pemain yang belum menjawab dianggap salah dan mendapat -5.
-    for(const slot of ["player1","player2"]){
-      if(!d.roundAnswers[slot]){
-        d.roundAnswers[slot]={choice:null,correct:false,answer:"",answeredAt:now,notAnswered:true};
-        d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
-        d.matchEvents.push({type:"wrong",slot,round:Number(d.round||round),questionIndex:qIndex,question:q.q||"",answer:"",correctAnswer:q.a?.[q.c]||"",points:-5,notAnswered:true,at:now});
+  try{
+    const result=await runTransaction(r,d=>{
+      if(!d||d.status!=="playing"||Number(d.round)!==Number(round))return d;
+      if(d.feedbackUntil)return d;
+      const qIndex=Number(d.questionIndex||0);
+      const order=d.questionOrder||[];
+      const q=questions[Number(order[qIndex])] || questions[0] || {};
+      d.roundAnswers=d.roundAnswers||{};
+      const now=nowServer();
+      for(const slot of ["player1","player2"]){
+        if(!d.roundAnswers[slot]){
+          d.roundAnswers[slot]={choice:null,correct:false,answer:"",answeredAt:now,notAnswered:true};
+          d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+          d.matchEvents.push({type:"wrong",slot,round:Number(d.round||round),questionIndex:qIndex,question:q.q||"",answer:"",correctAnswer:q.a?.[q.c]||"",points:-5,notAnswered:true,at:now});
+        }
       }
-    }
-    const a=d.roundAnswers.player1,b=d.roundAnswers.player2;
-    const p1=d.player1||{},p2=d.player2||{};
-    // Skor hanya dihitung sekali, saat feedback pertama kali dibuat.
-    p1.score=Number(p1.score||0)+(a.correct?10:-5);
-    p2.score=Number(p2.score||0)+(b.correct?10:-5);
-    d.player1=p1; d.player2=p2;
-    d.streakP1=a.correct?(Number(d.streakP1||0)+1):0;
-    d.streakP2=b.correct?(Number(d.streakP2||0)+1):0;
-    d.maxStreak=d.maxStreak||{player1:0,player2:0};
-    d.maxStreak.player1=Math.max(Number(d.maxStreak.player1||0),Number(d.streakP1||0));
-    d.maxStreak.player2=Math.max(Number(d.maxStreak.player2||0),Number(d.streakP2||0));
-    d.suddenDeathCounter=0;
-    // Tali bergerak hanya bila tepat satu pemain benar. Combo 3x = tarikan 20%.
-    if(a.correct!==b.correct){
-      const delta=a.correct?(Number(d.streakP1||0)>=3?20:5):(Number(d.streakP2||0)>=3?-20:-5);
-      d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
-    }
-    if(Math.abs(Number(d.ropePosition||0))>=100){
-      d.status="finished";
-      d.winner=Number(d.ropePosition||0)<0?"player1":"player2";
-      d.feedbackUntil=null; d.feedbackRound=null;
+      const a=d.roundAnswers.player1,b=d.roundAnswers.player2;
+      const p1=d.player1||{},p2=d.player2||{};
+      p1.score=Number(p1.score||0)+(a.correct?10:-5);
+      p2.score=Number(p2.score||0)+(b.correct?10:-5);
+      d.player1=p1; d.player2=p2;
+      d.streakP1=a.correct?(Number(d.streakP1||0)+1):0;
+      d.streakP2=b.correct?(Number(d.streakP2||0)+1):0;
+      d.maxStreak=d.maxStreak||{player1:0,player2:0};
+      d.maxStreak.player1=Math.max(Number(d.maxStreak.player1||0),Number(d.streakP1||0));
+      d.maxStreak.player2=Math.max(Number(d.maxStreak.player2||0),Number(d.streakP2||0));
+
+      // Consecutive timeout rounds. Two timeouts trigger a 5-point nudge
+      // toward the center; a normal answered round resets the streak.
+      d.suddenDeathCounter=Number(d.suddenDeathCounter||0)+1;
+      if(d.suddenDeathCounter>=SUDDEN_DEATH_TIMEOUTS){
+        const pos=Number(d.ropePosition||0);
+        d.ropePosition=clampRope(pos>0?pos-SUDDEN_DEATH_NUDGE:pos<0?pos+SUDDEN_DEATH_NUDGE:0);
+        d.suddenDeathCounter=0;
+        d.suddenDeathNudgeAt=now;
+        d.matchEvents=Array.isArray(d.matchEvents)?d.matchEvents:[];
+        d.matchEvents.push({type:"suddenDeathNudge",round:Number(d.round||round),from:pos,to:Number(d.ropePosition||0),points:SUDDEN_DEATH_NUDGE,at:now});
+      }
+      // If exactly one player answered correctly before timeout, that answer
+      // still gets its normal pull. Both unanswered means no normal pull.
+      if(a.correct!==b.correct){
+        const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
+        d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
+      }
+      d.feedbackUntil=now+3000;
+      d.feedbackRound=Number(d.round||round);
+      d.feedbackCorrectAnswer=q.a?.[q.c]||"";
+      d.feedbackTriggeredByTimeout=true;
       return d;
+    });
+    const after=result?.snapshot?.val?.();
+    // Mark locally only after the server accepted this timeout or the round has
+    // already moved/finished. If the transaction fails, a retry remains possible.
+    if(after && (after.feedbackTriggeredByTimeout===true || Number(after.round)!==Number(round) || after.status!=="playing")){
+      timeoutRound=round;
     }
-    d.feedbackUntil=now+3000;
-    d.feedbackRound=Number(d.round||round);
-    d.feedbackCorrectAnswer=q.a?.[q.c]||"";
-    d.feedbackTriggeredByTimeout=true;
-    return d;
-  }).catch(()=>null);
-  if(result?.committed) timeoutRound=round;
+  }catch(e){
+    console.error("timeout save",e);
+    timeoutRound=0;
+    setTimeout(()=>{
+      if(roomId && Number(currentRound)===Number(round) && timeoutRound!==round) timeOut(round);
+    },1000);
+  }
 }
 
 async function archiveMatchHistory(d){
@@ -1211,20 +1253,20 @@ async function archiveMatchHistory(d){
     const claim=await runTransaction(flagRef,cur=>{
       if(cur?.status==="complete") return;
       if(cur?.status==="processing" && Date.now()-Number(cur.at||0)<15000) return;
-      return {status:"processing",uid,at:Date.now()};
+      return {status:"processing",uid,at:nowServer()};
     });
     if(!claim?.committed)return;
     const started=Number(d.startedAt||Date.now());
     const matchId=`${roomId}_${started}`;
-    const durationSeconds=started?Math.max(0,Math.round((Date.now()-started)/1000)):0;
+    const durationSeconds=started?Math.max(0,Math.round((nowServer()-started)/1000)):0;
     const history={...d,roomId,matchId,durationSeconds,archivedAt:Date.now()};
     delete history.spectators; delete history.historyRecorded;
     await set(ref(db,`matchHistory/${matchId}`),history);
-    await set(flagRef,{status:"complete",uid,at:Date.now(),matchId});
+    await set(flagRef,{status:"complete",uid,at:nowServer(),matchId});
     console.log("Riwayat match tersimpan",matchId);
   }catch(e){
     console.error("archive history error",e);
-    try{await set(ref(db,`games/${roomId}/historyRecorded`),{status:"failed",uid,error:String(e?.message||e),at:Date.now()});}catch(_){}
+    try{await set(ref(db,`games/${roomId}/historyRecorded`),{status:"failed",uid,error:String(e?.message||e),at:nowServer()});}catch(_){}
   }
 }
 
@@ -1460,9 +1502,8 @@ $("playAgainBtn").onclick=async()=>{
       status:"waiting",ropePosition:0,round:0,questionIndex:0,winner:null,
       "player1/score":0,"player2/score":0,
       streakP1:0,streakP2:0,suddenDeathCounter:0,matchEvents:[],maxStreak:{player1:0,player2:0},historyRecorded:false,
-      questionOrder:buildOrder(category),usedQuestions:[],roundAnswers:null,feedbackUntil:null,feedbackRound:null,startedAt:null,roundStartedAt:null,timeLeft:20
+      questionOrder:buildOrder(category),usedQuestions:[]
     });
-    victoryShownForRoom=null; victoryAudioPlayedForRoom=null; timeoutRound=0;
   }
   $("gameMessage").textContent="Menunggu host memulai...";
   show("lobby");
