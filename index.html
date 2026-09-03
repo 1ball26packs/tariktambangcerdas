@@ -112,7 +112,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 .lb-name{flex:1}
 @media(min-width:521px){body{padding:15px 0}.app{border:4px solid var(--ink);border-radius:28px;min-height:calc(100vh - 30px)}}
 .logo-tarik {
-    animation: tugTug 2s infinite ease-in-out;
+  animation: tugTug 2s infinite ease-in-out;
   width: 90%;
   height: auto;
    display: block; /* Wajib ditambahkan jika aslinya tag <img> */
@@ -227,7 +227,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
         <option value="2">🎵 Lagu 2</option>
         <option value="3">🎵 Lagu 3</option>
       </select>
-      <div class="mini">Pilih soundtrack biar semangat</div>
+      <div class="mini">Pilih soundtrack biar semangat!</div>
           </div>
     <button class="btn" id="closeSettingsBtn">✓ SELESAI</button>
   </div>
@@ -243,7 +243,7 @@ input:focus,select:focus{box-shadow:0 0 0 4px #ffe58a}
 <section id="home" class="screen active">
 <div><img src="logo.webp" class="logo-tarik" alt="Tarik Tambang Cerdas"></div> 
   <div class="tag">⚡ Jawab tepat! Tarik kuat! Menang! ⚡</div>
-    <div class="card">
+   <div class="card">
     <div class="name-avatar-row">
       <div class="name-field"><label for="name">Nama pemain</label><input id="name" maxlength="18" placeholder="Contoh: Bayu" autocomplete="off"></div>
       <div class="avatar-field"><label for="avatarInput">Avatar</label><label class="avatar-picker" title="Upload avatar">
@@ -1232,46 +1232,59 @@ function renderHistoryPage(){
 function renderHistoryCard(g){
   const p1=g.player1||{},p2=g.player2||{},winner=g.winner||null;
   const ev=Array.isArray(g.matchEvents)?g.matchEvents:[];
+  const roundsPlayed=Number(g.round||0) || new Set(ev.map(e=>Number(e.round||0)).filter(Boolean)).size;
   const statFor=slot=>{
-    const es=ev.filter(e=>e.slot===slot);
-    const c=es.filter(e=>e.type==="correct").length;
-    const w=es.filter(e=>e.type==="wrong").length;
-    const t=c+w;
+    const es=ev.filter(e=>e.slot===slot && (e.type==='correct'||e.type==='wrong'));
+    const c=es.filter(e=>e.type==='correct').length;
+    const w=es.filter(e=>e.type==='wrong' && !e.notAnswered).length;
+    const na=es.filter(e=>e.type==='wrong' && e.notAnswered).length;
+    const answered=c+w;
+    const total=c+w+na;
     return {
-      correct:c, wrong:w, attempts:t,
-      accuracy:t?Math.round(c/t*100):0,
-      penalty:Number(g.playerPenalty?.[slot]||0),
-      maxStreak:Number(g.maxStreak?.[slot]||0),
-      timeouts:es.filter(e=>e.type==="timeout"||e.notAnswered).length
+      correct:c, wrong:w, notAnswered:na, total,
+      accuracy:total?Math.round(c/total*100):0,
+      maxStreak:Number(g.maxStreak?.[slot]||0)
     };
   };
-  const s1=statFor("player1"),s2=statFor("player2");
-  const cls1=winner==="player1"?"win":winner==="player2"?"lose":"draw";
-  const cls2=winner==="player2"?"win":winner==="player1"?"lose":"draw";
-  const date=g.startedAt?new Date(Number(g.startedAt)).toLocaleString("id-ID"):"-";
+  const s1=statFor('player1'),s2=statFor('player2');
+  const pullFor=slot=>{
+    const other=slot==='player1'?'player2':'player1';
+    const byRound={};
+    ev.filter(e=>(e.slot===slot||e.slot===other) && (e.type==='correct'||e.type==='wrong')).forEach(e=>{
+      const r=Number(e.round||0); if(!r)return;
+      byRound[r]=byRound[r]||{}; byRound[r][e.slot]=e.type==='correct';
+    });
+    return Object.values(byRound).filter(x=>x[slot]===true && x[other]===false).length;
+  };
+  const pulls1=pullFor('player1'),pulls2=pullFor('player2');
+  const cls1=winner==='player1'?'win':winner==='player2'?'lose':'draw';
+  const cls2=winner==='player2'?'win':winner==='player1'?'lose':'draw';
+  const date=g.startedAt?new Date(Number(g.startedAt)).toLocaleString('id-ID'):'-';
   const result=winner
-    ? `${esc(winner==="player1"?(p1.name||"Player 1"):(p2.name||"Player 2"))} MENANG`
-    : "PERTANDINGAN SERI";
+    ? `${esc(winner==='player1'?(p1.name||'Player 1'):(p2.name||'Player 2'))} MENANG`
+    : 'PERTANDINGAN SERI';
   const timeline=ev.slice().sort((a,b)=>Number(a.at||0)-Number(b.at||0)).map(e=>{
-    const name=e.type==="timeout"?"Sistem / Kedua Pemain":(e.slot==="player1"?(p1.name||"P1"):(p2.name||"P2"));
-    const icon=e.type==="correct"?"⚡":e.type==="wrong"?"❌":"⏱️";
-    const note=e.type==="correct"?`+${e.points||10}`:e.type==="wrong"?(e.notAnswered?"⏱️ TIDAK MENJAWAB -5":"-5"):"Waktu habis";
-    const q=e.question?`<span class="event-question">${esc(e.question)}</span>`:"";
+    if(e.type!=='correct' && e.type!=='wrong') return '';
+    const name=e.slot==='player1'?(p1.name||'P1'):(p2.name||'P2');
+    const unanswered=!!e.notAnswered;
+    const icon=e.type==='correct'?'⚡':(unanswered?'⏱️':'❌');
+    const note=e.type==='correct'?`+${e.points||10}`:(unanswered?'⏱️ TIDAK MENJAWAB −5':'−5');
+    const q=e.question?`<span class="event-question">${esc(e.question)}</span>`:'';
     return `<div class="event"><span class="event-icon">${icon}</span><span class="event-name">${esc(name)} ${q}</span><span class="event-note">${note}</span></div>`;
-  }).join("");
+  }).join('');
 
   return `<article class="history-card">
     <div class="history-summary" role="button" tabindex="0">
-      <div class="match-head"><span>🏟️ ${esc((g.category||"umum").toUpperCase())}</span><span>${esc(date)}</span></div>
+      <div class="match-head"><span>🏟️ ${esc((g.category||'umum').toUpperCase())}</span><span>${esc(date)}</span></div>
       <div class="match-score">
-        <div class="team ${cls1}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p1.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p1.name||"PLAYER 1")}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==="player1"?"🏆 PEMENANG":winner==="player2"?"KALAH":"SERI"}</div></div>
+        <div class="team ${cls1}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p1.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p1.name||'PLAYER 1')}</div><div class="score-big">${Number(p1.score||0)}</div><div class="match-result">${winner==='player1'?'🏆 PEMENANG':winner==='player2'?'KALAH':'SERI'}</div></div>
         <div class="vs">VS</div>
-        <div class="team ${cls2}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p2.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p2.name||"PLAYER 2")}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==="player2"?"🏆 PEMENANG":winner==="player1"?"KALAH":"SERI"}</div></div>
+        <div class="team ${cls2}"><div class="team-avatar-wrap"><img class="history-avatar" src="${esc(getAvatar(p2.avatar))}" alt="Avatar"></div><div class="team-name">${esc(p2.name||'PLAYER 2')}</div><div class="score-big">${Number(p2.score||0)}</div><div class="match-result">${winner==='player2'?'🏆 PEMENANG':winner==='player1'?'KALAH':'SERI'}</div></div>
       </div>
       <div class="match-meta">
         <span class="pill">🏆 ${result}</span>
-        <span class="pill">🔢 ${Number(g.round||0)} ronde</span>
-        <span class="pill">${Math.abs(Number(g.ropePosition||0))>=100?"🪢 Tarik Tambang":"📊 Skor"}</span>
+        <span class="pill">🔢 ${roundsPlayed} ronde</span>
+        <span class="pill">🪢 ${pulls1}/${pulls2} tarikan</span>
         <span class="pill">⏱️ ${Number(g.durationSeconds||0)} detik</span>
       </div>
       <div class="history-toggle"><span class="toggle-open">▼ LIHAT DETAIL STATISTIK</span><span class="toggle-close">▲ SEMBUNYIKAN DETAIL</span></div>
@@ -1279,25 +1292,25 @@ function renderHistoryCard(g){
 
     <div class="history-details">
       <div class="detail-grid">
-        <div class="detail-box"><h4>🔵 ${esc(p1.name||"PLAYER 1")}</h4>
+        <div class="detail-box"><h4>🔵 ${esc(p1.name||'PLAYER 1')}</h4>
           <div class="detail-line"><span>Benar</span><b>${s1.correct}</b></div>
           <div class="detail-line"><span>Salah</span><b>${s1.wrong}</b></div>
+          <div class="detail-line"><span>Tidak menjawab</span><b>${s1.notAnswered}</b></div>
           <div class="detail-line"><span>Akurasi</span><b>${s1.accuracy}%</b></div>
-          <div class="detail-line"><span>Pengurangan poin</span><b>${s1.wrong}x -5</b></div>
-          <div class="detail-line"><span>Timeout</span><b>${s1.timeouts}</b></div>
+          <div class="detail-line"><span>Tarikan berhasil</span><b>${pulls1} 🪢</b></div>
           <div class="detail-line"><span>Max streak</span><b>${s1.maxStreak} 🔥</b></div>
         </div>
-        <div class="detail-box"><h4>🔴 ${esc(p2.name||"PLAYER 2")}</h4>
+        <div class="detail-box"><h4>🔴 ${esc(p2.name||'PLAYER 2')}</h4>
           <div class="detail-line"><span>Benar</span><b>${s2.correct}</b></div>
           <div class="detail-line"><span>Salah</span><b>${s2.wrong}</b></div>
+          <div class="detail-line"><span>Tidak menjawab</span><b>${s2.notAnswered}</b></div>
           <div class="detail-line"><span>Akurasi</span><b>${s2.accuracy}%</b></div>
-          <div class="detail-line"><span>Pengurangan poin</span><b>${s2.wrong}x -5</b></div>
-          <div class="detail-line"><span>Timeout</span><b>${s2.timeouts}</b></div>
+          <div class="detail-line"><span>Tarikan berhasil</span><b>${pulls2} 🪢</b></div>
           <div class="detail-line"><span>Max streak</span><b>${s2.maxStreak} 🔥</b></div>
         </div>
       </div>
-      ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN (${ev.length})</b>${timeline}</div>`:`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b><div class="mini">Tidak ada event yang tercatat.</div></div>`}
-      <div class="match-footer">ID MATCH: ${esc(g.matchId||g.id||"-")} • ${s1.attempts+s2.attempts} percobaan • ${s1.timeouts+s2.timeouts} timeout</div>
+      ${timeline?`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN (${ev.filter(e=>e.type==='correct'||e.type==='wrong').length})</b>${timeline}</div>`:`<div class="timeline"><b style="font-size:10px">📊 MOMEN PERTANDINGAN</b><div class="mini">Tidak ada event yang tercatat.</div></div>`}
+      <div class="match-footer">ID MATCH: ${esc(g.matchId||g.id||'-')} • ${s1.total+s2.total} respons • ${s1.notAnswered+s2.notAnswered} tidak menjawab</div>
     </div>
   </article>`;
 }
