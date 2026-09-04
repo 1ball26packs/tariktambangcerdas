@@ -869,6 +869,9 @@ async function hasResumableSession(){
     const snap=await get(ref(db,"games/"+saved.roomId)); 
     if(!snap.exists())return false; 
     const d=snap.val(); 
+    // Check if session expired (24 hour timeout)
+    const expiresAt = Number(d.expiresAt) || 0;
+    if(expiresAt < Date.now()) return false;
     // Safely check if player slot exists and has valid structure
     const playerData = d[saved.mySlot];
     if(!playerData || !playerData.id) return false;
@@ -887,6 +890,9 @@ async function tryResume(){
     const snap=await get(ref(db,"games/"+saved.roomId));
     if(!snap.exists()){clearSession();return false}
     const d=snap.val();
+    // Check if session expired (24 hour timeout)
+    const expiresAt = Number(d.expiresAt) || 0;
+    if(expiresAt < Date.now()){clearSession();return false}
     if(d.status==="finished" || !d[saved.mySlot] || d[saved.mySlot].id!==uid){clearSession();return false}
     roomId=saved.roomId; mySlot=saved.mySlot;
     await update(ref(db,`games/${roomId}/${mySlot}/connected`),true).catch(()=>{});
@@ -926,6 +932,7 @@ $("createBtn").onclick=async()=>{
     roomId=makeCode(); mySlot="player1";
     const room={
       status:"waiting", hostId:uid, createdAt:serverTimestamp(),
+      expiresAt:Date.now()+(24*60*60*1000),
       player1:{id:uid,name,avatar:playerAvatar,score:0,connected:true},
       player2:null, ropePosition:0, round:0, questionIndex:0,
       questionOrder:buildOrder(category), usedQuestions:[], category,
@@ -1017,8 +1024,18 @@ function renderLobby(){
 function listenRoom(){
   if(roomUnsub)roomUnsub();
   roomUnsub=onValue(ref(db,"games/"+roomId),snap=>{
-    if(!snap.exists()){clearSession();show("home");alert("Room sudah ditutup.");return}
+    if(!snap.exists()){
+      clearSession();cleanup();show("home");
+      alert(mySlot==="player1"?"Game sudah dihapus.":"Host menutup game. Kembali ke home.");
+      return;
+    }
     const d=snap.val();
+    // Validate player still exists in game
+    if(!d[mySlot] || (mySlot!=="spectator" && d[mySlot].id!==uid)){
+      clearSession();cleanup();show("home");
+      alert("Anda tidak lagi di game ini.");
+      return;
+    }
     const p1=d.player1,p2=d.player2;
     $("p1Status").innerHTML=p1?`🔵 <b>${esc(p1.name)}</b> ${p1.connected?"🟢":"🔴"}`:"👤 Menunggu pemain...";
     $("p2Status").innerHTML=p2?`🔴 <b>${esc(p2.name)}</b> ${p2.connected?"🟢":"🔴"}`:"👤 Menunggu pemain kedua...";
@@ -1624,7 +1641,8 @@ $("playAgainBtn").onclick=async()=>{
       status:"waiting",ropePosition:0,round:0,questionIndex:0,winner:null,
       "player1/score":0,"player2/score":0,
       streakP1:0,streakP2:0,suddenDeathCounter:0,matchEvents:[],maxStreak:{player1:0,player2:0},historyRecorded:false,
-      questionOrder:buildOrder(category),usedQuestions:[]
+      questionOrder:buildOrder(category),usedQuestions:[],
+      expiresAt:Date.now()+(24*60*60*1000)
     });
   }
   $("gameMessage").textContent="Menunggu host memulai...";
