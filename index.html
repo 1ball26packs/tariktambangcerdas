@@ -1180,7 +1180,7 @@ async function answer(choice,q,btn){
         // A normal completed round breaks a consecutive-timeout streak.
         d.suddenDeathCounter=0;
         if(a.correct!==b.correct){
-          const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
+          const delta=a.correct?(Number(d.streakP1||0)>=3?-(5*COMBO_MULTIPLIER):-5):(Number(d.streakP2||0)>=3?(5*COMBO_MULTIPLIER):5);
           d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
         }
         d.feedbackUntil=nowServer()+3000;
@@ -1339,7 +1339,7 @@ async function timeOut(round){
       // If exactly one player answered correctly before timeout, that answer
       // still gets its normal pull. Both unanswered means no normal pull.
       if(a.correct!==b.correct){
-        const delta=a.correct?(Number(d.streakP1||0)>=3?(5*COMBO_MULTIPLIER):5):(Number(d.streakP2||0)>=3?-(5*COMBO_MULTIPLIER):-5);
+        const delta=a.correct?(Number(d.streakP1||0)>=3?-(5*COMBO_MULTIPLIER):-5):(Number(d.streakP2||0)>=3?(5*COMBO_MULTIPLIER):5);
         d.ropePosition=clampRope(Number(d.ropePosition||0)+delta);
       }
       d.feedbackUntil=now+3000;
